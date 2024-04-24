@@ -1,8 +1,9 @@
 <script setup>
 import { useTaskStore } from '@/stores/task'
 import { onMounted, ref } from 'vue'
-import { convertStatus, getTimezone, formatDateTime } from '@/libs/utils'
+import { getTimezone, formatDateTime } from '@/libs/utils'
 import BaseModal from '@/components/BaseModal.vue'
+import StatusBadge from '@/components/StatusBadge.vue';
 
 const taskStore = useTaskStore()
 const taskOpenState = ref(false)
@@ -29,24 +30,31 @@ const handleCloseTaskModal = () => {
 <template>
   <BaseModal :show="taskOpenState">
     <div class="bg-base-100 w-[50rem] max-w-[90%] rounded-xl">
-      <div class="itbkk-title text-2xl font-bold p-4 bg-base-200">{{ taskModalData.title }}</div>
+      <div class="itbkk-title text-2xl font-bold p-4 bg-base-200 text-ellipsis overflow-hidden">{{ taskModalData.title
+        }}</div>
       <div class="grid grid-rows-1 grid-cols-2">
         <div>
           <div class="p-4 w-full h-full flex flex-col">
             <div class="text-lg font-semibold flex-[0]">Description</div>
-            <div class="bg-neutral px-4 py-2 mt-2 rounded-lg overflow-auto flex-[1]">
-              <div class="itbkk-description">{{ taskModalData.description }}</div>
+            <div :class="{
+              'italic text-[grey] grid place-items-center': !taskModalData.description,
+            }" class="bg-neutral px-4 py-2 mt-2 rounded-lg overflow-auto flex-[1]">
+              <div class="itbkk-description">{{ taskModalData.description || 'No description provided' }}</div>
             </div>
           </div>
         </div>
         <div>
           <div class="p-4">
             <div class="text-lg font-semibold">Assignees</div>
-            <div class="itbkk-assignees">{{ taskModalData.assignees }}</div>
+            <div :class="{
+              'italic text-[grey]': !taskModalData.assignees,
+            }" class="itbkk-assignees">
+              {{ taskModalData.assignees || 'Unassigned' }}
+            </div>
           </div>
           <div class="p-4">
             <div class="text-lg font-semibold">Status</div>
-            <div class="itbkk-status">{{ convertStatus(taskModalData.status) }}</div>
+            <StatusBadge :status="taskModalData.status" class="itbkk-status" />
           </div>
           <div>
             <div class="p-4 flex flex-col gap-1">
@@ -98,14 +106,15 @@ const handleCloseTaskModal = () => {
         <tbody>
           <tr v-for="task in taskStore.tasks" :key="task.id" class="itbkk-item">
             <td>{{ task.id }}</td>
-            <td
-              @click="handleOpenTaskModal(task.id)"
-              class="itbkk-title hover:underline hover:cursor-pointer"
-            >
-              {{ task.title }}
+            <td @click="handleOpenTaskModal(task.id)" class="hover:underline hover:cursor-pointer">
+              <div class="itbkk-title overflow-hidden w-full max-w-72 text-ellipsis">{{ task.title }}</div>
             </td>
             <td class="itbkk-assignees">{{ task.assignees }}</td>
-            <td class="itbkk-status whitespace-nowrap">{{ convertStatus(task.status) }}</td>
+            <td>
+              <div class="grid place-items-center">
+                <StatusBadge :status="task.status" class="itbkk-status" />
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>

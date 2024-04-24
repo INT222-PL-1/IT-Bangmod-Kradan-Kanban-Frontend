@@ -21,3 +21,10 @@ export function formatDateTime(dateTime) {
 export function getTimezone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone
 }
+
+export function truncateText(text, maxLength) {
+  if (text.length > maxLength) {
+    return text.slice(0, maxLength) + '...'
+  }
+  return text
+}
