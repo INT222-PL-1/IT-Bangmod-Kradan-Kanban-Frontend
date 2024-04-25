@@ -4,13 +4,19 @@ import { onMounted, ref } from 'vue'
 import { getTimezone, formatDateTime } from '@/libs/utils'
 import BaseModal from '@/components/BaseModal.vue'
 import StatusBadge from '@/components/StatusBadge.vue';
+import { useRoute, useRouter } from 'vue-router';
 
+const route = useRoute()
+const router = useRouter()
 const taskStore = useTaskStore()
 const taskOpenState = ref(false)
 const taskModalData = ref({})
 
 onMounted(async () => {
   await taskStore.fetchTasks()
+  if (route.params.taskId) {
+    handleOpenTaskModal(route.params.taskId)
+  }
 })
 
 async function fetchTaskById(id) {
@@ -24,6 +30,7 @@ const handleOpenTaskModal = async (taskId) => {
 
 const handleCloseTaskModal = () => {
   taskOpenState.value = false
+  router.push({ name: 'task' })
 }
 </script>
 
