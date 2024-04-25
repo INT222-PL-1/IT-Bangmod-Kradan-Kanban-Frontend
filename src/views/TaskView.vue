@@ -130,7 +130,9 @@ watch(route, async (to) => {
           <tr v-for="task in taskStore.tasks" :key="task.id" class="itbkk-item">
             <td>{{ task.id }}</td>
             <td @click="handleTaskClick(task.id)" class="hover:underline hover:cursor-pointer">
-              <div class="itbkk-title overflow-hidden w-full max-w-72 text-ellipsis">{{ task.title }}</div>
+              <div class="itbkk-title overflow-hidden max-w-32 sm:max-w-52 md:max-w-72 lg:max-w-96 text-ellipsis">{{
+                task.title
+                }}</div>
             </td>
             <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees">{{ task.assignees ||
               'Unassigned' }}</td>

@@ -16,7 +16,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="w-fit px-2 py-1 rounded-lg grid place-items-center whitespace-nowrap" :style="{
+  <div class="w-full px-2 py-1 rounded-lg grid place-items-center whitespace-nowrap" :style="{
     backgroundColor: bgcolor,
     color
   }">
