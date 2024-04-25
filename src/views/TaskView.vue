@@ -1,52 +1,68 @@
 <script setup>
 import { useTaskStore } from '@/stores/task'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { getTimezone, formatDateTime } from '@/libs/utils'
+import { getTaskById } from '@/libs/taskManagement'
 import BaseModal from '@/components/BaseModal.vue'
+import LoadingModal from '@/components/LoadingModal.vue'
 import StatusBadge from '@/components/StatusBadge.vue';
 import { useRoute, useRouter } from 'vue-router';
 
+const isLoading = ref(false)
 const route = useRoute()
 const router = useRouter()
 const taskStore = useTaskStore()
-const taskOpenState = ref(false)
-const taskModalData = ref({})
+const taskModalOpenState = ref(false)
+const taskModalData = ref(null)
 
 onMounted(async () => {
+  isLoading.value = true
   await taskStore.fetchTasks()
-  if (route.params.taskId) {
-    handleOpenTaskModal(route.params.taskId)
-  }
+  isLoading.value = false
 })
 
-async function fetchTaskById(id) {
-  return await taskStore.fetchTaskById(id)
-}
-
-const handleOpenTaskModal = async (taskId) => {
-  taskModalData.value = await fetchTaskById(taskId)
-  taskOpenState.value = true
+const handleOpenTaskModal = async () => {
+  taskModalOpenState.value = true
 }
 
 const handleCloseTaskModal = () => {
-  taskOpenState.value = false
+  taskModalOpenState.value = false
   router.push({ name: 'task' })
 }
+
+const handleTaskClick = (taskId) => {
+  router.push({ name: 'task-id', params: { taskId } })
+}
+
+watch(route, async (to) => {
+  const taskId = to.params.taskId
+  if (taskId) {
+    taskModalData.value = await getTaskById(taskId)
+    if (taskModalData.value) {
+      handleOpenTaskModal()
+    } else {
+      router.push({ name: 'task' })
+    }
+  }
+}, { immediate: true })
+
 </script>
 
 <template>
-  <BaseModal :show="taskOpenState">
+  <LoadingModal :isLoading="isLoading" />
+  <BaseModal :show="taskModalOpenState">
     <div class="bg-base-100 w-[50rem] max-w-[90%] rounded-xl">
-      <div class="itbkk-title text-2xl font-bold p-4 bg-base-200 text-ellipsis overflow-hidden">{{ taskModalData.title
-        }}</div>
+      <div class="itbkk-title text-2xl font-bold p-4 bg-base-200 text-ellipsis overflow-hidden">
+        {{ taskModalData?.title }}
+      </div>
       <div class="grid grid-rows-1 grid-cols-2">
         <div>
           <div class="p-4 w-full h-full flex flex-col">
             <div class="text-lg font-semibold flex-[0]">Description</div>
             <div :class="{
-              'italic text-[grey] grid place-items-center': !taskModalData.description,
+              'italic text-[grey] grid place-items-center': !taskModalData?.description,
             }" class="bg-neutral px-4 py-2 mt-2 rounded-lg overflow-auto flex-[1]">
-              <div class="itbkk-description">{{ taskModalData.description || 'No description provided' }}</div>
+              <div class="itbkk-description">{{ taskModalData?.description || 'No Description Provided' }}</div>
             </div>
           </div>
         </div>
@@ -54,14 +70,14 @@ const handleCloseTaskModal = () => {
           <div class="p-4">
             <div class="text-lg font-semibold">Assignees</div>
             <div :class="{
-              'italic text-[grey]': !taskModalData.assignees,
+              'italic text-[grey]': !taskModalData?.assignees,
             }" class="itbkk-assignees">
-              {{ taskModalData.assignees || 'Unassigned' }}
+              {{ taskModalData?.assignees || 'Unassigned' }}
             </div>
           </div>
           <div class="p-4">
             <div class="text-lg font-semibold">Status</div>
-            <StatusBadge :status="taskModalData.status" class="itbkk-status" />
+            <StatusBadge :status="taskModalData?.status" class="itbkk-status" />
           </div>
           <div>
             <div class="p-4 flex flex-col gap-1">
@@ -75,13 +91,13 @@ const handleCloseTaskModal = () => {
               <div class="flex">
                 <div class="flex-[2] font-semibold">Created On</div>
                 <div class="itbkk-created-on flex-[3] text-sm bg-neutral rounded-lg px-2">
-                  {{ formatDateTime(taskModalData.createdOn) }}
+                  {{ formatDateTime(taskModalData?.createdOn) }}
                 </div>
               </div>
               <div class="flex">
                 <div class="flex-[2] font-semibold">Updated On</div>
                 <div class="itbkk-updated-on flex-[3] text-sm bg-neutral rounded-lg px-2">
-                  {{ formatDateTime(taskModalData.updatedOn) }}
+                  {{ formatDateTime(taskModalData?.updatedOn) }}
                 </div>
               </div>
             </div>
@@ -113,7 +129,7 @@ const handleCloseTaskModal = () => {
         <tbody>
           <tr v-for="task in taskStore.tasks" :key="task.id" class="itbkk-item">
             <td>{{ task.id }}</td>
-            <td @click="handleOpenTaskModal(task.id)" class="hover:underline hover:cursor-pointer">
+            <td @click="handleTaskClick(task.id)" class="hover:underline hover:cursor-pointer">
               <div class="itbkk-title overflow-hidden w-full max-w-72 text-ellipsis">{{ task.title }}</div>
             </td>
             <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees">{{ task.assignees ||

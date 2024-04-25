@@ -14,7 +14,7 @@ export function convertStatus(status) {
 }
 
 export function formatDateTime(dateTime) {
-  console.log(dateTime)
+  // console.log(dateTime)
 
   const options = {
     day: '2-digit',
