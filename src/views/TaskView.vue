@@ -67,13 +67,13 @@ const handleCloseTaskModal = () => {
               </div>
               <div class="flex">
                 <div class="flex-[2] font-semibold">Created On</div>
-                <div class="itbkk-timezone flex-[3] text-sm bg-neutral rounded-lg px-2">
+                <div class="itbkk-created-on flex-[3] text-sm bg-neutral rounded-lg px-2">
                   {{ formatDateTime(taskModalData.createdOn) }}
                 </div>
               </div>
               <div class="flex">
                 <div class="flex-[2] font-semibold">Updated On</div>
-                <div class="itbkk-timezone flex-[3] text-sm bg-neutral rounded-lg px-2">
+                <div class="itbkk-updated-on flex-[3] text-sm bg-neutral rounded-lg px-2">
                   {{ formatDateTime(taskModalData.updatedOn) }}
                 </div>
               </div>
@@ -109,7 +109,8 @@ const handleCloseTaskModal = () => {
             <td @click="handleOpenTaskModal(task.id)" class="hover:underline hover:cursor-pointer">
               <div class="itbkk-title overflow-hidden w-full max-w-72 text-ellipsis">{{ task.title }}</div>
             </td>
-            <td class="itbkk-assignees">{{ task.assignees }}</td>
+            <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees">{{ task.assignees ||
+              'Unassigned' }}</td>
             <td>
               <div class="grid place-items-center">
                 <StatusBadge :status="task.status" class="itbkk-status" />
