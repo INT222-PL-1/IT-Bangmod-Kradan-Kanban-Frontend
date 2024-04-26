@@ -5,7 +5,7 @@ import { RouterView } from 'vue-router'
 <template>
   <header>
     <div class="flex justify-center">
-      <div class="text-3xl font-bold py-6">IT-Bangmod Kradan Kanban</div>
+      <div class="text-lg sm:text-3xl font-bold py-6">IT-Bangmod Kradan Kanban</div>
     </div>
     <!-- <nav>
       <RouterLink to="/">Home</RouterLink>

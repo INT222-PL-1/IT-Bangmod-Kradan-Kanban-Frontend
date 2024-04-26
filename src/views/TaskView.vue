@@ -115,8 +115,7 @@ watch(route, async (to) => {
     </div>
   </BaseModal>
   <main>
-    <!-- {{ taskStore.tasks }} -->
-    <section class="flex justify-center">
+    <section class="flex px-6 sm:justify-center max-w-full overflow-auto table-overflow-x-scroll">
       <table class="table w-[60rem] max-w-[90%] border border-base-300">
         <thead class="bg-base-200">
           <tr>
@@ -130,7 +129,7 @@ watch(route, async (to) => {
           <tr v-for="task in taskStore.tasks" :key="task.id" class="itbkk-item">
             <td>{{ task.id }}</td>
             <td @click="handleTaskClick(task.id)" class="hover:underline hover:cursor-pointer">
-              <div class="itbkk-title overflow-hidden max-w-32 sm:max-w-52 md:max-w-72 lg:max-w-96 text-ellipsis">{{
+              <div class="itbkk-title overflow-hidden max-w-52 md:max-w-72 lg:max-w-96 text-ellipsis">{{
                 task.title
                 }}</div>
             </td>
