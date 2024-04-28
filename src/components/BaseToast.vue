@@ -26,7 +26,7 @@ const handleCloseToast = () => {
 
 <template>
   <div :class="toastColor[toastData.status]"
-    class="w-full max-w-[30rem] animate-pop-in rounded-lg overflow-hidden relative text-white">
+    class="w-full min-w-[24rem] max-w-[30rem] animate-pop-in rounded-lg overflow-hidden relative text-white">
     <!-- {{ toastData.id }} -->
     <div @click="handleCloseToast" class="top-4 right-4 absolute cursor-pointer">
       <IconSVG iconName="x" />
