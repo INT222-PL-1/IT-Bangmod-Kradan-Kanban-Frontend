@@ -1,13 +1,12 @@
 <script setup>
 import { useTaskStore } from '@/stores/task'
 import { onMounted, ref, watch } from 'vue'
-import { getTimezone, formatDateTime } from '@/libs/utils'
 import { getTaskById } from '@/libs/taskManagement'
-import BaseModal from '@/components/BaseModal.vue'
 import LoadingModal from '@/components/LoadingModal.vue'
 import StatusBadge from '@/components/StatusBadge.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToastStore } from '@/stores/toast'
+import TaskModal from '@/components/TaskModal.vue';
 
 const isLoading = ref(false)
 const route = useRoute()
@@ -68,70 +67,9 @@ watch(route, async (to) => {
     Test Toast
   </button> -->
   <LoadingModal :isLoading="isLoading" />
-  <BaseModal :show="taskModalOpenState">
-    <div class="bg-base-100 w-[50rem] max-w-[90%] rounded-xl">
-      <div class="itbkk-title text-2xl font-bold p-4 bg-base-200 text-ellipsis overflow-hidden">
-        {{ taskModalData?.title }}
-      </div>
-      <div class="grid grid-rows-1 grid-cols-2">
-        <div>
-          <div class="p-4 w-full h-full flex flex-col">
-            <div class="text-lg font-semibold flex-[0]">Description</div>
-            <div :class="{
-              'italic text-[grey] grid place-items-center': !taskModalData?.description,
-            }" class="bg-neutral px-4 py-2 mt-2 rounded-lg overflow-auto flex-[1]">
-              <div class="itbkk-description">{{ taskModalData?.description || 'No Description Provided' }}</div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div class="p-4">
-            <div class="text-lg font-semibold">Assignees</div>
-            <div :class="{
-              'italic text-[grey]': !taskModalData?.assignees,
-            }" class="itbkk-assignees">
-              {{ taskModalData?.assignees || 'Unassigned' }}
-            </div>
-          </div>
-          <div class="p-4">
-            <div class="text-lg font-semibold">Status</div>
-            <StatusBadge :status="taskModalData?.status" class="itbkk-status" />
-          </div>
-          <div>
-            <div class="p-4 flex flex-col gap-1">
-              <!-- <div class="text-lg font-bold">Timezone</div> -->
-              <div class="flex">
-                <div class="flex-[2] font-semibold">Timezone</div>
-                <div class="itbkk-timezone flex-[3] text-sm bg-neutral rounded-lg px-2">
-                  {{ getTimezone() }}
-                </div>
-              </div>
-              <div class="flex">
-                <div class="flex-[2] font-semibold">Created On</div>
-                <div class="itbkk-created-on flex-[3] text-sm bg-neutral rounded-lg px-2">
-                  {{ formatDateTime(taskModalData?.createdOn) }}
-                </div>
-              </div>
-              <div class="flex">
-                <div class="flex-[2] font-semibold">Updated On</div>
-                <div class="itbkk-updated-on flex-[3] text-sm bg-neutral rounded-lg px-2">
-                  {{ formatDateTime(taskModalData?.updatedOn) }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 p-4">
-        <button @click="handleCloseTaskModal" class="itbkk-button btn btn-sm btn-success">
-          Ok
-        </button>
-        <button @click="handleCloseTaskModal" class="itbkk-button btn btn-sm btn-neutral">
-          Close
-        </button>
-      </div>
-    </div>
-  </BaseModal>
+  <TaskModal :show="taskModalOpenState" :taskModalData="taskModalData" @clickOk="handleCloseTaskModal"
+    @clickClose="handleCloseTaskModal" />
+
   <main>
     <section class="flex px-6 sm:justify-center max-w-full overflow-auto table-overflow-x-scroll">
       <table class="table w-[60rem] max-w-[90%] border border-base-300">
