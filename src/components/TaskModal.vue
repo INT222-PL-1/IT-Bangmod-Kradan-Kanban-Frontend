@@ -19,11 +19,12 @@ defineProps({
 
 <template>
   <BaseModal :show="show" @clickBG="$emit('clickClose')">
-    <div class="bg-base-100 w-[65rem] max-w-[90vw] rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
+    <div
+      class="bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
       <div class="itbkk-title text-2xl font-bold p-4 bg-base-200 break-words flex-none">
         {{ taskModalData?.title }}
       </div>
-      <div class="grid grid-rows-2 grid-cols-1 lg:grid-rows-1 lg:grid-cols-2 flex-auto">
+      <div class="grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 flex-auto">
         <div>
           <div class="p-4 w-full h-full flex flex-col">
             <div class="text-lg font-semibold flex-[0]">Description</div>
