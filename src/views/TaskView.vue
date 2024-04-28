@@ -7,10 +7,12 @@ import BaseModal from '@/components/BaseModal.vue'
 import LoadingModal from '@/components/LoadingModal.vue'
 import StatusBadge from '@/components/StatusBadge.vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useToastStore } from '@/stores/toast'
 
 const isLoading = ref(false)
 const route = useRoute()
 const router = useRouter()
+const toastStore = useToastStore()
 const taskStore = useTaskStore()
 const taskModalOpenState = ref(false)
 const taskModalData = ref(null)
@@ -42,13 +44,29 @@ watch(route, async (to) => {
       handleOpenTaskModal()
     } else {
       router.push({ name: 'task' })
+      toastStore.createToast({
+        title: 'Error',
+        description: 'Task not found',
+        status: 'error'
+      })
     }
   }
 }, { immediate: true })
 
+// function testToast() {
+//   toastStore.createToast({
+//     title: 'Welcome to IT-Bangmod Kradan Kanban',
+//     description: 'This is a simple kanban board for IT-Bangmod Kradan',
+//     status: 'success'
+//   })
+// }
+
 </script>
 
 <template>
+  <!-- <button @click="testToast" class="itbkk-button btn btn-sm btn-success">
+    Test Toast
+  </button> -->
   <LoadingModal :isLoading="isLoading" />
   <BaseModal :show="taskModalOpenState">
     <div class="bg-base-100 w-[50rem] max-w-[90%] rounded-xl">
@@ -131,7 +149,7 @@ watch(route, async (to) => {
             <td @click="handleTaskClick(task.id)" class="hover:underline hover:cursor-pointer">
               <div class="itbkk-title overflow-hidden max-w-52 md:max-w-72 lg:max-w-96 text-ellipsis">{{
                 task.title
-                }}</div>
+              }}</div>
             </td>
             <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees">{{ task.assignees ||
               'Unassigned' }}</td>
