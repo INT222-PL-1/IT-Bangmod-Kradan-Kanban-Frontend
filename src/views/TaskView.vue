@@ -28,7 +28,7 @@ const handleOpenTaskModal = async () => {
 
 const handleCloseTaskModal = () => {
   taskModalOpenState.value = false
-  router.push({ name: 'task' })
+  router.back()
 }
 
 const handleTaskClick = (taskId) => {
@@ -75,19 +75,19 @@ watch(route, async (to) => {
       <table class="table w-[60rem] max-w-[90%] border border-base-300">
         <thead class="bg-base-200">
           <tr>
-            <th>ID</th>
+            <th></th>
             <th>Title</th>
             <th>Assignees</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="task in taskStore.tasks" :key="task.id" class="itbkk-item">
-            <td>{{ task.id }}</td>
+          <tr v-for="(task, index) in taskStore.tasks" :key="task.id" class="itbkk-item">
+            <td>{{ index + 1 }}</td>
             <td @click="handleTaskClick(task.id)" class="hover:underline hover:cursor-pointer">
-              <div class="itbkk-title overflow-hidden max-w-52 md:max-w-72 lg:max-w-96 text-ellipsis">{{
-                task.title
-              }}</div>
+              <div class="itbkk-title overflow-hidden max-w-52 md:max-w-72 lg:max-w-96 text-ellipsis font-semibold">
+                {{ task.title }}
+              </div>
             </td>
             <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees">{{ task.assignees ||
               'Unassigned' }}</td>
