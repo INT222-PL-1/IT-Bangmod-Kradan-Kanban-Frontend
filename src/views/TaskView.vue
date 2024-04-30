@@ -42,12 +42,12 @@ watch(route, async (to) => {
     if (taskModalData.value) {
       handleOpenTaskModal()
     } else {
-      router.push({ name: 'task' })
       toastStore.createToast({
         title: 'Error',
-        description: 'Task not found',
+        description: `Task ${route.params.taskId} not found`,
         status: 'error'
       })
+      router.push({ name: 'task' })
     }
   }
 }, { immediate: true })
