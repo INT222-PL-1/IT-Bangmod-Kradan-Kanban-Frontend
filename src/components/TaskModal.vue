@@ -2,6 +2,10 @@
 import { getTimezone, formatDateTime } from '@/libs/utils'
 import BaseModal from '@/components/BaseModal.vue'
 import StatusBadge from './StatusBadge.vue';
+import { useRoute, useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue';
+import { useTaskStore } from '@/stores/task';
+import { getTaskById } from '@/libs/taskManagement';
 
 defineEmits(['clickOk', 'clickClose'])
 
@@ -10,15 +14,34 @@ defineProps({
     type: Boolean,
     default: false
   },
-  taskModalData: {
-    type: Object,
-    default: () => ({})
+})
+
+const route = useRoute()
+const router = useRouter()
+const toastStore = useTaskStore()
+const taskModalData = ref({})
+
+onMounted(async () => {
+  const taskId = route.params.taskId
+  taskModalData.value = await getTaskById(taskId)
+  if (taskModalData.value === null) {
+    toastStore.createToast({
+      title: 'Error',
+      description: `Task ${route.params.taskId} not found`,
+      status: 'error'
+    })
+    router.push({ name: 'task' })
   }
 })
+
+const handleCLickClose = () => {
+  router.replace({ name: 'task' })
+}
+
 </script>
 
 <template>
-  <BaseModal :show="show" @clickBG="$emit('clickClose')">
+  <BaseModal :show="show" @clickBG="handleCLickClose">
     <div
       class="bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
       <div class="itbkk-title text-2xl font-bold p-4 bg-base-200 break-words flex-none">
