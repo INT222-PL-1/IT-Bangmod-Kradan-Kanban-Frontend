@@ -1,20 +1,16 @@
 <script setup>
 import { useTaskStore } from '@/stores/task'
-import { onMounted, ref, watch } from 'vue'
-import { getTaskById } from '@/libs/taskManagement'
+import { onMounted, ref } from 'vue'
 import LoadingModal from '@/components/LoadingModal.vue'
 import StatusBadge from '@/components/StatusBadge.vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useToastStore } from '@/stores/toast'
-import TaskModal from '@/components/TaskModal.vue';
+import { useRouter } from 'vue-router';
+// import { useToastStore } from '@/stores/toast';
+
 
 const isLoading = ref(false)
-const route = useRoute()
 const router = useRouter()
-const toastStore = useToastStore()
 const taskStore = useTaskStore()
-const taskModalOpenState = ref(false)
-const taskModalData = ref(null)
+// const toastStore = useToastStore()
 
 onMounted(async () => {
   isLoading.value = true
@@ -22,41 +18,15 @@ onMounted(async () => {
   isLoading.value = false
 })
 
-const handleOpenTaskModal = async () => {
-  taskModalOpenState.value = true
-}
-
-const handleCloseTaskModal = () => {
-  taskModalOpenState.value = false
-  router.back()
-}
-
 const handleTaskClick = (taskId) => {
   router.push({ name: 'task-id', params: { taskId } })
 }
-
-watch(route, async (to) => {
-  const taskId = to.params.taskId
-  if (taskId) {
-    taskModalData.value = await getTaskById(taskId)
-    if (taskModalData.value) {
-      handleOpenTaskModal()
-    } else {
-      toastStore.createToast({
-        title: 'Error',
-        description: `Task ${route.params.taskId} not found`,
-        status: 'error'
-      })
-      router.push({ name: 'task' })
-    }
-  }
-}, { immediate: true })
 
 // function testToast() {
 //   toastStore.createToast({
 //     title: 'Welcome to IT-Bangmod Kradan Kanban',
 //     description: 'This is a simple kanban board for IT-Bangmod Kradan',
-//     status: 'success'
+//     status: 'info'
 //   })
 // }
 
@@ -67,8 +37,12 @@ watch(route, async (to) => {
     Test Toast
   </button> -->
   <LoadingModal :isLoading="isLoading" />
-  <TaskModal :show="taskModalOpenState" :taskModalData="taskModalData" @clickOk="handleCloseTaskModal"
-    @clickClose="handleCloseTaskModal" />
+
+  <RouterView v-slot="{ Component }">
+    <Transition>
+      <Component :is="Component" />
+    </Transition>
+  </RouterView>
 
   <main>
     <section class="flex px-6 sm:justify-center max-w-full overflow-auto table-overflow-x-scroll">
@@ -102,3 +76,15 @@ watch(route, async (to) => {
     </section>
   </main>
 </template>
+
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>
