@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// import HomeView from '../views/HomeView.vue'
+import TaskView from '../views/TaskView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,18 +7,17 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      // component: HomeView
       redirect: '/task'
     },
     {
       path: '/task',
       name: 'task',
-      component: () => import('../views/TaskView.vue'),
+      component: TaskView,
       children: [
         {
           path: ':taskId',
           name: 'task-id',
-          component: () => import('../views/TaskView.vue')
+          component: () => import('../components/TaskModal.vue')
         }
       ]
     }

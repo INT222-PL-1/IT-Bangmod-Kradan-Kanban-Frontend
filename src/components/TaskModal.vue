@@ -19,7 +19,7 @@ defineProps({
 const route = useRoute()
 const router = useRouter()
 const toastStore = useTaskStore()
-const taskModalData = ref({})
+const taskModalData = ref(null)
 
 onMounted(async () => {
   const taskId = route.params.taskId
@@ -30,7 +30,7 @@ onMounted(async () => {
       description: `Task ${route.params.taskId} not found`,
       status: 'error'
     })
-    router.push({ name: 'task' })
+    router.replace({ name: 'task' })
   }
 })
 
@@ -41,7 +41,7 @@ const handleCLickClose = () => {
 </script>
 
 <template>
-  <BaseModal :show="show" @clickBG="handleCLickClose">
+  <BaseModal :show="taskModalData !== null" @clickBG="handleCLickClose">
     <div
       class="bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
       <div class="itbkk-title text-2xl font-bold p-4 bg-base-200 break-words flex-none">
@@ -106,7 +106,7 @@ const handleCLickClose = () => {
         <button @click="$emit('clickOk')" class="itbkk-button btn btn-sm btn-success">
           Ok
         </button>
-        <button @click="$emit('clickClose')" class="itbkk-button btn btn-sm btn-neutral">
+        <button @click="handleCLickClose" class="itbkk-button btn btn-sm btn-neutral">
           Close
         </button>
       </div>
