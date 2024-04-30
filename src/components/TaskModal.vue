@@ -4,8 +4,8 @@ import BaseModal from '@/components/BaseModal.vue'
 import StatusBadge from './StatusBadge.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
-import { useTaskStore } from '@/stores/task';
 import { getTaskById } from '@/libs/taskManagement';
+import { useToastStore } from '@/stores/toast';
 
 defineEmits(['clickOk', 'clickClose'])
 
@@ -18,7 +18,7 @@ defineProps({
 
 const route = useRoute()
 const router = useRouter()
-const toastStore = useTaskStore()
+const toastStore = useToastStore()
 const taskModalData = ref(null)
 
 onMounted(async () => {
