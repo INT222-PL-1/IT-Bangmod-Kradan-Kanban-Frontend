@@ -30,7 +30,7 @@ defineProps({
             <div class="text-lg font-semibold flex-[0]">Description</div>
             <div :class="{
               'italic text-[grey] grid place-items-center': !taskModalData?.description,
-            }" class="bg-neutral px-4 py-2 mt-2 rounded-lg flex-[1]">
+            }" class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-[1]">
               <div class="itbkk-description break-words">
                 {{ taskModalData?.description || 'No Description Provided' }}
               </div>
@@ -59,19 +59,19 @@ defineProps({
               <!-- <div class="text-lg font-bold">Timezone</div> -->
               <div class="flex">
                 <div class="flex-[2] font-semibold">Timezone</div>
-                <div class="itbkk-timezone flex-[3] text-sm bg-neutral rounded-lg px-2">
+                <div class="itbkk-timezone flex-[3] text-sm bg-base-200 rounded-lg px-2">
                   {{ getTimezone() }}
                 </div>
               </div>
               <div class="flex">
                 <div class="flex-[2] font-semibold">Created On</div>
-                <div class="itbkk-created-on flex-[3] text-sm bg-neutral rounded-lg px-2">
+                <div class="itbkk-created-on flex-[3] text-sm bg-base-200 rounded-lg px-2">
                   {{ formatDateTime(taskModalData?.createdOn) }}
                 </div>
               </div>
               <div class="flex">
                 <div class="flex-[2] font-semibold">Updated On</div>
-                <div class="itbkk-updated-on flex-[3] text-sm bg-neutral rounded-lg px-2">
+                <div class="itbkk-updated-on flex-[3] text-sm bg-base-200 rounded-lg px-2">
                   {{ formatDateTime(taskModalData?.updatedOn) }}
                 </div>
               </div>
