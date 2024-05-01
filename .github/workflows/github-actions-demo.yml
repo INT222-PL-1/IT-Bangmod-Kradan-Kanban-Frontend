@@ -7,14 +7,10 @@ on:
     - 'children-path'
     - 'CI/CD'
 jobs:
-  Github-Notification:
+  Plain-Notification:
     runs-on: ubuntu-latest
     steps:
-    - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-    - name: List files in the repository
-      run: ls ${{ github.workspace }}
-    - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-    - run: echo "🍏 This job's status is ${{ job.status }}."
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
   docker:
     runs-on: ubuntu-latest
@@ -28,10 +24,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
           tags: itb-kk-Frontend:latest
           secrets: GIT_AUTH_TOKEN=${{ secrets.MYTOKEN }}
+      - name: List files in the repository
+      - run: ls ${{ github.workspace }}
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🍏 This job's status is ${{ job.status }}."
