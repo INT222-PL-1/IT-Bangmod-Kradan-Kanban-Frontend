@@ -16,11 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -30,9 +30,9 @@ jobs:
           push: true
           tags: itb-kk-Frontend:latest
           secrets: |
-          run: docker login --username <YOUR_USERNAME>
+            - run: docker login --username <YOUR_USERNAME>
           
       - name: status
-        run: echo "🍏 This job's status is ${{ job.status }}."
+      - run: echo "🍏 This job's status is ${{ job.status }}."
       - name: List files in the repository
-        run: ls ${{ github.workspace }}
+      - run: ls ${{ github.workspace }}
