@@ -1,5 +1,5 @@
 name: echo-test-CI/CD
-run-name: 🔔 @${{github-actor}} was push up a new update at ${{ inputs.deploy_target }} 👾⬆️!
+run-name: 🔔 @${{ github.actor }} was push up a new update at ${{ inputs.deploy_target }} 👾⬆️!
 on:
   push:
     branches:
