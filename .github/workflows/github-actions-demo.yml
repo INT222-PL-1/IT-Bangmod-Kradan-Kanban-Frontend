@@ -1,4 +1,4 @@
-name: CI/CD
+name: echo-test-CI/CD
 run-name: 🔔 @${{ github.actor }} was push up a new update at ${{ inputs.deploy_target }} 👾⬆️!
 on:
   push:
@@ -6,33 +6,31 @@ on:
     - main
     - children-path
 jobs:
-  Github-Plain-Notification:
+  Github-Notification:
     runs-on: ubuntu-latest
     steps:
     - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+    - name: List files in the repository
+      run: ls ${{ github.workspace }}
     - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+    - run: echo "🍏 This job's status is ${{ job.status }}."
 
   docker:
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
-      - uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-      - uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub
-      - uses: docker/login-action@v3
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
+      -
+        name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
           tags: itb-kk-Frontend:latest
-          secrets: |
-            - run: docker login --username <YOUR_USERNAME>
-          
-      - name: status
-      - run: echo "🍏 This job's status is ${{ job.status }}."
-      - name: List files in the repository
-      - run: ls ${{ github.workspace }}
+          secrets: GIT_AUTH_TOKEN=${{ secrets.MYTOKEN }}
