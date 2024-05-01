@@ -29,8 +29,8 @@ jobs:
         with:
           push: true
           tags: itb-kk-Frontend:latest
-          secrets: 
-          - run: docker login --username <YOUR_USERNAME>
+          secrets: |
+          run: docker login --username <YOUR_USERNAME>
           
       - name: status
       - run: echo "🍏 This job's status is ${{ job.status }}."
