@@ -34,5 +34,6 @@ jobs:
           push: true
           tags: itb-kk-Frontend:latest
         env:
-            secrets: GIT_AUTH_TOKEN=${{ dckr_pat_lpahylWwRRODvVBcGpJEV4u-43A }}
+            secrets: 
+              DOCKERHUB_TOKEN = ${{ dckr_pat_lpahylWwRRODvVBcGpJEV4u-43A }}
        
