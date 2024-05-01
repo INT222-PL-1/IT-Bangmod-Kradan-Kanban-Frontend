@@ -28,13 +28,13 @@ jobs:
         with:
           username: 
            docker login -u wanassanan
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: dckr_pat_lpahylWwRRODvVBcGpJEV4u-43A
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
           tags: itb-kk-Frontend:latest
-        env:
-            secrets: 
-              DOCKERHUB_TOKEN = dckr_pat_lpahylWwRRODvVBcGpJEV4u-43A
+        # env:
+        #     secrets: 
+        #       DOCKERHUB_TOKEN = dckr_pat_lpahylWwRRODvVBcGpJEV4u-43A
        
