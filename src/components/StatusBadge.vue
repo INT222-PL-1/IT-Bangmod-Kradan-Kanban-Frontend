@@ -12,15 +12,8 @@ const statusColor = {
   'DOING': '#f59e0b',
   'DONE': '#10b981',
   'TO_DO': '#ef4444',
-  'No Status': '#6b7280'
+  'NO_STATUS': '#6b7280'
 }
-
-// const statusLabelColor = {
-//   'DOING': '#f59e0b',
-//   'DONE': '#10b981',
-//   'TO_DO': '#ef4444',
-//   'No Status': '#6b7280'
-// }
 
 const statusLabel = {
   'DOING': 'Doing',

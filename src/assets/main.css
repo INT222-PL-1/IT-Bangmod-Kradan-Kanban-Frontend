@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.table-overflow-x-scroll {
+  overflow-x: auto;
+}
+
 .table-overflow-x-scroll::-webkit-scrollbar {
   height: 6px;
 }
