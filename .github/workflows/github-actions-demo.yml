@@ -28,7 +28,7 @@ jobs:
         with:
           username: 
            docker login -u wanassanan
-          password: dckr_pat_lpahylWwRRODvVBcGpJEV4u-43A
+          password: ${{ env.secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
