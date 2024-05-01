@@ -34,5 +34,6 @@ jobs:
           push: true
           tags: itb-kk-Frontend:latest
           secrets: 
+              DOCKERHUB_USERNAME = docker login -u wanassanan
               DOCKERHUB_TOKEN = dckr_pat_lpahylWwRRODvVBcGpJEV4u-43A
        
