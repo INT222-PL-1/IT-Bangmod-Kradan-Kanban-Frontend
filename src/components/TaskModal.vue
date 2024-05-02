@@ -7,8 +7,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { onMounted, ref, watch } from 'vue';
 import { createTask, getTaskById } from '@/libs/taskManagement';
 import { useToastStore } from '@/stores/toast';
-
-defineEmits(['clickOk', 'clickClose'])
+import { useTaskStore } from '@/stores/task';
 
 defineProps({
   show: {
@@ -19,6 +18,7 @@ defineProps({
 
 const route = useRoute()
 const router = useRouter()
+const taskStore = useTaskStore()
 const toastStore = useToastStore()
 const taskModalMode = ref('view')
 const taskModalData = ref(null)
@@ -99,7 +99,8 @@ const handleClickConfirm = async () => {
       status: 'success'
     })
   }
-  router.replace({ name: 'all-task' })
+  taskStore.fetchTasks()
+  router.push({ name: 'all-task' })
 }
 
 </script>

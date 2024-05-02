@@ -4,11 +4,11 @@ export async function getTaskById(taskId) {
   try {
     const res = await fetch(`${SERVER_URL}/tasks/${taskId}`)
     if (res.status === 404) {
-      console.log(res)
+      // console.log(res)
       return null
     }
     const data = await res.json()
-    console.log(data)
+    // console.log(data)
     return data
   } catch (error) {
     console.error(error)
