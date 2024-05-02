@@ -15,13 +15,18 @@ jobs:
   #     - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
   #     - run: echo "🍏 This job's status is ${{ job.status }}."
 
+  Create-ENV-File:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make .env file
+        uses: SpicyPizza/create-envfile@v1
+        with:
+          envkey_VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
+          file_name: .env
+          
   Docker-Image-Build:
     runs-on: ubuntu-latest
     steps:
-      - name: Create ENV file
-        run: |
-          echo ${{ secrets.ENV_FILE }} > .env
-          cat .env
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
