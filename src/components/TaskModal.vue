@@ -89,13 +89,13 @@ const handleClickConfirm = async () => {
   if (createdTask === null) {
     toastStore.createToast({
       title: 'Error',
-      description: 'Failed to create task',
+      description: 'An error occurred while adding the task',
       status: 'error'
     })
   } else {
     toastStore.createToast({
       title: 'Success',
-      description: `Task created ${createdTask.title} successfully`,
+      description: `The task "${createdTask.title}" is added successfully`,
       status: 'success'
     })
   }

@@ -12,6 +12,7 @@ export async function getTaskById(taskId) {
     return data
   } catch (error) {
     console.error(error)
+    return null
   }
 }
 
@@ -36,5 +37,21 @@ export async function createTask({ title, description, assignees, status }) {
     } else return null
   } catch (error) {
     console.error(error)
+    return null
+  }
+}
+
+export async function deleteTask(taskId) {
+  try {
+    const res = await fetch(`${SERVER_URL}/tasks/${taskId}`, { method: 'DELETE' })
+    if (res.ok) {
+      const data = await res.json()
+      return data
+    } else if (res.status === 404) {
+      return { errorStatus: res.status }
+    } else return null
+  } catch (error) {
+    console.error(error)
+    return null
   }
 }
