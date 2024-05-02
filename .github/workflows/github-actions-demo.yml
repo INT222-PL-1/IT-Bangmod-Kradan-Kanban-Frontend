@@ -33,7 +33,4 @@ jobs:
         with:
           push: true
           tags: itb-kk-Frontend:latest
-          secrets: |
-            "github_token=${{ secrets.GITHUB_TOKEN }}"  
-            DOCKER_ACCESS_TOKEN= dckr_pat_Qr-1-DLb65d8FW5DN5V85O3nGaQ
-       
+  
