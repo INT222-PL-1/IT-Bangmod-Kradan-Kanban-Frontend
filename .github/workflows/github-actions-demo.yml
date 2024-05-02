@@ -1,10 +1,9 @@
 name: echo-test-CI/CD
 run-name: 🔔 @${{ github.actor }} was push up a new update at ${{ inputs.deploy_target }} 👾⬆️!
-on:
+on: 
   push:
     branches:
     - main
-    - 'children-path'
     - 'CI/CD'
 jobs:
   Plain-Notification:
