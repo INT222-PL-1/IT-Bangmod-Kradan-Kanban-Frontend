@@ -20,10 +20,9 @@ jobs:
     steps:
       - name: Create ENV file
         run: |
-          touch .env
-          echo VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }} >> .env
-          cat .env
-          ls -l | echo
+          touch ../.env
+          echo VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }} >> ../.env
+          cat ../.env
           pwd
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
