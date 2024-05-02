@@ -32,4 +32,6 @@ jobs:
         with:
           push: true
           tags: wanassanan/itb-kk-frontend:latest
+        env:
+          VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
   
