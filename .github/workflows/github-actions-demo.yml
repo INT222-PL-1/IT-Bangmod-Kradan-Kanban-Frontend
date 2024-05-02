@@ -20,6 +20,7 @@ jobs:
     steps:
       - name: Create ENV file
         run: |
+          touch .env
           echo VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }} >> .env
           cat .env
       - name: Set up QEMU
@@ -35,5 +36,5 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: wanassanan/itb-kk-frontend:latest
+          tags: wanassanan/itb-kk-frontend:test
   
