@@ -1,4 +1,4 @@
-name: echo-test-CI/CD
+name: CI/CD
 run-name: 🔔 @${{ github.actor }} was push up a new update at ${{ inputs.deploy_target }} 👾⬆️!
 on: 
   push:
@@ -6,18 +6,22 @@ on:
     - main
     - 'CI/CD'
 jobs:
-  Plain-Notification:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: List files in the repository
-        run: ls ${{ github.workspace }}
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+  # Plain-Notification:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+  #     - name: List files in the repository
+  #       run: ls ${{ github.workspace }}
+  #     - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+  #     - run: echo "🍏 This job's status is ${{ job.status }}."
 
-  docker:
+  Docker-Image-Build:
     runs-on: ubuntu-latest
     steps:
+      - name: Create ENV file
+        run: |
+          echo VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }} >> .env
+          cat .env
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -32,6 +36,4 @@ jobs:
         with:
           push: true
           tags: wanassanan/itb-kk-frontend:latest
-        env:
-          VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
   
