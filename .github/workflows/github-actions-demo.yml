@@ -23,7 +23,7 @@ jobs:
           touch .env
           echo VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }} >> .env
           cat .env
-          ls
+          ls -l | echo
           pwd
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
