@@ -13,8 +13,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Create .env file
         run: |
-          echo ${{ secrets.ENV_FILE }} > .env
+          echo "VITE_SERVER_URL=http://ip23pl1.sit.kmutt.ac.th:8080/v1" > .env
           ls -al | cat
+          cat .env
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
