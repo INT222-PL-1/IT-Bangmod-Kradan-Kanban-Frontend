@@ -35,7 +35,7 @@ jobs:
   deploy:
     needs: Docker-Image-Build
     name: Set up tunnel
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - name: Checkout
       uses: actions/checkout@v2
