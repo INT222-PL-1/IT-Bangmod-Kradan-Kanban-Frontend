@@ -35,6 +35,10 @@ const handleAddBtnCLick = () => {
   router.push({ name: 'task-add' })
 }
 
+const handleEditBtnCLick = (taskId) => {
+  router.push({ name: 'task-edit', params: { taskId } })
+}
+
 const handleOpenDeleteModal = (taskData) => {
   taskDeleteModalData.value = taskData
   taskDeleteModalOpenState.value = true
@@ -127,7 +131,8 @@ const handleDeleteTask = async (taskId) => {
                     </template>
                     <template #menu>
                       <div class="bg-base-200 rounded-lg p-2 flex flex-col border border-base-300 drop-shadow-lg">
-                        <ButtonWithIcon className="btn btn-sm justify-start" iconName="pencil-square" text="Edit" />
+                        <ButtonWithIcon @click="handleEditBtnCLick(task.id)" className="btn btn-sm justify-start"
+                          iconName="pencil-square" text="Edit" />
                         <ButtonWithIcon @click="handleOpenDeleteModal(task)"
                           className="btn btn-sm justify-start text-error" iconName="trash-fill" text="Delete" />
                       </div>

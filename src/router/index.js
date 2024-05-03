@@ -20,6 +20,11 @@ const router = createRouter({
           component: () => import('../components/TaskModal.vue')
         },
         {
+          path: ':taskId/edit',
+          name: 'task-edit',
+          component: () => import('../components/TaskModal.vue')
+        },
+        {
           path: 'add',
           name: 'task-add',
           component: () => import('../components/TaskModal.vue')
