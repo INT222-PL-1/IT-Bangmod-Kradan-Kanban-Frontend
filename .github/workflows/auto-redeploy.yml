@@ -32,8 +32,8 @@ jobs:
           push: true
           tags: wanassanan/itb-kk-frontend:test
 
-  deploy:
-    # needs: Docker-Image-Build
+  SSH-Remote-Deploy:
+    needs: Docker-Image-Build
     runs-on: ubuntu-latest
     steps:
     - name: executing remote ssh commands using password
