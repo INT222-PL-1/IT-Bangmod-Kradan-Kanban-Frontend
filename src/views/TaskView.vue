@@ -101,13 +101,11 @@ const handleDeleteTask = async (taskId) => {
   </RouterView>
 
   <main>
-    <nav class="flex justify-center items-center h-12 bg-base-200 border-y-2 border-base-300">
-      <div class="container flex justify-end">
-        <button @click="handleAddBtnCLick" type="button" class="btn btn-outline btn-sm">
-          <IconSVG iconName="plus" :scale="1.25" />Add Task
-        </button>
-      </div>
-    </nav>
+    <Teleport to="#header-right">
+      <button @click="handleAddBtnCLick" type="button" class="btn btn-primary btn-sm text-neutral">
+        <IconSVG iconName="plus" :scale="1.25" />Add Task
+      </button>
+    </Teleport>
     <section class="mt-12 flex flex-col sm:items-center max-w-full table-overflow-x-scroll">
       <div class="mx-6 w-[60rem] max-w-[90%]">
         <div class="text-center p-2 text-xl font-semibold">Task Table</div>
