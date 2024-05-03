@@ -30,7 +30,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: wanassanan/itb-kk-frontend:test
+          tags: wanassanan/itb-kk-frontend:latest
 
   SSH-Remote-Deploy:
     needs: Docker-Image-Build
