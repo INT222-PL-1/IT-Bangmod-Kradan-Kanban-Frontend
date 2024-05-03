@@ -106,6 +106,7 @@ const handleDeleteTask = async (taskId) => {
     </nav>
     <section class="mt-12 flex flex-col sm:items-center max-w-full table-overflow-x-scroll">
       <div class="mx-6 w-[60rem] max-w-[90%]">
+        <div class="text-center p-2 text-xl font-semibold">Task Table</div>
         <table class="table border border-base-300">
           <thead class="bg-base-200">
             <tr>
