@@ -31,3 +31,18 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: wanassanan/itb-kk-frontend:test
+
+  deploy:
+    needs: Docker-Image-Build
+    name: Set up tunnel
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Setup tunnel
+      uses: joshlarsen/ssh-tunnel-action@main
+      with:
+        timeout: 1h
+        ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+        ngrok_token: ${{ secrets.NGROK_TOKEN }}
