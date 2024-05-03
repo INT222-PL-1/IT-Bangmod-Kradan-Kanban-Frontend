@@ -11,7 +11,7 @@ defineProps({
 </script>
 
 <template>
-  <BaseModal :show="isLoading">
+  <BaseModal :show="isLoading" :mobileCenter="true">
     <div>
       <span class="loading loading-spinner loading-lg"></span>
     </div>

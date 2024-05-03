@@ -6,6 +6,10 @@ defineProps({
   show: {
     type: Boolean,
     default: false
+  },
+  mobileCenter: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -15,7 +19,7 @@ const handleClickBG = (e) => {
 </script>
 
 <template>
-  <div v-show="show"
+  <div v-if="show" :class="{ 'grid place-items-center': mobileCenter }"
     class="fixed inset-0 bg-[#0005] backdrop-blur-sm z-50 transition-opacity sm:grid sm:place-items-center overflow-auto"
     @click="handleClickBG">
     <slot></slot>
