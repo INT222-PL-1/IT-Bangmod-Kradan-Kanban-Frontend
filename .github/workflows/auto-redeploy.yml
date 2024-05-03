@@ -46,4 +46,4 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
         script: |
-          echo "I am from GitHub Action" > hello.txt
+          docker-compose up -f ./INT221/project/docker-compose.yml -d --no-deps --build frontend
