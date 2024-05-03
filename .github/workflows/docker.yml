@@ -44,4 +44,4 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
         script: |
-          "echo I am from GitHub Action > hello.txt"
+          echo "I am from GitHub Action" > hello.txt
