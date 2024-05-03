@@ -34,15 +34,13 @@ jobs:
 
   deploy:
     needs: Docker-Image-Build
-    name: Set up tunnel
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      
-    - name: Setup tunnel
-      uses: joshlarsen/ssh-tunnel-action@main
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
       with:
-        timeout: 1h
-        ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-        ngrok_token: ${{ secrets.NGROK_TOKEN }}
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cat test.txt
