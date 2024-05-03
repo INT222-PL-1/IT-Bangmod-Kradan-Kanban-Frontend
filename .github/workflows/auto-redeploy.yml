@@ -46,4 +46,4 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
         script: |
-          docker-compose up -f ./INT221/project/docker-compose.yml -d --no-deps --build frontend
+          docker-compose -f ./INT221/project/docker-compose.yml up -d --no-deps --build frontend
