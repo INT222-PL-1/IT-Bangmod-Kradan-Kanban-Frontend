@@ -1,10 +1,12 @@
 name: Build and Push docker image
 run-name: "@${{ github.actor }} was pushed up a new update. Auto-Redeploy START!"
-on: 
-  push:
-    branches:
-    - main
-    - 'CI/CD'
+# on: 
+#   push:
+#     branches:
+#     - main
+#     - 'CI/CD'
+on: push
+
 jobs:     
   Docker-Image-Build:
     runs-on: ubuntu-latest
