@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - 'main'
+    - 'develop/**'
   
 jobs:     
   Docker-Image-Build:
@@ -31,8 +32,6 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: wanassanan/itb-kk-frontend:latest
-          cache-from: type=registry, ref=wanassanan/itb-kk-frontend:buildcache
-          cache-to: type=registry, ref=wanassanan/itb-kk-frontend:buildcache, mode=max
 
   SSH-Remote-Deploy:
     needs: Docker-Image-Build
