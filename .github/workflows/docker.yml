@@ -33,7 +33,7 @@ jobs:
           tags: wanassanan/itb-kk-frontend:test
 
   deploy:
-    needs: Docker-Image-Build
+    # needs: Docker-Image-Build
     runs-on: ubuntu-latest
     steps:
     - name: executing remote ssh commands using password
@@ -43,4 +43,5 @@ jobs:
         port: ${{ secrets.SSH_PORT }}
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
-        script: whoami
+        script: |
+          "echo I am from GitHub Action > hello.txt"
