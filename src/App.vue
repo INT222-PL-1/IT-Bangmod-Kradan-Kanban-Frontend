@@ -6,9 +6,7 @@ import ToastContainer from './components/ToastContainer.vue';
 <template>
   <ToastContainer />
   <header>
-    <div class="flex justify-center">
-      <div class="text-lg sm:text-3xl font-bold py-6">IT-Bangmod Kradan Kanban</div>
-    </div>
+    <div class="text-lg sm:text-3xl font-bold py-6 bg-base-200 text-center">IT-Bangmod Kradan Kanban</div>
   </header>
   <RouterView />
 </template>
