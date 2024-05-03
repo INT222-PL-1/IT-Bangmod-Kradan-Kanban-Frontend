@@ -1,8 +1,11 @@
 name: SSH Tunnel
 on:
   workflow_run:
-    workflows: ["Build and Push docker image"]
-    branches: [main, "CI/CD"]
+    workflows: 
+      'Build and Push docker image'
+    branches: 
+      - main
+      - "CI/CD"
     types: 
       - completed
 
