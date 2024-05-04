@@ -1,31 +1,42 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import BaseMenu from './BaseMenu.vue';
+import IconSVG from './IconSVG.vue';
+import ButtonWithIcon from './ButtonWithIcon.vue';
 
-let themeSetting = ''
+const DARKMODE_THEME = 'itbkk-dark'
+const LIGHTMODE_THEME = 'itbkk-light'
+
+let themeSetting = ref('')
 const isSystemDark = ref(false)
 
 function themeSetup() {
-  themeSetting = localStorage.getItem('theme') || 'system'
+  themeSetting.value = localStorage.getItem('theme') || 'system'
+  // console.log('themeSetting', themeSetting)
   const html = document.documentElement
   const darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  isSystemDark.value = darkQuery.matches
   darkQuery.addEventListener('change', (e) => {
+    // console.log('hello')
     isSystemDark.value = e.matches
+    // console.log('isSystemDark', isSystemDark.value)
   })
 
-  if (themeSetting === 'dark') {
-    html.dataset.theme = 'itbkk-dark'
-  } else if (themeSetting === 'light') {
-    html.dataset.theme = 'itbkk-light'
+  if (themeSetting.value === 'dark') {
+    html.dataset.theme = DARKMODE_THEME
+  } else if (themeSetting.value === 'light') {
+    html.dataset.theme = LIGHTMODE_THEME
   } else {
-    html.dataset.theme = darkQuery.matches ? 'itbkk-dark' : 'itbkk-light'
+    html.dataset.theme = darkQuery.matches ? DARKMODE_THEME : LIGHTMODE_THEME
   }
 }
 
 watch(isSystemDark, (value) => {
-  if (themeSetting !== 'system') return
+  // console.log('isSystemDark', value);
+  if (themeSetting.value !== 'system') return
   const html = document.documentElement
-  html.dataset.theme = value ? 'itbkk-dark' : 'itbkk-light'
+  html.dataset.theme = value ? DARKMODE_THEME : LIGHTMODE_THEME
+  // console.log(html.dataset.theme);
 }, { immediate: true })
 
 onMounted(() => {
@@ -40,16 +51,49 @@ const handleSetTheme = (theme) => {
 </script>
 
 <template>
-  <BaseMenu>
+  <BaseMenu side="left">
     <template #icon>
-      test
+      <div class="grid place-items-center w-8 h-8">
+        <Transition>
+          <div v-show="(!isSystemDark && themeSetting === 'system') || themeSetting === 'light'" class="absolute">
+            <IconSVG iconName="sun-fill" :scale="1.5" size="2rem" />
+          </div>
+        </Transition>
+        <Transition>
+          <div v-show="(isSystemDark && themeSetting === 'system') || themeSetting === 'dark'" class="absolute">
+            <IconSVG iconName="moon-fill" :scale="1.5" size="2rem" />
+          </div>
+        </Transition>
+      </div>
     </template>
     <template #menu>
-      <button @click="handleSetTheme('system')">System</button>
-      <button @click="handleSetTheme('light')">Light</button>
-      <button @click="handleSetTheme('dark')">Dark</button>
+      <li>
+        <ButtonWithIcon @click="handleSetTheme('system')" iconName="pencil-square" text="System"
+          className="btn btn-ghost btn-sm justify-start" />
+      </li>
+      <li>
+        <ButtonWithIcon @click="handleSetTheme('light')" iconName="sun-fill" text="Light"
+          className="btn btn-ghost btn-sm justify-start" />
+      </li>
+      <li>
+        <ButtonWithIcon @click="handleSetTheme('dark')" iconName="moon-fill" text="Dark"
+          className="btn btn-ghost btn-sm justify-start" />
+      </li>
     </template>
   </BaseMenu>
 </template>
 
-<style scoped></style>
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+  /* transition: opacity 0.3s; */
+  transition-property: opacity transform;
+  transition-duration: .5s;
+}
+
+.v-enter-from,
+.v-leave-to {
+  transform: rotate(180deg);
+  opacity: 0;
+}
+</style>

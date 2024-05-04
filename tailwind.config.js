@@ -9,7 +9,7 @@ export default {
   daisyui: {
     themes: [
       {
-        light: {
+        'itbkk-light': {
           primary: '#f04c1c',
           secondary: '#4b5563',
           accent: '#00cdb7',
@@ -22,7 +22,7 @@ export default {
         }
       },
       {
-        dark: {
+        'itbkk-dark': {
           primary: '#f04c1c',
           secondary: '#4b5563',
           accent: '#00cdb7',

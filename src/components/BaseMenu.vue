@@ -1,23 +1,21 @@
 <script setup>
-import { ref } from 'vue'
-
-const showMenu = ref(false)
-const mousePosition = ref({ x: 0, y: 0 })
-
-const handleClick = (e) => {
-  showMenu.value = true
-  mousePosition.value = { x: e.clientX, y: e.clientY }
-}
-
+defineProps({
+  side: {
+    type: String,
+    validator: (value) => ['left', 'right'].includes(value),
+    default: 'right'
+  }
+})
 </script>
 
 <template>
-  <div @click="handleClick" class="cursor-pointer">
-    <slot name="icon"></slot>
-  </div>
-  <div @mouseleave="showMenu = false" :class="showMenu ? 'block' : 'hidden'" class="fixed z-10"
-    :style="{ top: (mousePosition.y - 4) + 'px', left: (mousePosition.x - 4) + 'px' }">
-    <slot name="menu"></slot>
+  <div class="dropdown" :class="{ 'dropdown-end': side === 'left' }">
+    <div tabindex="0" @click="handleClick" role="button" class="btn btn-sm btn-ghost">
+      <slot name="icon"></slot>
+    </div>
+    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52 gap-1 flex flex-col">
+      <slot name="menu"></slot>
+    </ul>
   </div>
 </template>
 

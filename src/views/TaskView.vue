@@ -101,14 +101,19 @@ const handleDeleteTask = async (taskId) => {
   </RouterView>
 
   <main>
-    <Teleport to="#header-right">
+    <!-- <Teleport to="#header-right">
       <button @click="handleAddBtnCLick" type="button" class="btn btn-primary btn-sm text-neutral">
         <IconSVG iconName="plus" :scale="1.25" />Add Task
       </button>
-    </Teleport>
-    <section class="mt-12 flex flex-col sm:items-center max-w-full table-overflow-x-scroll">
+    </Teleport> -->
+    <section class="p-4 flex justify-end">
+      <button @click="handleAddBtnCLick" type="button" class="btn btn-primary btn-sm text-neutral">
+        <IconSVG iconName="plus" :scale="1.25" />Add Task
+      </button>
+    </section>
+    <section class=" flex flex-col sm:items-center max-w-full table-overflow-x-scroll">
       <div class="mx-6 w-[60rem] max-w-[90%]">
-        <div class="text-center p-2 text-xl font-semibold">Task Table</div>
+        <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
         <table class="table border border-base-300">
           <thead class="bg-base-200">
             <tr>
@@ -119,8 +124,11 @@ const handleDeleteTask = async (taskId) => {
             </tr>
           </thead>
           <tbody>
+            <tr v-show="taskStore.tasks.length === 0">
+              <td colspan="4" class="text-center">No task</td>
+            </tr>
             <tr v-for="(task, index) in taskStore.tasks" :key="task.id" class="itbkk-item">
-              <td>
+              <td class="w-16">
                 <div class="flex items-center justify-between gap-2">
                   <div>{{ index + 1 }}</div>
                   <BaseMenu>
@@ -128,24 +136,30 @@ const handleDeleteTask = async (taskId) => {
                       <IconSVG iconName="three-dots-vertical" />
                     </template>
                     <template #menu>
-                      <div class="bg-base-200 rounded-lg p-2 flex flex-col border border-base-300 drop-shadow-lg">
-                        <ButtonWithIcon @click="handleEditBtnCLick(task.id)" className="btn btn-sm justify-start"
-                          iconName="pencil-square" text="Edit" />
+                      <li>
+                        <ButtonWithIcon @click="handleEditBtnCLick(task.id)"
+                          className="btn btn-sm btn-ghost justify-start flex flex-nowrap" iconName="pencil-square"
+                          text="Edit" />
+                      </li>
+                      <li>
                         <ButtonWithIcon @click="handleOpenDeleteModal(task)"
-                          className="btn btn-sm justify-start text-error" iconName="trash-fill" text="Delete" />
-                      </div>
+                          className="btn btn-sm btn-ghost justify-start text-error flex flex-nowrap"
+                          iconName="trash-fill" text="Delete" />
+                      </li>
                     </template>
                   </BaseMenu>
                 </div>
               </td>
-              <td @click="handleTaskClick(task.id)" class="hover:underline hover:cursor-pointer">
-                <div class="itbkk-title overflow-hidden max-w-52 md:max-w-72 lg:max-w-96 text-ellipsis font-semibold">
+              <td @click="handleTaskClick(task.id)"
+                class="overflow-hidden min-w-52 w-full max-w-52 md:max-w-72 lg:max-w-96 hover:underline hover:cursor-pointer">
+                <div class="itbkk-title break-words font-semibold">
                   {{ task.title }}
                 </div>
               </td>
-              <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees">{{ task.assignees ||
-                'Unassigned' }}</td>
-              <td>
+              <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees min-w-60 w-60">
+                {{ task.assignees || 'Unassigned' }}
+              </td>
+              <td class="min-w-44">
                 <div class="grid place-items-center">
                   <StatusBadge :status="task.status" class="itbkk-status" />
                 </div>
