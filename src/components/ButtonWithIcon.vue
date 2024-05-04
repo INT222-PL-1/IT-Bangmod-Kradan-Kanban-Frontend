@@ -8,17 +8,17 @@ defineProps({
   iconName: {
     type: String,
     required: true
-  },
-  text: {
-    type: String,
-    required: true
   }
 })
 </script>
 
 <template>
-  <div :class="className">
-    <IconSVG :iconName="iconName" />
-    <div>{{ text }}</div>
+  <div :class="className" class="flex">
+    <div class="flex-none">
+      <IconSVG :iconName="iconName" />
+    </div>
+    <div class="flex-auto">
+      <slot></slot>
+    </div>
   </div>
 </template>

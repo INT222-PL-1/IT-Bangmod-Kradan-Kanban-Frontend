@@ -106,12 +106,12 @@ const handleDeleteTask = async (taskId) => {
         <IconSVG iconName="plus" :scale="1.25" />Add Task
       </button>
     </Teleport> -->
-    <section class="p-4 flex justify-end">
+    <section class="px-4 h-16 flex justify-end items-center">
       <button @click="handleAddBtnCLick" type="button" class="btn btn-primary btn-sm text-neutral">
         <IconSVG iconName="plus" :scale="1.25" />Add Task
       </button>
     </section>
-    <section class=" flex flex-col sm:items-center max-w-full table-overflow-x-scroll">
+    <section class="flex flex-col sm:items-center max-w-full table-overflow-x-scroll min-h-[calc(100vh-9rem)] h-auto">
       <div class="mx-6 w-[60rem] max-w-[90%]">
         <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
         <table class="table border border-base-300">
@@ -138,13 +138,16 @@ const handleDeleteTask = async (taskId) => {
                     <template #menu>
                       <li>
                         <ButtonWithIcon @click="handleEditBtnCLick(task.id)"
-                          className="btn btn-sm btn-ghost justify-start flex flex-nowrap" iconName="pencil-square"
-                          text="Edit" />
+                          className="btn btn-sm btn-ghost justify-start flex flex-nowrap" iconName="pencil-square">
+                          Edit
+                        </ButtonWithIcon>
                       </li>
                       <li>
                         <ButtonWithIcon @click="handleOpenDeleteModal(task)"
                           className="btn btn-sm btn-ghost justify-start text-error flex flex-nowrap"
-                          iconName="trash-fill" text="Delete" />
+                          iconName="trash-fill">
+                          Delete
+                        </ButtonWithIcon>
                       </li>
                     </template>
                   </BaseMenu>

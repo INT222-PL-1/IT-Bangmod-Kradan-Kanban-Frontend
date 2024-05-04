@@ -68,16 +68,40 @@ const handleSetTheme = (theme) => {
     </template>
     <template #menu>
       <li>
-        <ButtonWithIcon @click="handleSetTheme('system')" iconName="pencil-square" text="System"
-          className="btn btn-ghost btn-sm justify-start" />
+        <ButtonWithIcon @click="handleSetTheme('system')" iconName="pencil-square"
+          className="btn btn-ghost btn-sm justify-start">
+          <div class="flex justify-between w-full">
+            <div>System</div>
+            <div v-show="themeSetting === 'system'">
+              <span class="text-success">●</span>
+              <span> In use</span>
+            </div>
+          </div>
+        </ButtonWithIcon>
       </li>
       <li>
-        <ButtonWithIcon @click="handleSetTheme('light')" iconName="sun-fill" text="Light"
-          className="btn btn-ghost btn-sm justify-start" />
+        <ButtonWithIcon @click="handleSetTheme('light')" iconName="sun-fill"
+          className="btn btn-ghost btn-sm justify-start">
+          <div class="flex justify-between w-full">
+            <div>Light</div>
+            <div v-show="themeSetting === 'light'">
+              <span class="text-success">●</span>
+              <span> In use</span>
+            </div>
+          </div>
+        </ButtonWithIcon>
       </li>
       <li>
-        <ButtonWithIcon @click="handleSetTheme('dark')" iconName="moon-fill" text="Dark"
-          className="btn btn-ghost btn-sm justify-start" />
+        <ButtonWithIcon @click="handleSetTheme('dark')" iconName="moon-fill"
+          className="btn btn-ghost btn-sm justify-start">
+          <div class="flex justify-between w-full">
+            <div>Dark</div>
+            <div v-show="themeSetting === 'dark'">
+              <span class="text-success">●</span>
+              <span> In use</span>
+            </div>
+          </div>
+        </ButtonWithIcon>
       </li>
     </template>
   </BaseMenu>

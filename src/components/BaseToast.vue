@@ -44,9 +44,9 @@ const handleCloseToast = () => {
   animation: time-indicator 5s linear;
 }
 
-.animate-pop-in {
+/* .animate-pop-in {
   animation: pop-in 0.3s ease;
-}
+} */
 
 @keyframes time-indicator {
   0% {
