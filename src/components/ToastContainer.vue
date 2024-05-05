@@ -19,11 +19,11 @@ const toastStore = useToastStore()
 <style scoped>
 .v-enter-active,
 .v-leave-active {
-  transition: transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-out;
 }
 
 .v-enter-from,
 .v-leave-to {
-  transform: translateX(120%);
+  transform: translateX(110%);
 }
 </style>

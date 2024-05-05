@@ -68,7 +68,7 @@ const handleSetTheme = (theme) => {
     </template>
     <template #menu>
       <li>
-        <ButtonWithIcon @click="handleSetTheme('system')" iconName="pencil-square"
+        <ButtonWithIcon @click="handleSetTheme('system')" iconName="display"
           className="btn btn-ghost btn-sm justify-start">
           <div class="flex justify-between w-full">
             <div>System</div>

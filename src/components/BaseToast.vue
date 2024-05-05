@@ -27,13 +27,12 @@ const handleCloseToast = () => {
 <template>
   <div :class="toastColor[toastData.status]"
     class="w-full sm:min-w-[24rem] max-w-[30rem] animate-pop-in rounded-lg overflow-hidden relative text-white">
-    <!-- {{ toastData.id }} -->
     <div @click="handleCloseToast" class="top-4 right-4 absolute cursor-pointer">
       <IconSVG iconName="x" />
     </div>
     <div class="p-4">
       <div class="font-bold">{{ toastData.title }}</div>
-      <div class="itbkk-message">{{ toastData.description }}</div>
+      <div class="itbkk-message break-words">{{ toastData.description }}</div>
     </div>
     <div class="h-2 bg-white animate-time-indicator opacity-50"></div>
   </div>
@@ -41,7 +40,7 @@ const handleCloseToast = () => {
 
 <style scoped>
 .animate-time-indicator {
-  animation: time-indicator 5s linear;
+  animation: time-indicator 5s linear forwards;
 }
 
 /* .animate-pop-in {
@@ -49,13 +48,14 @@ const handleCloseToast = () => {
 } */
 
 @keyframes time-indicator {
-  0% {
+  from {
+    width: 100%;
+  }
+
+  to {
     width: 0%;
   }
 
-  100% {
-    width: 100%;
-  }
 }
 
 @keyframes pop-in {
