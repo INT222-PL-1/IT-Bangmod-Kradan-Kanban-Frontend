@@ -4,16 +4,21 @@ defineProps({
     type: String,
     validator: (value) => ['left', 'right'].includes(value),
     default: 'right'
+  },
+  zLayer: {
+    type: Number,
+    default: 1
   }
 })
 </script>
 
 <template>
   <div class="dropdown" :class="{ 'dropdown-end': side === 'left' }">
-    <div tabindex="0" @click="handleClick" role="button" class="btn btn-sm btn-ghost">
+    <div tabindex="0" @click="handleClick" role="button" class="btn btn-sm btn-square btn-ghost">
       <slot name="icon"></slot>
     </div>
-    <ul tabindex="0" class="dropdown-content z-30 menu p-2 shadow bg-base-200 rounded-box w-52 gap-1 flex flex-col">
+    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52 gap-1 flex flex-col"
+      :style="{ 'z-index': zLayer }">
       <slot name="menu"></slot>
     </ul>
   </div>
