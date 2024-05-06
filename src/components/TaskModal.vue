@@ -142,7 +142,7 @@ const handleClickConfirm = async () => {
         <div :class="{ 'border border-error animate-shake-x-in': taskModalData.title.length > 100 }"
           class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-[1]">
           <textarea v-model.trim="taskModalData.title" placeholder="Enter Task Title"
-            class="itbkk-description break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
+            class="itbkk-title break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
         </div>
       </div>
       <div class="grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 flex-auto">
@@ -244,7 +244,7 @@ const handleClickConfirm = async () => {
         </div>
         <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="flex gap-2">
           <button @click="handleClickConfirm"
-            :class="{ 'btn-disabled cursor-not-allowed': taskModalData.title.length < 1 }"
+            :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
             class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledSaveButton">
             Save
           </button>

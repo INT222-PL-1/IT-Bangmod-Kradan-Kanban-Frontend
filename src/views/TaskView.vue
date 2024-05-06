@@ -61,7 +61,7 @@ const handleDeleteTask = async (taskId) => {
   } else {
     toastStore.createToast({
       title: 'Success',
-      description: `Task "${deletedTask.title}" deleted`,
+      description: 'The task has been deleted',
       status: 'success'
     })
     await taskStore.fetchTasks()
@@ -78,14 +78,16 @@ const handleDeleteTask = async (taskId) => {
     <BaseModal @clickBG="taskDeleteModalOpenState = false" :show="taskDeleteModalOpenState" :mobileCenter="true">
       <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
         <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Delete Task</div>
-        <div class="p-4 break-words">Do you want to delete the task "{{ taskDeleteModalData.title }}"?</div>
+        <div class="itbkk-message p-4 break-words">Do you want to delete the task number {{ taskDeleteModalData.id }} -
+          "{{
+            taskDeleteModalData.title }}"?</div>
         <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
           <div class="flex gap-2">
-            <button @click="taskDeleteModalOpenState = false" class="itbkk-button btn btn-sm btn-neutral">
+            <button @click="taskDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
               Cancel
             </button>
             <button @click="handleDeleteTask(taskDeleteModalData.id)"
-              class="itbkk-button btn btn-sm btn-error btn-outline">
+              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
               Confirm
             </button>
           </div>
@@ -106,7 +108,7 @@ const handleDeleteTask = async (taskId) => {
       </button>
     </Teleport> -->
   <Teleport to="#navbar-item">
-    <button @click="handleAddBtnCLick" type="button" class="btn btn-primary btn-sm text-neutral">
+    <button @click="handleAddBtnCLick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
       <IconSVG iconName="plus" :scale="1.25" />Add Task
     </button>
   </Teleport>
@@ -137,13 +139,15 @@ const handleDeleteTask = async (taskId) => {
                 <template #menu>
                   <li>
                     <ButtonWithIcon @click="handleEditBtnCLick(task.id)"
-                      className="btn btn-sm btn-ghost justify-start flex flex-nowrap" iconName="pencil-square">
+                      className="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap"
+                      iconName="pencil-square">
                       Edit
                     </ButtonWithIcon>
                   </li>
                   <li>
                     <ButtonWithIcon @click="handleOpenDeleteModal(task)"
-                      className="btn btn-sm btn-ghost justify-start text-error flex flex-nowrap" iconName="trash-fill">
+                      className="itbkk-button-delete btn btn-sm btn-ghost justify-start text-error flex flex-nowrap"
+                      iconName="trash-fill">
                       Delete
                     </ButtonWithIcon>
                   </li>

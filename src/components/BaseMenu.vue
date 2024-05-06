@@ -13,7 +13,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="dropdown" :class="{ 'dropdown-end': side === 'left' }">
+  <div class="dropdown itbkk-button-action " :class="{ 'dropdown-end': side === 'left' }">
     <div tabindex="0" @click="handleClick" role="button" class="btn btn-sm btn-square btn-ghost">
       <slot name="icon"></slot>
     </div>
