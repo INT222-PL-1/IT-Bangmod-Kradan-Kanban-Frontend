@@ -1,5 +1,16 @@
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
+export async function getTasks() {
+  try {
+    const res = await fetch(`${SERVER_URL}/v1/tasks`)
+    const data = await res.json()
+    return data
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
 export async function getTaskById(taskId) {
   try {
     const res = await fetch(`${SERVER_URL}/v1/tasks/${taskId}`)
