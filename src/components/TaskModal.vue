@@ -235,9 +235,9 @@ const handleClickConfirm = async () => {
       </div>
       <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
         <div v-if="taskModalMode === 'view'" class="flex gap-2">
-          <button @click="$emit('clickOk')" class="itbkk-button btn btn-sm btn-success">
+          <!-- <button @click="$emit('clickOk')" class="itbkk-button btn btn-sm btn-success">
             Ok
-          </button>
+          </button> -->
           <button @click="handleCLickClose" class="itbkk-button btn btn-sm btn-neutral">
             Close
           </button>
