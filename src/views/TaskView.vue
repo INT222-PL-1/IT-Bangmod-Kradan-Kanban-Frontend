@@ -140,10 +140,13 @@ const handleDeleteTask = async (taskId) => {
         </tr>
       </thead>
       <tbody>
-        <tr v-show="taskStore.tasks.length === 0">
+        <tr v-if="taskStore.tasks === null">
+          <td colspan="4" class="text-center">Error while loading tasks from server. Please try again later.</td>
+        </tr>
+        <tr v-else-if="taskStore.tasks.length === 0">
           <td colspan="4" class="text-center">No task</td>
         </tr>
-        <tr v-for="(task, index) in taskStore.tasks" :key="task.id" class="itbkk-item">
+        <tr v-else v-for="(task, index) in taskStore.tasks" :key="task.id" class="itbkk-item">
           <td class="w-16">
             <div class="flex items-center justify-between gap-2">
               <div>{{ index + 1 }}</div>

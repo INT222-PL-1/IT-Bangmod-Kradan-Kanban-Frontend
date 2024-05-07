@@ -4,6 +4,9 @@ export async function getTasks() {
   try {
     const res = await fetch(`${SERVER_URL}/v1/tasks`)
     const data = await res.json()
+    if (res.status === 500) {
+      return null
+    }
     return data
   } catch (error) {
     console.error(error)
