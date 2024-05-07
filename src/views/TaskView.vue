@@ -117,7 +117,7 @@ const handleDeleteTask = async (taskId) => {
     </Teleport> -->
   <Teleport to="#navbar-item">
     <div class="flex gap-2">
-      <button @click="handleRefreshBtnCLick" type="button" class="itbkk-button-add btn btn-secondary btn-sm">
+      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm">
         <div :class="{ 'animate-spin': isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
         </div>Refresh
