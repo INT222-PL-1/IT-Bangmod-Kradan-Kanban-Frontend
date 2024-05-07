@@ -9,17 +9,27 @@ export const useToastStore = defineStore('toast', () => {
     // { id: 2, message: 'This is an error', status: 'error', endTime: Date.now() + 15000 }
   ])
 
-  function createToast(toastObject) {
+  /**
+   * Create a new toast
+   * @param {Object} toastData
+   * @param {String} toastData.title
+   * @param {String} toastData.description
+   * @param {String | 'success' | 'error' | 'warning' | 'info'} toastData.status
+   * @param {Number} duration
+   * @param {*} duration
+   */
+  function createToast(toastData, duration = 5000) {
     const id = nextId++
 
     toasts.value.push({
       id,
-      ...toastObject
+      ...toastData,
+      duration
     })
 
     setTimeout(() => {
       removeToast(id)
-    }, 5000)
+    }, duration)
   }
 
   const removeToast = (id) => {

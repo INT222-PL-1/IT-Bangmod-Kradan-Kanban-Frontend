@@ -1,23 +1,26 @@
 <script setup>
-import { ref } from 'vue'
-
-const showMenu = ref(false)
-const mousePosition = ref({ x: 0, y: 0 })
-
-const handleClick = (e) => {
-  showMenu.value = true
-  mousePosition.value = { x: e.clientX, y: e.clientY }
-}
-
+defineProps({
+  side: {
+    type: String,
+    validator: (value) => ['left', 'right'].includes(value),
+    default: 'right'
+  },
+  zLayer: {
+    type: Number,
+    default: 1
+  }
+})
 </script>
 
 <template>
-  <div @click="handleClick" class="cursor-pointer">
-    <slot name="icon"></slot>
-  </div>
-  <div @mouseleave="showMenu = false" :class="showMenu ? 'block' : 'hidden'" class="fixed z-10"
-    :style="{ top: (mousePosition.y - 4) + 'px', left: (mousePosition.x - 4) + 'px' }">
-    <slot name="menu"></slot>
+  <div class="dropdown itbkk-button-action " :class="{ 'dropdown-end': side === 'left' }">
+    <div tabindex="0" @click="handleClick" role="button" class="btn btn-sm btn-square btn-ghost">
+      <slot name="icon"></slot>
+    </div>
+    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52 gap-1 flex flex-col"
+      :style="{ 'z-index': zLayer }">
+      <slot name="menu"></slot>
+    </ul>
   </div>
 </template>
 
