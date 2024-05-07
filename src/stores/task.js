@@ -5,9 +5,9 @@ import { getTasks } from '@/libs/taskManagement'
 export const useTaskStore = defineStore('task', () => {
   const tasks = ref(0)
 
-  async function fetchTasks() {
+  async function loadTasks() {
     tasks.value = await getTasks()
   }
 
-  return { tasks, fetchTasks }
+  return { tasks, loadTasks }
 })

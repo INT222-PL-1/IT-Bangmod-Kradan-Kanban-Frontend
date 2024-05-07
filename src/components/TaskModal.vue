@@ -45,7 +45,7 @@ async function fetchTaskData() {
   if (taskModalData.value === null) {
     toastStore.createToast({
       title: 'Error',
-      description: `Task ${route.params.taskId} not found`,
+      description: 'An error has occurred, the task does not exist.',
       status: 'error'
     })
     router.replace({ name: 'all-task' })
@@ -93,7 +93,7 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    taskStore.fetchTasks()
+    taskStore.loadTasks()
     router.push({ name: 'all-task' })
   } else if (taskModalMode.value === 'edit') {
     const updatedTask = await updateTask(taskModalData.value)
@@ -110,7 +110,7 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    taskStore.fetchTasks()
+    taskStore.loadTasks()
     router.push({ name: 'all-task' })
   }
 }

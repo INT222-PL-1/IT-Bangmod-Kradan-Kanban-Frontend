@@ -1,7 +1,7 @@
 <script setup>
 import { useTaskStore } from '@/stores/task'
 import { onMounted, ref } from 'vue'
-import LoadingModal from '@/components/LoadingModal.vue'
+// import LoadingModal from '@/components/LoadingModal.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
@@ -23,12 +23,18 @@ const taskDeleteModalOpenState = ref(false)
 
 onMounted(async () => {
   isLoading.value = true
-  await taskStore.fetchTasks()
+  await taskStore.loadTasks()
   isLoading.value = false
 })
 
 const handleTaskClick = (taskId) => {
   router.push({ name: 'task-view', params: { taskId } })
+}
+
+const handleRefreshBtnCLick = async () => {
+  isLoading.value = true
+  await taskStore.loadTasks()
+  isLoading.value = false
 }
 
 const handleAddBtnCLick = () => {
@@ -49,13 +55,14 @@ const handleDeleteTask = async (taskId) => {
   if (deletedTask?.errorStatus === 404) {
     toastStore.createToast({
       title: 'Error',
-      description: `Task "${taskDeleteModalData.value.title}" not found`,
+      description: 'An error has occurred, the task does not exist.',
       status: 'error'
     })
+    await taskStore.loadTasks()
   } else if (deletedTask === null) {
     toastStore.createToast({
       title: 'Error',
-      description: `Task "${taskDeleteModalData.value.title}" could not be deleted`,
+      description: 'An error has occurred, please try again later.',
       status: 'error'
     })
   } else {
@@ -64,7 +71,7 @@ const handleDeleteTask = async (taskId) => {
       description: 'The task has been deleted',
       status: 'success'
     })
-    await taskStore.fetchTasks()
+    await taskStore.loadTasks()
   }
   taskDeleteModalOpenState.value = false
 }
@@ -72,15 +79,16 @@ const handleDeleteTask = async (taskId) => {
 </script>
 
 <template>
-  <LoadingModal :isLoading="isLoading" />
+  <!-- <LoadingModal :isLoading="isLoading" /> -->
 
   <Transition>
     <BaseModal @clickBG="taskDeleteModalOpenState = false" :show="taskDeleteModalOpenState" :mobileCenter="true">
       <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
         <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Delete Task</div>
-        <div class="itbkk-message p-4 break-words">Do you want to delete the task number {{ taskDeleteModalData.id }} -
-          "{{
-            taskDeleteModalData.title }}"?</div>
+        <div class="itbkk-message p-4 break-words">
+          Do you want to delete the task number {{ taskDeleteModalData.id }} -
+          "<span class="opacity-75 italic">{{ taskDeleteModalData.title }}</span>"?
+        </div>
         <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
           <div class="flex gap-2">
             <button @click="taskDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
@@ -108,9 +116,16 @@ const handleDeleteTask = async (taskId) => {
       </button>
     </Teleport> -->
   <Teleport to="#navbar-item">
-    <button @click="handleAddBtnCLick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
-      <IconSVG iconName="plus" :scale="1.25" />Add Task
-    </button>
+    <div class="flex gap-2">
+      <button @click="handleRefreshBtnCLick" type="button" class="itbkk-button-add btn btn-secondary btn-sm">
+        <div :class="{ 'animate-spin': isLoading }">
+          <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+        </div>Refresh
+      </button>
+      <button @click="handleAddBtnCLick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
+        <IconSVG iconName="plus" :scale="1.25" />Add Task
+      </button>
+    </div>
   </Teleport>
 
   <div class="px-4 w-[60rem] max-w-full table-overflow-x-scroll py-20">
