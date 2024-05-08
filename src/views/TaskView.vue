@@ -84,6 +84,10 @@ const handleDeleteTask = async (taskId) => {
   taskDeleteModalOpenState.value = false
 }
 
+const handleManageStatusBtnCLick = () => {
+  router.push({ name: 'status-manage' })
+}
+
 </script>
 
 <template>
@@ -125,10 +129,13 @@ const handleDeleteTask = async (taskId) => {
     </Teleport> -->
   <Teleport to="#navbar-item">
     <div class="flex gap-2">
+      <button @click="handleManageStatusBtnCLick" type="button" class="itbkk-manage-status btn btn-outline btn-sm">
+        <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
+      </button>
       <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm">
         <div :class="{ 'animate-spin': isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-        </div>Refresh
+        </div>Refresh Tasks
       </button>
       <button @click="handleAddBtnCLick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
         <IconSVG iconName="plus" :scale="1.25" />Add Task

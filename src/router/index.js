@@ -34,6 +34,18 @@ const router = createRouter({
       ]
     },
     {
+      path: '/status/manage',
+      name: 'status-manage',
+      component: () => import('../views/StatusManageView.vue'),
+      children: [
+        {
+          path: '/status/add',
+          name: 'status-add',
+          component: () => import('../components/StatusModal.vue')
+        }
+      ]
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('../views/NotFound.vue')

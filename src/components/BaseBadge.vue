@@ -29,12 +29,14 @@ defineProps({
 </script>
 
 <template>
-  <div class="w-full px-2 py-1 rounded-lg cursor-default" :style="{
+  <div class="px-2 py-1 rounded-lg cursor-default" :style="{
     backgroundColor: bgcolor,
     color,
     width
   }" :title="label">
-    <div :class="textWrapMode === 'truncate' ? 'truncate' : 'break-words'" class="text-center w-full">{{ label }}</div>
+    <div class="flex justify-center items-center" :style="{ width }">
+      <div :class="textWrapMode === 'truncate' ? 'truncate' : 'break-words'" class="max-w-full">{{ label }}</div>
+    </div>
   </div>
 </template>
 
