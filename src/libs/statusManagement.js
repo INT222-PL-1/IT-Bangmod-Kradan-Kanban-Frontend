@@ -1,8 +1,8 @@
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
-export async function getTasks() {
+export async function getStatuses() {
   try {
-    const res = await fetch(`${SERVER_URL}/v2/tasks`)
+    const res = await fetch(`${SERVER_URL}/v2/statuses`)
     const data = await res.json()
     if (res.status === 500) {
       return null
@@ -14,9 +14,9 @@ export async function getTasks() {
   }
 }
 
-export async function getTaskById(taskId) {
+export async function getStatusById(statusId) {
   try {
-    const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`)
+    const res = await fetch(`${SERVER_URL}/v2/statuses/${statusId}`)
     if (res.status === 404) {
       // console.log(res)
       return null
@@ -33,18 +33,17 @@ export async function getTaskById(taskId) {
   }
 }
 
-export async function createTask({ title, description, assignees, statusId }) {
+export async function createStatus({ name, description, color }) {
   try {
-    const res = await fetch(`${SERVER_URL}/v2/tasks`, {
+    const res = await fetch(`${SERVER_URL}/v2/statuses`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        title,
+        name,
         description: description === '' ? null : description,
-        assignees: assignees === '' ? null : assignees,
-        statusId
+        color: color === '' ? '#666666' : color
       })
     })
 
@@ -58,18 +57,17 @@ export async function createTask({ title, description, assignees, statusId }) {
   }
 }
 
-export async function updateTask({ id: taskId, title, description, assignees, statusId }) {
+export async function updateStatus({ id: statusId, name, description, color }) {
   try {
-    const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`, {
+    const res = await fetch(`${SERVER_URL}/v2/statuses/${statusId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        title,
+        name,
         description: description === '' ? null : description,
-        assignees: assignees === '' ? null : assignees,
-        statusId
+        color: color === '' ? '#666666' : color
       })
     })
 
@@ -83,9 +81,11 @@ export async function updateTask({ id: taskId, title, description, assignees, st
   }
 }
 
-export async function deleteTask(taskId) {
+export async function deleteStatus(statusId) {
   try {
-    const res = await fetch(`${SERVER_URL}/v1/tasks/${taskId}`, { method: 'DELETE' })
+    const res = await fetch(`${SERVER_URL}/v2/statuses/${statusId}`, {
+      method: 'DELETE'
+    })
     if (res.ok) {
       const data = await res.json()
       return data

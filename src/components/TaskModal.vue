@@ -8,6 +8,7 @@ import { computed, onMounted, ref } from 'vue';
 import { createTask, getTaskById, updateTask } from '@/libs/taskManagement';
 import { useToastStore } from '@/stores/toast';
 import { useTaskStore } from '@/stores/task';
+import { useStatusStore } from '@/stores/status';
 
 defineProps({
   show: {
@@ -20,6 +21,8 @@ const route = useRoute()
 const router = useRouter()
 const taskStore = useTaskStore()
 const toastStore = useToastStore()
+const statusStore = useStatusStore()
+
 const taskModalMode = ref('view')
 const taskModalData = ref(null)
 let previousTaskData = null
@@ -34,7 +37,7 @@ const disabledSaveButton = computed(() => {
         taskModalData.value.title === previousTaskData.title &&
         taskModalData.value.description === previousTaskData.description &&
         taskModalData.value.assignees === previousTaskData.assignees &&
-        taskModalData.value.status === previousTaskData.status
+        taskModalData.value.statusId === previousTaskData.statusId
       )
     )
 })
@@ -42,6 +45,7 @@ const disabledSaveButton = computed(() => {
 async function fetchTaskData() {
   const taskId = route.params.taskId
   taskModalData.value = await getTaskById(taskId)
+  console.log(taskModalData.value)
   if (taskModalData.value === null) {
     toastStore.createToast({
       title: 'Error',
@@ -64,7 +68,7 @@ onMounted(async () => {
       title: '',
       description: '',
       assignees: '',
-      status: 'NO_STATUS'
+      statusId: 1
     }
     return
   } else if (taskModalMode.value === 'edit') {
@@ -202,10 +206,11 @@ const handleClickConfirm = async () => {
             <div class="p-4">
               <div class="text-lg font-semibold">Status</div>
               <div v-if="taskModalMode === 'view'" class="w-full max-w-[16rem]">
-                <StatusBadge :status="taskModalData?.status" class="itbkk-status" />
+                <StatusBadge :statusData="statusStore.statuses.find(status => status.id === taskModalData.statusId)"
+                  width="100%" class="itbkk-status" />
               </div>
               <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="w-full max-w-[16rem]">
-                <StatusSelector v-model="taskModalData.status" />
+                <StatusSelector v-model="taskModalData.statusId" />
               </div>
             </div>
           </div>

@@ -10,6 +10,7 @@ import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import BaseModal from '@/components/BaseModal.vue'
 import { deleteTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
+import { useStatusStore } from '@/stores/status'
 // import { useToastStore } from '@/stores/toast';
 
 
@@ -17,6 +18,8 @@ const isLoading = ref(false)
 const router = useRouter()
 const toastStore = useToastStore()
 const taskStore = useTaskStore()
+const statusStore = useStatusStore()
+
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
 // const toastStore = useToastStore()
@@ -24,6 +27,11 @@ const taskDeleteModalOpenState = ref(false)
 onMounted(async () => {
   isLoading.value = true
   await taskStore.loadTasks()
+  await statusStore.loadStatuses()
+
+  console.log(taskStore.tasks)
+  console.log(statusStore.statuses)
+
   isLoading.value = false
 })
 
@@ -182,9 +190,11 @@ const handleDeleteTask = async (taskId) => {
           <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees min-w-60 w-60">
             {{ task.assignees || 'Unassigned' }}
           </td>
-          <td class="min-w-44">
-            <div class="grid place-items-center">
-              <StatusBadge :status="task.status" class="itbkk-status" />
+          <td class="min-w-44 max-w-44">
+            <div class="grid place-items-center w-full">
+              <StatusBadge :statusData="statusStore.statuses.find(status => status.id === task.statusId)"
+                textWrapMode="truncate" class="itbkk-status" />
+              <!-- {{ statusStore.statuses.find(status => status.id === task.statusId).name }} -->
             </div>
           </td>
         </tr>

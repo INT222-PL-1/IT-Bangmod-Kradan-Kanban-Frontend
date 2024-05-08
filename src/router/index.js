@@ -30,6 +30,11 @@ const router = createRouter({
           component: () => import('../components/TaskModal.vue')
         }
       ]
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFound.vue')
     }
   ]
 })
