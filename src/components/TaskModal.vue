@@ -52,8 +52,8 @@ async function fetchTaskData() {
       description: 'An error has occurred, the task does not exist.',
       status: 'error'
     })
-    router.back()
-    // router.replace({ name: 'all-task' })
+    // router.back()
+    router.replace({ name: 'all-task' })
   } else {
     if (taskModalMode.value === 'edit') {
       previousTaskData = { ...taskModalData.value }

@@ -141,10 +141,10 @@ const handleDeleteTask = async (taskId) => {
     <table class="table border border-base-300">
       <thead class="bg-base-200">
         <tr>
-          <th></th>
-          <th>Title</th>
-          <th>Assignees</th>
-          <th>Status</th>
+          <th class="min-w-16 max-w-16"></th>
+          <th class="min-w-52 w-full max-w-52 md:max-w-72 lg:max-w-96">Title</th>
+          <th class="min-w-60 w-60">Assignees</th>
+          <th class="min-w-44 max-w-44">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -155,7 +155,7 @@ const handleDeleteTask = async (taskId) => {
           <td colspan="4" class="text-center">No task</td>
         </tr>
         <tr v-else v-for="(task, index) in taskStore.tasks" :key="task.id" class="itbkk-item">
-          <td class="w-16">
+          <td class="min-w-16 max-w-16">
             <div class="flex items-center justify-between gap-2">
               <div>{{ index + 1 }}</div>
               <BaseMenu>
