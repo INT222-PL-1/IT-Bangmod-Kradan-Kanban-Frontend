@@ -198,11 +198,8 @@ const handleManageStatusBtnCLick = () => {
             {{ task.assignees || 'Unassigned' }}
           </td>
           <td class="min-w-44 max-w-44">
-            <div class="grid place-items-center w-full">
-              <StatusBadge :statusData="statusStore.statuses.find(status => status.id === task.statusId)"
-                textWrapMode="truncate" class="itbkk-status" />
-              <!-- {{ statusStore.statuses.find(status => status.id === task.statusId).name }} -->
-            </div>
+            <StatusBadge :statusData="statusStore.statuses.find(status => status.id === task.statusId)"
+              textWrapMode="truncate" width="100%" class="itbkk-status" />
           </td>
         </tr>
       </tbody>
