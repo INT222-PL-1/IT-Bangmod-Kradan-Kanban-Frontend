@@ -194,12 +194,13 @@ const handleManageStatusBtnCLick = () => {
               {{ task.title }}
             </div>
           </td>
-          <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees min-w-60 w-60">
+          <td :class="{ 'italic text-[grey]': !task.assignees, 'itbkk-assignees': $route.name === 'all-task' }"
+            class="min-w-60 w-60">
             {{ task.assignees || 'Unassigned' }}
           </td>
           <td class="min-w-44 max-w-44">
             <StatusBadge :statusData="statusStore.statuses.find(status => status.id === task.statusId)"
-              textWrapMode="truncate" width="100%" class="itbkk-status" />
+              textWrapMode="truncate" width="100%" :class="{ 'itbkk-status': $route.name === 'all-task' }" />
           </td>
         </tr>
       </tbody>
