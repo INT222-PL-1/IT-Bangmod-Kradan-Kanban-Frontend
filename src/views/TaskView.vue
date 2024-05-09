@@ -190,7 +190,7 @@ const handleManageStatusBtnCLick = () => {
           </td>
           <td @click="handleTaskClick(task.id)"
             class="overflow-hidden min-w-52 w-full max-w-52 md:max-w-72 lg:max-w-96 hover:underline hover:cursor-pointer">
-            <div class="itbkk-title break-words font-semibold">
+            <div :class="{ 'itbkk-title': $route.name === 'all-task' }" class="break-words font-semibold">
               {{ task.title }}
             </div>
           </td>
