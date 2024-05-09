@@ -1,5 +1,5 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
 import { useStatusStore } from '@/stores/status'
 import IconSVG from '@/components/IconSVG.vue';
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue';
@@ -7,6 +7,7 @@ import { onMounted, ref } from 'vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 
 const isLoading = ref(false)
+const router = useRouter()
 const statusStore = useStatusStore()
 
 async function fetchStatuses() {
@@ -25,6 +26,7 @@ const handleRefreshBtnCLick = async () => {
 
 const handleAddBtnCLick = () => {
   console.log('add button clicked')
+  router.push({ name: 'status-add' })
 }
 
 const handleStatusClick = (statusId) => {

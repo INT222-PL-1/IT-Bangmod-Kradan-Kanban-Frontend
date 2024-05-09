@@ -18,6 +18,32 @@
 .table-overflow-x-scroll::-webkit-scrollbar-thumb:hover {
   background-color: #4f4f4f99;
 }
+
+.animate-shake-x-in {
+  animation: shake-x-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) both;
+}
+
+@keyframes shake-x-in {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
 /* 
 html::-webkit-scrollbar {
   width: 12px;

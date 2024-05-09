@@ -42,6 +42,11 @@ const router = createRouter({
           path: '/status/add',
           name: 'status-add',
           component: () => import('../components/StatusModal.vue')
+        },
+        {
+          path: '/status/:statusId/edit',
+          name: 'status-edit',
+          component: () => import('../components/StatusModal.vue')
         }
       ]
     },

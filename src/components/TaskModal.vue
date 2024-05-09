@@ -146,7 +146,7 @@ const handleClickConfirm = async () => {
         </div>
         <div :class="{ 'border border-error animate-shake-x-in': taskModalData.title.length > 100 }"
           class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-[1]">
-          <textarea v-model.trim="taskModalData.title" placeholder="Enter Task Title"
+          <textarea v-model.trim="taskModalData.title" placeholder="Enter Task Title (Required)"
             class="itbkk-title break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
         </div>
       </div>
@@ -263,31 +263,4 @@ const handleClickConfirm = async () => {
   </BaseModal>
 </template>
 
-<style scoped>
-.animate-shake-x-in {
-  animation: shake-x-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) both;
-}
-
-@keyframes shake-x-in {
-
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  10%,
-  30%,
-  50%,
-  70%,
-  90% {
-    transform: translateX(-5px);
-  }
-
-  20%,
-  40%,
-  60%,
-  80% {
-    transform: translateX(5px);
-  }
-}
-</style>
+<style scoped></style>
