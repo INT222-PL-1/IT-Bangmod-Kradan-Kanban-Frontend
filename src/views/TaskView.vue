@@ -129,10 +129,32 @@ const handleManageStatusBtnCLick = () => {
     </Teleport> -->
   <Teleport to="#navbar-item">
     <div class="flex gap-2">
-      <button @click="handleManageStatusBtnCLick" type="button" class="itbkk-manage-status btn btn-outline btn-sm">
+      <BaseMenu side="left" class="sm:hidden">
+        <template #icon>
+          <IconSVG iconName="three-dots" />
+        </template>
+        <template #menu>
+          <li>
+            <button @click="handleRefreshBtnCLick" type="button"
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
+              <div :class="{ 'animate-spin': isLoading }">
+                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+              </div>Refresh Tasks
+            </button>
+          </li>
+          <li>
+            <button @click="handleManageStatusBtnCLick"
+              class="itbkk-manage-status btn btn-sm btn-ghost justify-start flex flex-nowrap">
+              <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
+            </button>
+          </li>
+        </template>
+      </BaseMenu>
+      <button @click="handleManageStatusBtnCLick" type="button"
+        class="itbkk-manage-status btn btn-outline btn-sm hidden sm:flex">
         <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
       </button>
-      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm">
+      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
         <div :class="{ 'animate-spin': isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
         </div>Refresh Tasks

@@ -5,9 +5,11 @@ import IconSVG from '@/components/IconSVG.vue';
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue';
 import { onMounted, ref } from 'vue';
 import StatusBadge from '@/components/StatusBadge.vue';
-import { deleteStatus } from '@/libs/statusManagement';
+import { deleteStatus, transferTasksStatus } from '@/libs/statusManagement';
 import { useToastStore } from '@/stores/toast';
 import BaseModal from '@/components/BaseModal.vue';
+import StatusSelector from '@/components/StatusSelector.vue';
+import BaseMenu from '@/components/BaseMenu.vue';
 
 const isLoading = ref(false)
 const router = useRouter()
@@ -16,6 +18,9 @@ const toastStore = useToastStore()
 
 const statusDeleteModalData = ref(null)
 const statusDeleteModalOpenState = ref(false)
+const statusTransferModalData = ref(null)
+const statusTransferModalOpenState = ref(false)
+const statusIdToTransfer = ref(1)
 
 async function fetchStatuses() {
   isLoading.value = true
@@ -44,9 +49,37 @@ const handleEditBtnCLick = (statusId) => {
   router.push({ name: 'status-edit', params: { statusId } })
 }
 
+const handleOpenTransferModal = (statusData) => {
+  statusTransferModalData.value = statusData
+  statusTransferModalOpenState.value = true
+}
+
 const handleOpenDeleteModal = (statusData) => {
-  statusDeleteModalData.value = statusData
-  statusDeleteModalOpenState.value = true
+  if (statusData.count > 0) {
+    handleOpenTransferModal(statusData)
+  } else {
+    statusDeleteModalData.value = statusData
+    statusDeleteModalOpenState.value = true
+  }
+}
+
+const handleTransferStatus = async (fromStatusId, toStatusId) => {
+  const transferredStatus = await transferTasksStatus(fromStatusId, toStatusId)
+  if (transferredStatus === null) {
+    toastStore.createToast({
+      title: 'Error',
+      description: 'An error has occurred, please try again later.',
+      status: 'error'
+    })
+  } else {
+    toastStore.createToast({
+      title: 'Success',
+      description: 'The tasks have been transferred and the status has been deleted.',
+      status: 'success'
+    })
+    await statusStore.loadStatuses()
+  }
+  statusTransferModalOpenState.value = false
 }
 
 const handleDeleteStatus = async (statusId) => {
@@ -75,6 +108,11 @@ const handleDeleteStatus = async (statusId) => {
   statusDeleteModalOpenState.value = false
 }
 
+const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
+  await handleTransferStatus(fromStatusId, toStatusId)
+  // await handleDeleteStatus(fromStatusId)
+}
+
 </script>
 
 <template>
@@ -101,6 +139,38 @@ const handleDeleteStatus = async (statusId) => {
     </BaseModal>
   </Transition>
 
+  <Transition>
+    <BaseModal @clickBG="statusTransferModalOpenState = false" :show="statusTransferModalOpenState"
+      :mobileCenter="true">
+      <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Transfer a Status</div>
+        <div class="itbkk-message p-4 break-words">
+          <div>There are <span class="font-semibold">{{ statusTransferModalData.count }}</span> task{{
+            statusTransferModalData.count > 1 ? 's' : '' }} associated with the <span class="opacity-75 italic">{{
+              statusTransferModalData.name }}</span> status.</div>
+          <div class="mt-2">
+            <span>Transfer to </span>
+            <div class="w-48 inline-block">
+              <StatusSelector v-model="statusIdToTransfer" :excludeStatusId="statusTransferModalData.id" />
+            </div>
+            <span> before deleting the status.</span>
+          </div>
+        </div>
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+          <div class="flex gap-2">
+            <button @click="statusTransferModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+              Cancel
+            </button>
+            <button @click="handleTransferAndDeleteStatus(statusTransferModalData.id, statusIdToTransfer)"
+              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+              Transfer and Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
+  </Transition>
+
   <RouterView v-slot="{ Component }">
     <Transition>
       <Component :is="Component" />
@@ -109,7 +179,22 @@ const handleDeleteStatus = async (statusId) => {
 
   <Teleport to="#navbar-item">
     <div class="flex gap-2">
-      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm">
+      <BaseMenu side="left" class="sm:hidden">
+        <template #icon>
+          <IconSVG iconName="three-dots" />
+        </template>
+        <template #menu>
+          <li>
+            <button @click="handleRefreshBtnCLick" type="button"
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
+              <div :class="{ 'animate-spin': isLoading }">
+                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+              </div>Refresh Statuses
+            </button>
+          </li>
+        </template>
+      </BaseMenu>
+      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
         <div :class="{ 'animate-spin': isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
         </div>Refresh Statuses
@@ -174,7 +259,7 @@ const handleDeleteStatus = async (statusId) => {
             </div>
           </td>
           <td class="min-w-44 max-w-44">
-            <div class="flex justify-center items-center gap-2 w-full">
+            <div v-if="status.id !== 1" class="flex justify-center items-center gap-1 w-full">
               <ButtonWithIcon @click="handleEditBtnCLick(status.id)"
                 className="itbkk-button-edit btn btn-sm justify-start flex flex-nowrap" iconName="pencil-square">
                 Edit
