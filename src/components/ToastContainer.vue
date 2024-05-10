@@ -8,7 +8,7 @@ const toastStore = useToastStore()
 
 <template>
   <Teleport to="#toast">
-    <div v-show="toastStore.toasts.length > 0"
+    <div :class="{ 'pointer-events-none': toastStore.toasts.length < 1 }"
       class="fixed bottom-0 w-full sm:w-auto sm:right-0 z-[60] flex flex-col gap-2 p-4">
       <TransitionGroup>
         <BaseToast v-for="toast in toastStore.toasts" :key="toast.id" :toastData="toast" />

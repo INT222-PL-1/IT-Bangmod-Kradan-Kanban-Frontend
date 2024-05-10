@@ -7,6 +7,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import ColorPalette from './ColorPalette.vue'
 import StatusBadge from './StatusBadge.vue';
+import { colorValidator } from '@/libs/utils';
 
 const route = useRoute()
 const router = useRouter()
@@ -20,6 +21,7 @@ const disabledSaveButton = computed(() => {
   return statusModalData.value.name.length < 1 ||
     statusModalData.value.name.length > 50 ||
     statusModalData.value.description.length > 200 ||
+    colorValidator(statusModalData.value.color) === false ||
     (
       statusModalMode.value === 'edit' &&
       (
@@ -55,7 +57,7 @@ onMounted(async () => {
     statusModalData.value = {
       name: '',
       description: '',
-      color: 'grey',
+      color: '#ffffff',
     }
     return
   } else if (statusModalMode.value === 'edit') {
@@ -166,7 +168,10 @@ const handleClickConfirm = async () => {
               </span>
             </div>
             <div class="mt-2">
-              <ColorPalette v-model="statusModalData.color" />
+              <ColorPalette v-model="statusModalData.color" :colorList="[
+                '#DC143C', '#ff5500', '#FFA500', '#3CB371', '#40E0D0', '#20B2AA',
+                '#1E90FF', '#9370DB', '#BA55D3', '#FF1493', '#ffffff', '#A9A9A9'
+              ]" />
             </div>
           </div>
         </div>

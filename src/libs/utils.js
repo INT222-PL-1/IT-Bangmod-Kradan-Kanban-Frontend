@@ -39,3 +39,12 @@ export function truncateText(text, maxLength) {
   }
   return text
 }
+
+export function colorValidator(value) {
+  if (value.length === 7 && value[0] === '#') {
+    if (value.slice(1).match(/^[0-9a-fA-F]+$/)) {
+      return true
+    }
+  }
+  return false
+}
