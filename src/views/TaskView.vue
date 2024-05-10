@@ -143,14 +143,14 @@ const handleManageStatusBtnCLick = () => {
     </div>
   </Teleport>
 
-  <div class="px-4 w-[60rem] max-w-full table-overflow-x-scroll py-20">
+  <div class="px-4 max-w-full table-overflow-x-scroll py-20">
     <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
     <table class="table border border-base-300">
       <thead class="bg-base-200">
         <tr>
           <th class="min-w-16 max-w-16"></th>
-          <th class="min-w-52 w-full max-w-52 md:max-w-72 lg:max-w-96">Title</th>
-          <th class="min-w-60 w-60">Assignees</th>
+          <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Title</th>
+          <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">Assignees</th>
           <th class="min-w-44 max-w-44">Status</th>
         </tr>
       </thead>
@@ -189,7 +189,7 @@ const handleManageStatusBtnCLick = () => {
             </div>
           </td>
           <td @click="handleTaskClick(task.id)"
-            class="overflow-hidden min-w-52 w-full max-w-52 md:max-w-72 lg:max-w-96 hover:underline hover:cursor-pointer">
+            class="overflow-hidden min-w-52 max-w-52 md:max-w-72 lg:max-w-96 hover:underline hover:cursor-pointer">
             <div :class="{ 'itbkk-title': $route.name === 'all-task' }" class="break-words font-semibold">
               {{ task.title }}
             </div>

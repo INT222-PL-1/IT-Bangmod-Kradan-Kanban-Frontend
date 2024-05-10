@@ -34,7 +34,7 @@ const handleStatusClick = (statusId) => {
 }
 
 const handleEditBtnCLick = (statusId) => {
-  console.log('edit button clicked', statusId)
+  router.push({ name: 'status-edit', params: { statusId } })
 }
 
 const handleOpenDeleteModal = (statusData) => {
@@ -64,7 +64,7 @@ const handleOpenDeleteModal = (statusData) => {
     </div>
   </Teleport>
 
-  <div class="px-4 w-[60rem] my-5">
+  <div class="px-4 w-11/12 my-5">
     <div class="text-base breadcrumbs">
       <ul>
         <li>
@@ -76,14 +76,15 @@ const handleOpenDeleteModal = (statusData) => {
     </div>
   </div>
 
-  <div class="px-4 w-[60rem] max-w-full table-overflow-x-scroll pb-20">
+  <div class="px-4 max-w-full table-overflow-x-scroll pb-20">
     <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
     <table class="table border border-base-300">
       <thead class="bg-base-200">
         <tr>
           <th class="min-w-16 max-w-16"></th>
-          <th class="min-w-52 max-w-52">Name</th>
-          <th class="min-w-96 max-w-96">Description</th>
+          <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
+          <th class="min-w-96 max-w-96 sm:min-w-[40vw] sm:max-w-[40vw]">Description</th>
+          <th class="min-w-16 max-w-16">Tasks</th>
           <th class="min-w-44 max-w-44">Action</th>
         </tr>
       </thead>
@@ -105,11 +106,16 @@ const handleOpenDeleteModal = (statusData) => {
               {{ status.name }}
             </div> -->
             <StatusBadge @click="handleStatusClick(status.id)" :statusData="status" textWrapMode="wrap"
-              class="itbkk-status-name hover:cursor-pointer hover:opacity-75 transition-opacity" width="100%" />
+              class="itbkk-status-name cursor-default" width="100%" />
           </td>
           <td :class="{ 'italic text-[grey]': !status.description }"
             class="itbkk-status-description min-w-96 max-w-96 break-words">
             {{ status.description || 'No description provided' }}
+          </td>
+          <td class="min-w-16 max-w-16">
+            <div class="grid place-items-center">
+              <div>{{ status.count }}</div>
+            </div>
           </td>
           <td class="min-w-44 max-w-44">
             <div class="flex justify-center items-center gap-2 w-full">

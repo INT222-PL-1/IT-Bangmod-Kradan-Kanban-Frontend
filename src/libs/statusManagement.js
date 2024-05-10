@@ -1,8 +1,18 @@
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
-export async function getStatuses() {
+/**
+ * Get all statuses
+ * @param {Object} options
+ * @param {Number} options.count
+ * @returns
+ */
+export async function getStatuses(options = {}) {
+  let url = `${SERVER_URL}/v2/statuses`
+
+  if (options.count) url += `?count=${options.count}`
+
   try {
-    const res = await fetch(`${SERVER_URL}/v2/statuses`)
+    const res = await fetch(url)
     const data = await res.json()
     if (res.status === 500) {
       return null
@@ -14,9 +24,20 @@ export async function getStatuses() {
   }
 }
 
-export async function getStatusById(statusId) {
+/**
+ * Get status by id
+ * @param {Number} statusId
+ * @param {Object} options
+ * @param {Number} options.count
+ * @returns
+ */
+export async function getStatusById(statusId, options = {}) {
+  let url = `${SERVER_URL}/v2/statuses/${statusId}`
+
+  if (options.count) url += `?count=${options.count}`
+
   try {
-    const res = await fetch(`${SERVER_URL}/v2/statuses/${statusId}`)
+    const res = await fetch(url)
     if (res.status === 404) {
       // console.log(res)
       return null

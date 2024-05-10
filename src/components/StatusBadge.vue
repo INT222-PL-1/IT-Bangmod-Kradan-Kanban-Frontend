@@ -10,8 +10,8 @@ defineProps({
 </script>
 
 <template>
-  <BaseBadge :bgcolor="statusData?.color" :color="'#fff'"
-    :label="statusData?.name !== '' ? statusData.name : 'Status Name'" :description="statusData?.description" />
+  <BaseBadge :bgcolor="statusData?.color" :color="'#fff'" :label="statusData?.name ? statusData.name : 'Status Name'"
+    :description="statusData?.description" />
 </template>
 
 <style scoped></style>

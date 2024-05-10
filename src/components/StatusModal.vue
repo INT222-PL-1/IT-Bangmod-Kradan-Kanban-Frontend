@@ -32,7 +32,7 @@ const disabledSaveButton = computed(() => {
 
 async function fetchStatusData() {
   const statusId = route.params.statusId
-  statusModalData.value = await getStatusById(statusId)
+  statusModalData.value = await getStatusById(statusId, { count: true })
   console.log(statusModalData.value)
   if (statusModalData.value === null) {
     toastStore.createToast({
@@ -117,7 +117,7 @@ const handleClickConfirm = async () => {
         <span v-if="statusModalMode === 'add'">Add Status</span>
         <span v-else-if="statusModalMode === 'edit'">Edit Status</span>
       </div>
-      <div class="p-4 flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-4">
+      <div class="p-4 flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-4 flex-auto">
         <div class="flex flex-col gap-2">
           <div>
             <div>
@@ -181,10 +181,10 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <div class="grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 flex-auto">
+      <!-- <div class="grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 flex-auto">
         <div>
-        </div>
-        <!-- <div class="flex flex-col justify-between">
+        </div> -->
+      <!-- <div class="flex flex-col justify-between">
           <div v-if="['edit'].includes(statusModalMode)">
             <div class="p-4 flex flex-col gap-1">
               <div class="flex">
@@ -208,7 +208,7 @@ const handleClickConfirm = async () => {
             </div>
           </div>
         </div> -->
-      </div>
+      <!-- </div> -->
       <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
         <div class="flex gap-2">
           <button @click="handleClickConfirm"
