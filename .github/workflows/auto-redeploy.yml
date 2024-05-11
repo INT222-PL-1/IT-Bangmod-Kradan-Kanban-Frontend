@@ -35,7 +35,7 @@ jobs:
   
         - name: Install Dependencies
           if: steps.cache.outputs.cache-hit != 'true'
-          run: /install.sh
+          run: npm list
       
               
         - name: Set up Docker Buildx
