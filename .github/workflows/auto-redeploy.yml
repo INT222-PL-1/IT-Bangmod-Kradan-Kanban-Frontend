@@ -20,10 +20,11 @@ jobs:
           with:
             node-version: 20
         - name: Cache node modules
-          id: cache-npm
           uses: actions/cache@v4
           env:
             cache-name: cache-node-modules
+          id: cache
+        
           with:
             # npm cache files are stored in `~/.npm` on Linux/macOS
             path: ~/.npm
@@ -32,7 +33,10 @@ jobs:
               ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
               ${{ runner.os }}-build-
               ${{ runner.os }}-
-  
+
+          run: |
+                echo restore-keys >> $GITHUB_OUTPUT
+                
         - name: Install Dependencies
           if: steps.cache.outputs.cache-hit != 'true'
           continue-on-error: true
