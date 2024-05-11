@@ -67,7 +67,7 @@ jobs:
           cache-to: type=gha,mode=max
 
     SSH-Remote-Deploy:
-      needs:  Prepare-to-docker-image-build
+      needs:  Catching-with-npm
       runs-on: ubuntu-latest
       steps:
       - name: executing remote ssh commands using password
