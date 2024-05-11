@@ -19,8 +19,7 @@ jobs:
         - uses: actions/setup-node@v4
           with:
             node-version: 20
-        - name: Cache node modules
-          uses: actions/cache@v4
+        - name: cache
           env:
             cache-name: cache-node-modules
           id: cache
@@ -34,13 +33,13 @@ jobs:
               ${{ runner.os }}-build-
               ${{ runner.os }}-
 
-          run: |
-                echo restore-keys >> $GITHUB_OUTPUT
+          
                 
         - name: Install Dependencies
+          run: |
+                echo restore-keys >> $GITHUB_OUTPUT
           if: steps.cache.outputs.cache-hit != 'true'
           continue-on-error: true
-          run: npm list
       
               
         - name: Set up Docker Buildx
