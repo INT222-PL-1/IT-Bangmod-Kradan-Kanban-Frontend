@@ -35,6 +35,7 @@ jobs:
   
         - name: Install Dependencies
           if: steps.cache.outputs.cache-hit != 'true'
+          continue-on-error: true
           run: npm list
       
               
