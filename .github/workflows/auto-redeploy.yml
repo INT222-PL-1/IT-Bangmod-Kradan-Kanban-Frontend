@@ -7,18 +7,18 @@ on:
     - 'develop/**'
   
 jobs:     
-    Prepare to docker-image-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Create .env file & set up node
-        run: |
-          echo "${{ secrets.ENV_PRODUCTION_FILE }}" > .env.production
-          ls -a
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+    Prepare-to-docker-image-build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+        - name: Create .env file & set up node
+          run: |
+            echo "${{ secrets.ENV_PRODUCTION_FILE }}" > .env.production
+            ls -a
+        - uses: actions/setup-node@v4
+          with:
+            node-version: 20
           
     Catching-with-npm:
       runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
           cache-to: type=gha,mode=max
 
     SSH-Remote-Deploy:
-      needs:  Prepare to docker-image-build
+      needs:  Prepare-to-docker-image-build
       runs-on: ubuntu-latest
       steps:
       - name: executing remote ssh commands using password
