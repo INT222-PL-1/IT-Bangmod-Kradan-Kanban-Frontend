@@ -31,7 +31,7 @@ const props = defineProps({
 })
 
 const validatedColor = computed(() => {
-  return colorValidator(props.bgcolor) ? props.bgcolor : '#ffffff'
+  return (props.bgcolor && colorValidator(props.bgcolor)) ? props.bgcolor : '#ffffff'
 })
 
 </script>
