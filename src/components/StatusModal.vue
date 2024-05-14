@@ -57,7 +57,7 @@ onMounted(async () => {
     statusModalData.value = {
       name: '',
       description: '',
-      color: '#ffffff',
+      color: '#A9A9A9',
     }
     return
   } else if (statusModalMode.value === 'edit') {
