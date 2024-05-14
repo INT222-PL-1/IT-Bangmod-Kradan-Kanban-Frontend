@@ -129,11 +129,11 @@ const handleManageStatusBtnCLick = () => {
     </Teleport> -->
   <Teleport to="#navbar-item">
     <div class="flex gap-2">
-      <BaseMenu side="left" class="sm:hidden">
+      <!-- <BaseMenu side="left" class="sm:hidden">
         <template #icon>
           <IconSVG iconName="three-dots" />
         </template>
-        <template #menu>
+<template #menu>
           <li>
             <button @click="handleRefreshBtnCLick" type="button"
               class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
@@ -149,7 +149,7 @@ const handleManageStatusBtnCLick = () => {
             </button>
           </li>
         </template>
-      </BaseMenu>
+</BaseMenu> -->
       <button @click="handleManageStatusBtnCLick" type="button"
         class="itbkk-manage-status btn btn-outline btn-sm hidden sm:flex">
         <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status

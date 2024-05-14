@@ -87,14 +87,14 @@ const handleDeleteStatus = async (statusId) => {
   if (deletedStatus?.errorStatus === 404) {
     deletedStatus.createToast({
       title: 'Error',
-      description: 'An error has occurred, the status does not exist.',
+      description: 'An error has occurred, the status does not exist',
       status: 'error'
     })
     await statusStore.loadTasks()
   } else if (deletedStatus === null) {
     toastStore.createToast({
       title: 'Error',
-      description: 'An error has occurred, please try again later.',
+      description: 'An error has occurred, please try again later',
       status: 'error'
     })
   } else {
@@ -252,7 +252,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
           </td>
           <td :class="{ 'italic text-[grey]': !status.description }"
             class="itbkk-status-description min-w-96 max-w-96 break-words">
-            {{ status.description || 'No description provided' }}
+            {{ status.description || 'No description is provided' }}
           </td>
           <td class="min-w-16 max-w-16">
             <div class="grid place-items-center">

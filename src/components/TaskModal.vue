@@ -125,7 +125,7 @@ const handleClickConfirm = async () => {
 <template>
   <BaseModal :show="taskModalData !== null" @clickBG="handleCLickClose">
     <div
-      class="bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
+      class="itbkk-modal-task bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
       <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">
         <span v-if="taskModalMode === 'view'" class="itbkk-title">{{ taskModalData?.title }}</span>
         <span v-else-if="taskModalMode === 'add'">New Task</span>

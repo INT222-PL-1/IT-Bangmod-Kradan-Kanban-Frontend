@@ -57,4 +57,9 @@ const filteredStatusList = computed(() => {
       </div>
     </div>
   </div>
+  <select v-model="model" class="itbkk-status opacity-0 w-[1px] h-[1px]">
+    <option v-for="status in statusList" :value="status?.id" :key="status?.id">
+      {{ status?.name }}
+    </option>
+  </select>
 </template>
