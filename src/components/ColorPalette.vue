@@ -37,7 +37,7 @@ watch(model, (value) => {
         <IconSVG iconName="eyedropper" scale="2.5" />
         <input :id="formattedId" type="color" v-model="model" class="w-0 h-0 opacity-0 absolute pointer-events-none">
       </label>
-      <div class="grid grid-cols-6 gap-2 p-1 place-items-center">
+      <div class="grid grid-cols-4 lg:grid-cols-6 gap-2 p-1 place-items-center">
         <div v-for="color in colorList" :key="color" @click="model = color" :style="{ backgroundColor: color }"
           class="rounded-md cursor-pointer w-10 h-10">
         </div>

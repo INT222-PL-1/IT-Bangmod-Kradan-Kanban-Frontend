@@ -37,13 +37,13 @@ const validatedColor = computed(() => {
 </script>
 
 <template>
-  <div class="px-2 py-1 rounded-lg cursor-default" :style="{
+  <div class="rounded-lg cursor-default drop-shadow-lg" :style="{
     border: `1px solid ${validatedColor}`,
     backgroundColor: validatedColor + 11,
     width
   }" :title="label">
-    <div class="flex justify-center items-center" :style="{ width }">
-      <div :class="textWrapMode === 'truncate' ? 'truncate' : 'break-words'" class="max-w-full"
+    <div class="my-1 flex justify-center items-center" :style="{ width }">
+      <div :class="textWrapMode === 'truncate' ? 'truncate' : 'break-words'" class="max-w-[95%]"
         :style="{ color: validatedColor }">{{ label }}</div>
     </div>
   </div>

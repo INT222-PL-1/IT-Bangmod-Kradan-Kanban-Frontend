@@ -142,7 +142,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
   <Transition>
     <BaseModal @clickBG="statusTransferModalOpenState = false" :show="statusTransferModalOpenState"
       :mobileCenter="true">
-      <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+      <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto flex flex-col">
         <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Transfer a Status</div>
         <div class="itbkk-message p-4 break-words">
           <div>There are <span class="font-semibold">{{ statusTransferModalData.count }}</span> task{{
@@ -150,13 +150,14 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
               statusTransferModalData.name }}</span> status.</div>
           <div class="mt-2">
             <span>Transfer to </span>
-            <div class="w-48 inline-block">
+            <div class="inline-block">
               <StatusSelector v-model="statusIdToTransfer" :excludeStatusId="statusTransferModalData.id" />
             </div>
             <span> before deleting the status.</span>
           </div>
         </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+        <div
+          class="flex justify-end items-center flex-none h-14 px-4 rounded-b-xl border-t-2 border-base-300 bg-base-200">
           <div class="flex gap-2">
             <button @click="statusTransferModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
               Cancel
