@@ -120,7 +120,7 @@ const handleClickConfirm = async () => {
         <span v-else-if="statusModalMode === 'edit'">Edit Status</span>
       </div>
       <div class="p-4 flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-4 flex-auto">
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 flex-none">
           <div>
             <div>
               <span class="text-lg font-semibold flex-[0]">
@@ -141,8 +141,8 @@ const handleClickConfirm = async () => {
                 class="itbkk-status-name break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
             </div>
           </div>
-          <div>
-            <div>
+          <div class="flex flex-col flex-auto">
+            <div class="flex-none">
               <span class="text-lg font-semibold ">
                 <span>Description</span>
                 <span class="text-sm">
@@ -156,12 +156,12 @@ const handleClickConfirm = async () => {
             <div :class="{
               'border border-error animate-shake-x-in': statusModalData.description?.length > 200,
               'italic text-[grey] grid place-items-center': !statusModalData?.description,
-            }" class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-[1]">
+            }" class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-auto">
               <textarea v-model.trim="statusModalData.description" placeholder="Enter Task Description"
                 class="itbkk-status-description break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
             </div>
           </div>
-          <div>
+          <div class="flex-none">
             <div>
               <span class="text-lg font-semibold flex-[0]">
                 <span>Color </span>
@@ -181,8 +181,13 @@ const handleClickConfirm = async () => {
               <span>Preview</span>
             </span>
           </div>
-          <div class="mt-2 h-52 md:flex-auto grid place-items-center w-full bg-base-200 rounded-lg">
-            <StatusBadge :statusData="statusModalData" textWrapMode="wrap" width="20rem" />
+          <div class="mt-2 md:flex-auto flex flex-col h-52 border-[3px] border-base-200 rounded-lg overflow-hidden">
+            <div class="flex-auto grid place-items-center w-full bg-[#1f232a]">
+              <StatusBadge :statusData="statusModalData" textWrapMode="wrap" width="20rem" />
+            </div>
+            <div class="flex-auto grid place-items-center w-full bg-[#ffffff]">
+              <StatusBadge :statusData="statusModalData" textWrapMode="wrap" width="20rem" />
+            </div>
           </div>
         </div>
       </div>
