@@ -51,7 +51,8 @@ const filteredStatusList = computed(() => {
           class="grid grid-flow-row grid-cols-2 content-start gap-2 h-[4.5rem] sm:h-28 overflow-y-auto">
           <button v-for="status in filteredStatusList" :key="status.id"
             class="active:scale-90 transition p-0 bg-base-200 hover:contrast-75 w-fit rounded-lg">
-            <StatusBadge class="cursor-pointer" @click="model = status.id" :statusData="status" textWrapMode="wrap" />
+            <StatusBadge class="cursor-pointer" @click="model = status.id" :statusData="status"
+              textWrapMode="truncate" />
           </button>
         </div>
       </div>
