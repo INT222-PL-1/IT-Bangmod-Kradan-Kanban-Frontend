@@ -90,7 +90,7 @@ const handleDeleteStatus = async (statusId) => {
       description: 'An error has occurred, the status does not exist',
       status: 'error'
     })
-    await statusStore.loadTasks()
+    await statusStore.loadStatuses()
   } else if (deletedStatus === null) {
     toastStore.createToast({
       title: 'Error',
