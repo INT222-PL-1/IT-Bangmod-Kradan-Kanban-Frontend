@@ -85,7 +85,7 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
 const handleDeleteStatus = async (statusId) => {
   const deletedStatus = await deleteStatus(statusId)
   if (deletedStatus?.errorStatus === 404) {
-    deletedStatus.createToast({
+    toastStore.createToast({
       title: 'Error',
       description: 'An error has occurred, the status does not exist',
       status: 'error'
