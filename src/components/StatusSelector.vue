@@ -1,42 +1,66 @@
 <script setup>
+import { useStatusStore } from '@/stores/status';
+import StatusBadge from './StatusBadge.vue';
+import { computed, ref } from 'vue';
+import IconSVG from './IconSVG.vue';
 
-defineProps({
-  status: {
-    type: Array,
-    default: () => ['NO_STATUS', 'TO_DO', 'DOING', 'DONE'],
-    validator: (value) => {
-      // No duplicate status
-      return new Set(value).size === value.length
-    }
-  }
+const props = defineProps({
+  excludeStatusId: {
+    type: Number,
+    default: -1,
+  },
 })
 
 const model = defineModel()
+const searchTerm = ref('')
+const statusStore = useStatusStore()
 
-const statusColor = {
-  'DOING': '#f59e0b',
-  'DONE': '#10b981',
-  'TO_DO': '#ef4444',
-  'NO_STATUS': '#6b7280'
-}
-
-const statusLabel = {
-  'DOING': 'Doing',
-  'DONE': 'Done',
-  'TO_DO': 'To Do',
-  'NO_STATUS': 'No Status'
-}
+const statusList = computed(() => {
+  const copiedStatuses = [...statusStore.statuses]
+  if (props.excludeStatusId !== -1) {
+    copiedStatuses.splice(copiedStatuses.findIndex(status => status.id === props.excludeStatusId), 1)
+  }
+  return copiedStatuses
+})
+const filteredStatusList = computed(() => {
+  return statusList.value.filter(status => status.name.toLowerCase().includes(searchTerm.value.toLowerCase())).sort((a, b) => b.id - a.id)
+})
 
 </script>
 
 <template>
-  <select v-model="model"
-    class="itbkk-status w-full px-2 py-1 rounded-lg grid place-items-center whitespace-nowrap text-white" :style="{
-      backgroundColor: statusColor[model]
-    }">
-    <option :value="status[0]">{{ statusLabel[status[0]] }}</option>
-    <option v-for="s in status.slice(1)" :value="s" :key="s">{{ statusLabel[s] }}</option>
+  <div class="z-[60]">
+    <div class="dropdown itbkk-button-action">
+      <div tabindex="0" @click="handleClick" role="button">
+        <button class="active:scale-90 transition flex bg-base-200 rounded-xl p-2 hover:contrast-75">
+          <StatusBadge class="cursor-pointer" :statusData="statusList.find(status => status.id === model)"
+            textWrapMode="wrap" width="10rem" />
+          <IconSVG iconName="chevron-down" size="2rem" />
+        </button>
+      </div>
+      <div tabindex="0"
+        class="dropdown-content menu p-2 mt-1 shadow bg-base-200 rounded-box w-72 gap-1 h-fit border border-base-300">
+        <div class="flex items-center gap-2">
+          <IconSVG iconName="search" size="2rem" />
+          <input v-model="searchTerm" type="text" placeholder="Search status name"
+            class="rounded-lg w-full bg-base-100 focus:outline-none focus:placeholder:opacity-50 p-2">
+        </div>
+        <div class="divider m-0"></div>
+        <div v-show="filteredStatusList.length === 0" class="p-2 text-center">No status found</div>
+        <div v-show="filteredStatusList.length > 0"
+          class="grid grid-flow-row grid-cols-2 content-start gap-2 h-[4.5rem] sm:h-28 overflow-y-auto">
+          <button v-for="status in filteredStatusList" :key="status.id"
+            class="active:scale-90 transition p-0 bg-base-200 hover:contrast-75 w-fit rounded-lg">
+            <StatusBadge class="cursor-pointer" @click="model = status.id" :statusData="status"
+              textWrapMode="truncate" />
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <select v-model="model" class="itbkk-status opacity-0 w-[1px] h-[1px]">
+    <option v-for="status in statusList" :value="status?.id" :key="status?.id">
+      {{ status?.name }}
+    </option>
   </select>
 </template>
-
-<style scoped></style>

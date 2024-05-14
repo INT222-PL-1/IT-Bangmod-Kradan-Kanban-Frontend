@@ -2,7 +2,7 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 export async function getTasks() {
   try {
-    const res = await fetch(`${SERVER_URL}/v1/tasks`)
+    const res = await fetch(`${SERVER_URL}/v2/tasks`)
     const data = await res.json()
     if (res.status === 500) {
       return null
@@ -16,7 +16,7 @@ export async function getTasks() {
 
 export async function getTaskById(taskId) {
   try {
-    const res = await fetch(`${SERVER_URL}/v1/tasks/${taskId}`)
+    const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`)
     if (res.status === 404) {
       // console.log(res)
       return null
@@ -33,9 +33,9 @@ export async function getTaskById(taskId) {
   }
 }
 
-export async function createTask({ title, description, assignees, status }) {
+export async function createTask({ title, description, assignees, statusId }) {
   try {
-    const res = await fetch(`${SERVER_URL}/v1/tasks`, {
+    const res = await fetch(`${SERVER_URL}/v2/tasks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -44,7 +44,7 @@ export async function createTask({ title, description, assignees, status }) {
         title,
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
-        status
+        statusId
       })
     })
 
@@ -58,9 +58,9 @@ export async function createTask({ title, description, assignees, status }) {
   }
 }
 
-export async function updateTask({ id: taskId, title, description, assignees, status }) {
+export async function updateTask({ id: taskId, title, description, assignees, statusId }) {
   try {
-    const res = await fetch(`${SERVER_URL}/v1/tasks/${taskId}`, {
+    const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -69,7 +69,7 @@ export async function updateTask({ id: taskId, title, description, assignees, st
         title,
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
-        status
+        statusId
       })
     })
 
@@ -85,7 +85,7 @@ export async function updateTask({ id: taskId, title, description, assignees, st
 
 export async function deleteTask(taskId) {
   try {
-    const res = await fetch(`${SERVER_URL}/v1/tasks/${taskId}`, { method: 'DELETE' })
+    const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`, { method: 'DELETE' })
     if (res.ok) {
       const data = await res.json()
       return data

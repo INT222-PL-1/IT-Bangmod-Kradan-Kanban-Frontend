@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TaskView from '../views/TaskView.vue'
+// import { useTaskStore } from '@/stores/task'
+// import { useToastStore } from '@/stores/toast'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,8 +32,49 @@ const router = createRouter({
           component: () => import('../components/TaskModal.vue')
         }
       ]
+    },
+    {
+      path: '/status/manage',
+      name: 'status-manage',
+      component: () => import('../views/StatusManageView.vue'),
+      children: [
+        {
+          path: '/status/add',
+          name: 'status-add',
+          component: () => import('../components/StatusModal.vue')
+        },
+        {
+          path: '/status/:statusId/edit',
+          name: 'status-edit',
+          component: () => import('../components/StatusModal.vue')
+        }
+      ]
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFound.vue')
     }
   ]
 })
+
+// router.beforeEach((to, from, next) => {
+//   if (to.name === 'task-view' || to.name === 'task-edit') {
+//     const taskId = to.params.taskId
+//     console.log(useTaskStore().tasks.findIndex((task) => task.id === taskId))
+//     if (useTaskStore().tasks.findIndex((task) => task.id === parseInt(taskId)) > -1) {
+//       next()
+//     } else {
+//       useToastStore().createToast({
+//         title: 'Error',
+//         description: 'An error has occurred, the task does not exist.',
+//         status: 'error'
+//       })
+//       next({ name: 'all-task' })
+//     }
+//   } else {
+//     next()
+//   }
+// })
 
 export default router

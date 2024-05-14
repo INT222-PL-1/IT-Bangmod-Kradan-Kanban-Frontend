@@ -8,6 +8,7 @@ import { computed, onMounted, ref } from 'vue';
 import { createTask, getTaskById, updateTask } from '@/libs/taskManagement';
 import { useToastStore } from '@/stores/toast';
 import { useTaskStore } from '@/stores/task';
+import { useStatusStore } from '@/stores/status';
 
 defineProps({
   show: {
@@ -20,6 +21,8 @@ const route = useRoute()
 const router = useRouter()
 const taskStore = useTaskStore()
 const toastStore = useToastStore()
+const statusStore = useStatusStore()
+
 const taskModalMode = ref('view')
 const taskModalData = ref(null)
 let previousTaskData = null
@@ -34,7 +37,7 @@ const disabledSaveButton = computed(() => {
         taskModalData.value.title === previousTaskData.title &&
         taskModalData.value.description === previousTaskData.description &&
         taskModalData.value.assignees === previousTaskData.assignees &&
-        taskModalData.value.status === previousTaskData.status
+        taskModalData.value.statusId === previousTaskData.statusId
       )
     )
 })
@@ -42,14 +45,15 @@ const disabledSaveButton = computed(() => {
 async function fetchTaskData() {
   const taskId = route.params.taskId
   taskModalData.value = await getTaskById(taskId)
+  console.log(taskModalData.value)
   if (taskModalData.value === null) {
     toastStore.createToast({
       title: 'Error',
       description: 'An error has occurred, the task does not exist.',
       status: 'error'
     })
-    router.back()
-    // router.replace({ name: 'all-task' })
+    // router.back()
+    router.replace({ name: 'all-task' })
   } else {
     if (taskModalMode.value === 'edit') {
       previousTaskData = { ...taskModalData.value }
@@ -64,7 +68,7 @@ onMounted(async () => {
       title: '',
       description: '',
       assignees: '',
-      status: 'NO_STATUS'
+      statusId: 1
     }
     return
   } else if (taskModalMode.value === 'edit') {
@@ -121,7 +125,7 @@ const handleClickConfirm = async () => {
 <template>
   <BaseModal :show="taskModalData !== null" @clickBG="handleCLickClose">
     <div
-      class="bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
+      class="itbkk-modal-task bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] flex flex-col">
       <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">
         <span v-if="taskModalMode === 'view'" class="itbkk-title">{{ taskModalData?.title }}</span>
         <span v-else-if="taskModalMode === 'add'">New Task</span>
@@ -142,7 +146,7 @@ const handleClickConfirm = async () => {
         </div>
         <div :class="{ 'border border-error animate-shake-x-in': taskModalData.title.length > 100 }"
           class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-[1]">
-          <textarea v-model.trim="taskModalData.title" placeholder="Enter Task Title"
+          <textarea v-model.trim="taskModalData.title" placeholder="Enter Task Title (Required)"
             class="itbkk-title break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
         </div>
       </div>
@@ -202,14 +206,15 @@ const handleClickConfirm = async () => {
             <div class="p-4">
               <div class="text-lg font-semibold">Status</div>
               <div v-if="taskModalMode === 'view'" class="w-full max-w-[16rem]">
-                <StatusBadge :status="taskModalData?.status" class="itbkk-status" />
+                <StatusBadge :statusData="statusStore.statuses.find(status => status.id === taskModalData.statusId)"
+                  width="100%" class="itbkk-status" />
               </div>
               <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="w-full max-w-[16rem]">
-                <StatusSelector v-model="taskModalData.status" />
+                <StatusSelector v-model="taskModalData.statusId" />
               </div>
             </div>
           </div>
-          <div v-if="taskModalMode === 'view'">
+          <div v-if="['view', 'edit'].includes(taskModalMode)">
             <div class="p-4 flex flex-col gap-1">
               <!-- <div class="text-lg font-bold">Timezone</div> -->
               <div class="flex">
@@ -234,7 +239,8 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+      <div
+        class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200 rounded-b-lg">
         <div v-if="taskModalMode === 'view'" class="flex gap-2">
           <!-- <button @click="$emit('clickOk')" class="itbkk-button btn btn-sm btn-success">
             Ok
@@ -258,31 +264,4 @@ const handleClickConfirm = async () => {
   </BaseModal>
 </template>
 
-<style scoped>
-.animate-shake-x-in {
-  animation: shake-x-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) both;
-}
-
-@keyframes shake-x-in {
-
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  10%,
-  30%,
-  50%,
-  70%,
-  90% {
-    transform: translateX(-5px);
-  }
-
-  20%,
-  40%,
-  60%,
-  80% {
-    transform: translateX(5px);
-  }
-}
-</style>
+<style scoped></style>

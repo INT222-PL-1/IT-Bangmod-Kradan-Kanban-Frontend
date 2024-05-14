@@ -12,12 +12,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Create .env file
-        run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
-          cat .env
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      # - name: Create .env file
+      #   run: |
+      #     echo "${{ secrets.ENV_PRODUCTION_FILE }}" > .env.production
+      #     ls -a
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub

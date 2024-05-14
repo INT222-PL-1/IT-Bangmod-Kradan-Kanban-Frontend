@@ -1,5 +1,8 @@
 <script setup>
-defineProps({
+import { colorValidator } from '@/libs/utils';
+import { computed } from 'vue';
+
+const props = defineProps({
   bgcolor: {
     type: String,
     default: '#555'
@@ -11,16 +14,38 @@ defineProps({
   label: {
     type: String,
     default: 'Badge'
+  },
+  width: {
+    type: String,
+    default: '8rem'
+  },
+  description: {
+    type: String,
+    default: ''
+  },
+  textWrapMode: {
+    type: String,
+    default: 'wrap',
+    validator: (value) => ['wrap', 'truncate'].includes(value)
   }
 })
+
+const validatedColor = computed(() => {
+  return (props.bgcolor && colorValidator(props.bgcolor)) ? props.bgcolor : '#ffffff'
+})
+
 </script>
 
 <template>
-  <div class="w-full px-2 py-1 rounded-lg grid place-items-center whitespace-nowrap" :style="{
-    backgroundColor: bgcolor,
-    color
-  }">
-    {{ label }}
+  <div class="rounded-lg cursor-default drop-shadow-lg" :style="{
+    border: `1px solid ${validatedColor}`,
+    backgroundColor: validatedColor + 11,
+    width
+  }" :title="label">
+    <div class="my-1 flex justify-center items-center" :style="{ width }">
+      <div :class="textWrapMode === 'truncate' ? 'truncate' : 'break-words'" class="max-w-[95%]"
+        :style="{ color: validatedColor }">{{ label }}</div>
+    </div>
   </div>
 </template>
 

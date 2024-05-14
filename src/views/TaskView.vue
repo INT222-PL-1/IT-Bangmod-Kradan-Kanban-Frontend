@@ -10,6 +10,7 @@ import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import BaseModal from '@/components/BaseModal.vue'
 import { deleteTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
+import { useStatusStore } from '@/stores/status'
 // import { useToastStore } from '@/stores/toast';
 
 
@@ -17,6 +18,8 @@ const isLoading = ref(false)
 const router = useRouter()
 const toastStore = useToastStore()
 const taskStore = useTaskStore()
+const statusStore = useStatusStore()
+
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
 // const toastStore = useToastStore()
@@ -24,6 +27,11 @@ const taskDeleteModalOpenState = ref(false)
 onMounted(async () => {
   isLoading.value = true
   await taskStore.loadTasks()
+  await statusStore.loadStatuses()
+
+  console.log(taskStore.tasks)
+  console.log(statusStore.statuses)
+
   isLoading.value = false
 })
 
@@ -76,6 +84,10 @@ const handleDeleteTask = async (taskId) => {
   taskDeleteModalOpenState.value = false
 }
 
+const handleManageStatusBtnCLick = () => {
+  router.push({ name: 'status-manage' })
+}
+
 </script>
 
 <template>
@@ -117,10 +129,35 @@ const handleDeleteTask = async (taskId) => {
     </Teleport> -->
   <Teleport to="#navbar-item">
     <div class="flex gap-2">
-      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm">
+      <BaseMenu side="left" class="sm:hidden">
+        <template #icon>
+          <IconSVG iconName="three-dots" />
+        </template>
+        <template #menu>
+          <li>
+            <button @click="handleRefreshBtnCLick" type="button"
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
+              <div :class="{ 'animate-spin': isLoading }">
+                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+              </div>Refresh Tasks
+            </button>
+          </li>
+          <li>
+            <button @click="handleManageStatusBtnCLick"
+              class="itbkk-manage-status btn btn-sm btn-ghost justify-start flex flex-nowrap">
+              <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
+            </button>
+          </li>
+        </template>
+      </BaseMenu>
+      <button @click="handleManageStatusBtnCLick" type="button"
+        class="itbkk-manage-status btn btn-outline btn-sm hidden sm:flex">
+        <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
+      </button>
+      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
         <div :class="{ 'animate-spin': isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-        </div>Refresh
+        </div>Refresh Tasks
       </button>
       <button @click="handleAddBtnCLick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
         <IconSVG iconName="plus" :scale="1.25" />Add Task
@@ -128,15 +165,15 @@ const handleDeleteTask = async (taskId) => {
     </div>
   </Teleport>
 
-  <div class="px-4 w-[60rem] max-w-full table-overflow-x-scroll py-20">
+  <div class="px-4 max-w-full table-overflow-x-scroll py-20">
     <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
     <table class="table border border-base-300">
       <thead class="bg-base-200">
         <tr>
-          <th></th>
-          <th>Title</th>
-          <th>Assignees</th>
-          <th>Status</th>
+          <th class="min-w-16 max-w-16"></th>
+          <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Title</th>
+          <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">Assignees</th>
+          <th class="min-w-44 max-w-44">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -147,7 +184,7 @@ const handleDeleteTask = async (taskId) => {
           <td colspan="4" class="text-center">No task</td>
         </tr>
         <tr v-else v-for="(task, index) in taskStore.tasks" :key="task.id" class="itbkk-item">
-          <td class="w-16">
+          <td class="min-w-16 max-w-16">
             <div class="flex items-center justify-between gap-2">
               <div>{{ index + 1 }}</div>
               <BaseMenu>
@@ -174,18 +211,18 @@ const handleDeleteTask = async (taskId) => {
             </div>
           </td>
           <td @click="handleTaskClick(task.id)"
-            class="overflow-hidden min-w-52 w-full max-w-52 md:max-w-72 lg:max-w-96 hover:underline hover:cursor-pointer">
-            <div class="itbkk-title break-words font-semibold">
+            class="overflow-hidden min-w-52 max-w-52 md:max-w-72 lg:max-w-96 hover:underline hover:cursor-pointer">
+            <div :class="{ 'itbkk-title': $route.name === 'all-task' }" class="break-words font-semibold">
               {{ task.title }}
             </div>
           </td>
-          <td :class="{ 'italic text-[grey]': !task.assignees }" class="itbkk-assignees min-w-60 w-60">
+          <td :class="{ 'italic text-[grey]': !task.assignees, 'itbkk-assignees': $route.name === 'all-task' }"
+            class="min-w-60 w-60">
             {{ task.assignees || 'Unassigned' }}
           </td>
-          <td class="min-w-44">
-            <div class="grid place-items-center">
-              <StatusBadge :status="task.status" class="itbkk-status" />
-            </div>
+          <td class="min-w-44 max-w-44">
+            <StatusBadge :statusData="statusStore.statuses.find(status => status.id === task.statusId)"
+              textWrapMode="truncate" width="100%" :class="{ 'itbkk-status': $route.name === 'all-task' }" />
           </td>
         </tr>
       </tbody>
