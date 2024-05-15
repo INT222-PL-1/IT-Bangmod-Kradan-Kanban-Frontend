@@ -48,3 +48,40 @@ export function colorValidator(value) {
   }
   return false
 }
+
+export function superArraySorter(array, sortBy, sortDirection) {
+  if (!['asc', 'desc'].includes(sortDirection)) {
+    throw new Error('Sort direction must be "asc" or "desc"');
+  }
+
+  if (!array.length) return [];
+
+  const copyArray = [...array];
+
+  const getField = (obj, path) => {
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  };
+
+  if (array.some((obj) => getField(obj, sortBy) === undefined)) {
+    throw new Error('Invalid sortBy key');
+  }
+
+  const fieldTypes = array.map(obj => typeof getField(obj, sortBy));
+  const uniqueFieldTypes = new Set(fieldTypes);
+
+  if (uniqueFieldTypes.size > 1) {
+    throw new Error('Mixed types for sortBy key');
+  }
+
+  const fieldType = fieldTypes[0];
+
+  if (fieldType === 'string') {
+    copyArray.sort((a, b) => (getField(a, sortBy).localeCompare(getField(b, sortBy))) * (sortDirection === 'asc' ? 1 : -1));
+  } else if (fieldType === 'number') {
+    copyArray.sort((a, b) => (getField(a, sortBy) - getField(b, sortBy)) * (sortDirection === 'asc' ? 1 : -1));
+  } else {
+    throw new Error('Invalid sortBy key type');
+  }
+
+  return copyArray;
+}

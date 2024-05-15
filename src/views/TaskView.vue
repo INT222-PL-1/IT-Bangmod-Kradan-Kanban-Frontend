@@ -10,7 +10,8 @@ import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import BaseModal from '@/components/BaseModal.vue'
 import { deleteTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
-import { useStatusStore } from '@/stores/status'
+import SortButton from '@/components/SortButton.vue'
+// import { useStatusStore } from '@/stores/status'
 // import { useToastStore } from '@/stores/toast';
 
 
@@ -18,7 +19,7 @@ const isLoading = ref(false)
 const router = useRouter()
 const toastStore = useToastStore()
 const taskStore = useTaskStore()
-const statusStore = useStatusStore()
+// const statusStore = useStatusStore()
 
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
@@ -27,10 +28,10 @@ const taskDeleteModalOpenState = ref(false)
 onMounted(async () => {
   isLoading.value = true
   await taskStore.loadTasks()
-  await statusStore.loadStatuses()
+  // await statusStore.loadStatuses()
 
   console.log(taskStore.tasks)
-  console.log(statusStore.statuses)
+  // console.log(statusStore.statuses)
 
   isLoading.value = false
 })
@@ -88,6 +89,10 @@ const handleManageStatusBtnCLick = () => {
   router.push({ name: 'status-manage' })
 }
 
+const handleSort = (e) => {
+  taskStore.options.sortBy = e.sortBy
+  taskStore.options.sortDirection = e.sortDirection
+}
 </script>
 
 <template>
@@ -173,7 +178,18 @@ const handleManageStatusBtnCLick = () => {
           <th class="min-w-16 max-w-16"></th>
           <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Title</th>
           <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">Assignees</th>
-          <th class="min-w-44 max-w-44">Status</th>
+          <th class="min-w-44 max-w-44">
+            <div class="flex gap-2">
+              <div>Status</div>
+              <SortButton
+                @clickSortButton="handleSort"
+                sortBy="status.name"
+                :currentSortBy="taskStore.options.sortBy"
+                :currentSortDirection="taskStore.options.sortDirection"
+                :defaultSortBy="taskStore.options.defaultSortBy"
+              />
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -221,7 +237,7 @@ const handleManageStatusBtnCLick = () => {
             {{ task.assignees || 'Unassigned' }}
           </td>
           <td class="min-w-44 max-w-44">
-            <StatusBadge :statusData="statusStore.statuses.find(status => status.id === task.statusId)"
+            <StatusBadge :statusData="task.status"
               textWrapMode="truncate" width="100%" :class="{ 'itbkk-status': $route.name === 'all-task' }" />
           </td>
         </tr>
