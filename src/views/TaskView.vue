@@ -132,7 +132,13 @@ const handleSort = (e) => {
         <IconSVG iconName="plus" :scale="1.25" />Add Task
       </button>
     </Teleport> -->
-  <Teleport to="#navbar-item">
+  <Teleport to="#navbar-item-left">
+    <button @click="handleManageStatusBtnCLick" type="button"
+      class="itbkk-manage-status btn btn-outline btn-sm hidden sm:flex">
+      <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
+    </button>
+  </Teleport>
+  <Teleport to="#navbar-item-right">
     <div class="flex gap-2">
       <BaseMenu side="left" class="sm:hidden">
         <template #icon>
@@ -155,10 +161,6 @@ const handleSort = (e) => {
           </li>
         </template>
       </BaseMenu>
-      <button @click="handleManageStatusBtnCLick" type="button"
-        class="itbkk-manage-status btn btn-outline btn-sm hidden sm:flex">
-        <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
-      </button>
       <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
         <div :class="{ 'animate-spin': isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
@@ -174,9 +176,20 @@ const handleSort = (e) => {
     <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
     <table class="table border border-base-300">
       <thead class="bg-base-200">
-        <tr>
+        <tr class="select-none">
           <th class="min-w-16 max-w-16"></th>
-          <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Title</th>
+          <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">
+            <div class="flex gap-2">
+              <div>Title</div>
+              <SortButton
+                @clickSortButton="handleSort"
+                sortBy="title"
+                :currentSortBy="taskStore.options.sortBy"
+                :currentSortDirection="taskStore.options.sortDirection"
+                :defaultSortBy="taskStore.options.defaultSortBy"
+              />
+            </div>
+          </th>
           <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">Assignees</th>
           <th class="min-w-44 max-w-44">
             <div class="flex gap-2">

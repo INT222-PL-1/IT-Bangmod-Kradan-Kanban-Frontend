@@ -32,7 +32,6 @@ const handleSortButtonClick = () => {
     }
 
     if (props.currentSortBy === props.sortBy) {
-    //    sortData.sortDirection = props.currentSortDirection === 'asc' ? 'desc' : 'asc'
         if (props.currentSortDirection === 'asc') sortData.sortDirection = 'desc'
         else if (props.currentSortDirection === 'desc') {
             sortData.sortBy = props.defaultSortBy
@@ -46,9 +45,23 @@ const handleSortButtonClick = () => {
 </script>
 
 <template>
-    <div @click="handleSortButtonClick">
-        <IconSVG v-if="currentSortBy === sortBy && currentSortDirection === 'asc'" iconName="sort-alpha-down" color="#f04c1c" />
-        <IconSVG v-else-if="currentSortBy === sortBy && currentSortDirection === 'desc'" iconName="sort-alpha-up" color="#f04c1c" />
-        <IconSVG v-else iconName="sort-alpha-down" />
+    <div @click="handleSortButtonClick" class="cursor-pointer">
+        <Transition>
+            <IconSVG v-if="currentSortBy === sortBy && currentSortDirection === 'asc'" iconName="sort-alpha-down" color="#f04c1c" class="absolute" />
+            <IconSVG v-else-if="currentSortBy === sortBy && currentSortDirection === 'desc'" iconName="sort-alpha-up" color="#f04c1c" class="absolute" />
+            <IconSVG v-else iconName="sort-alpha-down" class="absolute" />
+        </Transition>
     </div>
 </template>
+
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+    transition: opacity 0.2s ease-in;
+}
+
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
+}
+</style>

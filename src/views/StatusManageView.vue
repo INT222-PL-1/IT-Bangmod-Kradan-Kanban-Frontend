@@ -178,7 +178,13 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     </Transition>
   </RouterView>
 
-  <Teleport to="#navbar-item">
+  <Teleport to="#navbar-item-left">
+    <button @click="$router.push({ name: 'all-task'})" type="button"
+      class="btn btn-outline btn-sm hidden sm:flex">
+      <IconSVG iconName="house" :scale="1.25" />Home
+    </button>
+  </Teleport>
+  <Teleport to="#navbar-item-right">
     <div class="flex gap-2">
       <BaseMenu side="left" class="sm:hidden">
         <template #icon>
@@ -206,7 +212,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     </div>
   </Teleport>
 
-  <div class="px-4 w-11/12 my-5">
+  <!-- <div class="px-4 w-11/12 my-5">
     <div class="text-base breadcrumbs">
       <ul>
         <li>
@@ -216,9 +222,9 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
         <li class="font-semibold">Task Status</li>
       </ul>
     </div>
-  </div>
+  </div> -->
 
-  <div class="px-4 max-w-full table-overflow-x-scroll pb-20">
+  <div class="px-4 max-w-full table-overflow-x-scroll py-20">
     <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
     <table class="table border border-base-300">
       <thead class="bg-base-200">

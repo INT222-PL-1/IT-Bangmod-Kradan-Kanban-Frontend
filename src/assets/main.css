@@ -24,6 +24,7 @@
 }
 
 @keyframes shake-x-in {
+
   0%,
   100% {
     transform: translateX(0);
@@ -44,6 +45,7 @@
     transform: translateX(5px);
   }
 }
+
 /* 
 html::-webkit-scrollbar {
   width: 12px;

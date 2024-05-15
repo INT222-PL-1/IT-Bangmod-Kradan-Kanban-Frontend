@@ -14,8 +14,9 @@ import BackToTopButton from './components/BackToTopButton.vue'
     <ThemeSwitch />
   </header>
   <nav
-    class="sticky top-20 z-20 px-4 h-12 flex justify-end items-center box-border border-b-2 border-base-300 bg-base-200 drop-shadow-md">
-    <div id="navbar-item"></div>
+    class="sticky top-20 z-20 px-4 h-12 flex justify-between items-center box-border border-b-2 border-base-300 bg-base-200 drop-shadow-md">
+    <div id="navbar-item-left"></div>
+    <div id="navbar-item-right"></div>
   </nav>
   <section class="flex flex-col sm:items-center max-w-full min-h-[calc(100vh-8rem)] h-auto">
     <RouterView />
