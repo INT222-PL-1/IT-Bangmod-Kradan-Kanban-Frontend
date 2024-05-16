@@ -11,39 +11,30 @@ import BaseModal from '@/components/BaseModal.vue'
 import { deleteTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import SortButton from '@/components/SortButton.vue'
-// import { useStatusStore } from '@/stores/status'
-// import { useToastStore } from '@/stores/toast';
-
 
 const isLoading = ref(false)
 const router = useRouter()
 const toastStore = useToastStore()
 const taskStore = useTaskStore()
-// const statusStore = useStatusStore()
-
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
-// const toastStore = useToastStore()
 
-onMounted(async () => {
+async function fetchTasks() {
   isLoading.value = true
   await taskStore.loadTasks()
-  // await statusStore.loadStatuses()
-
-  console.log(taskStore.tasks)
-  // console.log(statusStore.statuses)
-
   isLoading.value = false
+}
+
+onMounted(async () => {
+  await fetchTasks()
 })
+
+const handleRefreshBtnCLick = async () => {
+  await fetchTasks()
+}
 
 const handleTaskClick = (taskId) => {
   router.push({ name: 'task-view', params: { taskId } })
-}
-
-const handleRefreshBtnCLick = async () => {
-  isLoading.value = true
-  await taskStore.loadTasks()
-  isLoading.value = false
 }
 
 const handleAddBtnCLick = () => {
@@ -96,8 +87,6 @@ const handleSort = (e) => {
 </script>
 
 <template>
-  <!-- <LoadingModal :isLoading="isLoading" /> -->
-
   <Transition>
     <BaseModal @clickBG="taskDeleteModalOpenState = false" :show="taskDeleteModalOpenState" :mobileCenter="true">
       <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
@@ -127,11 +116,6 @@ const handleSort = (e) => {
     </Transition>
   </RouterView>
 
-  <!-- <Teleport to="#header-right">
-      <button @click="handleAddBtnCLick" type="button" class="btn btn-primary btn-sm text-neutral">
-        <IconSVG iconName="plus" :scale="1.25" />Add Task
-      </button>
-    </Teleport> -->
   <Teleport to="#navbar-item-left">
     <button @click="handleManageStatusBtnCLick" type="button"
       class="itbkk-manage-status btn btn-outline btn-sm hidden sm:flex">
@@ -173,7 +157,6 @@ const handleSort = (e) => {
   </Teleport>
 
   <div class="px-4 max-w-full table-overflow-x-scroll py-20">
-    <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
     <table class="table border border-base-300">
       <thead class="bg-base-200">
         <tr class="select-none">
@@ -181,32 +164,27 @@ const handleSort = (e) => {
           <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">
             <div class="flex gap-2">
               <div>Title</div>
-              <SortButton
-                @clickSortButton="handleSort"
-                sortBy="title"
-                :currentSortBy="taskStore.options.sortBy"
+              <SortButton @clickSortButton="handleSort" sortBy="title" :currentSortBy="taskStore.options.sortBy"
                 :currentSortDirection="taskStore.options.sortDirection"
-                :defaultSortBy="taskStore.options.defaultSortBy"
-              />
+                :defaultSortBy="taskStore.options.defaultSortBy" />
             </div>
           </th>
           <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">Assignees</th>
           <th class="min-w-44 max-w-44">
             <div class="flex gap-2">
               <div>Status</div>
-              <SortButton
-                @clickSortButton="handleSort"
-                sortBy="status.name"
-                :currentSortBy="taskStore.options.sortBy"
+              <SortButton @clickSortButton="handleSort" sortBy="status.name" :currentSortBy="taskStore.options.sortBy"
                 :currentSortDirection="taskStore.options.sortDirection"
-                :defaultSortBy="taskStore.options.defaultSortBy"
-              />
+                :defaultSortBy="taskStore.options.defaultSortBy" />
             </div>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-if="taskStore.tasks === null">
+        <tr v-if="isLoading && taskStore.tasks.length === 0">
+          <td colspan="4" class="text-center">Loading tasks...</td>
+        </tr>
+        <tr v-else-if="taskStore.tasks === null">
           <td colspan="4" class="text-center">Error while loading tasks from server. Please try again later.</td>
         </tr>
         <tr v-else-if="taskStore.tasks.length === 0">
@@ -250,8 +228,8 @@ const handleSort = (e) => {
             {{ task.assignees || 'Unassigned' }}
           </td>
           <td class="min-w-44 max-w-44">
-            <StatusBadge :statusData="task.status"
-              textWrapMode="truncate" width="100%" :class="{ 'itbkk-status': $route.name === 'all-task' }" />
+            <StatusBadge :statusData="task.status" textWrapMode="truncate" width="100%"
+              :class="{ 'itbkk-status': $route.name === 'all-task' }" />
           </td>
         </tr>
       </tbody>

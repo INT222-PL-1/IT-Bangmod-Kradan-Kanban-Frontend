@@ -78,7 +78,14 @@ export async function createStatus({ name, description, color }) {
   }
 }
 
-export async function updateStatus({ id: statusId, name, description, color }) {
+export async function updateStatus({
+  id: statusId,
+  name,
+  description,
+  color,
+  is_limited_status,
+  maximum_limit
+}) {
   try {
     const res = await fetch(`${SERVER_URL}/v2/statuses/${statusId}`, {
       method: 'PUT',
@@ -88,7 +95,9 @@ export async function updateStatus({ id: statusId, name, description, color }) {
       body: JSON.stringify({
         name,
         description: description === '' ? null : description,
-        color: color === '' ? '#666666' : color
+        color: color === '' ? '#666666' : color,
+        is_limited_status,
+        maximum_limit
       })
     })
 
