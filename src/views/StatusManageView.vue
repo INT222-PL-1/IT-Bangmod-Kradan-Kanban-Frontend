@@ -5,7 +5,7 @@ import IconSVG from '@/components/IconSVG.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import { computed, onMounted, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
-import { deleteStatus, transferTasksStatus } from '@/libs/statusManagement'
+import { deleteStatus, transferTasksStatus, updateStatus } from '@/libs/statusManagement'
 import { useToastStore } from '@/stores/toast'
 import BaseModal from '@/components/BaseModal.vue'
 import StatusSelector from '@/components/StatusSelector.vue'
@@ -125,7 +125,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
 }
 
 const handleSaveSettingsStatus = async () => {
-  const updatedStatus = await statusStore.updateStatus(currentStatusSettingsModalData.value)
+  const updatedStatus = await updateStatus(currentStatusSettingsModalData.value)
   if (updatedStatus === null) {
     toastStore.createToast({
       title: 'Error',
