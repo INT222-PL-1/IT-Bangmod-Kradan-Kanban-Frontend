@@ -124,6 +124,24 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
   // await handleDeleteStatus(fromStatusId)
 }
 
+const handleSaveSettingsStatus = async () => {
+  const updatedStatus = await statusStore.updateStatus(currentStatusSettingsModalData.value)
+  if (updatedStatus === null) {
+    toastStore.createToast({
+      title: 'Error',
+      description: 'An error has occurred, please try again later.',
+      status: 'error'
+    })
+  } else {
+    toastStore.createToast({
+      title: 'Success',
+      description: 'The status settings have been updated.',
+      status: 'success'
+    })
+    await statusStore.loadStatuses()
+  }
+  statusSettingsModalOpenState.value = false
+}
 
 </script>
 
