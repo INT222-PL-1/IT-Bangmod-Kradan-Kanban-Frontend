@@ -164,7 +164,13 @@ const handleSort = (e) => {
                 :currentSortDirection="boardStore.options.sortDirection" />
             </div>
           </th>
-          <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">Assignees</th>
+          <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">
+            <div class="flex gap-2">
+              <div>Assignees</div>
+              <SortButton @clickSortButton="handleSort" sortBy="assignees" :currentSortBy="boardStore.options.sortBy"
+                :currentSortDirection="boardStore.options.sortDirection" />
+            </div>
+          </th>
           <th class="min-w-44 max-w-44">
             <div class="flex gap-2">
               <div>Status</div>
