@@ -44,7 +44,7 @@ export async function createTask({ title, description, assignees, status }) {
         title,
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
-        status
+        statusId: status.id
       })
     })
 
@@ -69,7 +69,7 @@ export async function updateTask({ id: taskId, title, description, assignees, st
         title,
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
-        status
+        statusId: status.id
       })
     })
 
