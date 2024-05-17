@@ -33,7 +33,7 @@ export async function getTaskById(taskId) {
   }
 }
 
-export async function createTask({ title, description, assignees, statusId }) {
+export async function createTask({ title, description, assignees, status }) {
   try {
     const res = await fetch(`${SERVER_URL}/v2/tasks`, {
       method: 'POST',
@@ -44,7 +44,7 @@ export async function createTask({ title, description, assignees, statusId }) {
         title,
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
-        statusId
+        status
       })
     })
 
@@ -58,7 +58,7 @@ export async function createTask({ title, description, assignees, statusId }) {
   }
 }
 
-export async function updateTask({ id: taskId, title, description, assignees, statusId }) {
+export async function updateTask({ id: taskId, title, description, assignees, status }) {
   try {
     const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`, {
       method: 'PUT',
@@ -69,7 +69,7 @@ export async function updateTask({ id: taskId, title, description, assignees, st
         title,
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
-        statusId
+        status
       })
     })
 
