@@ -1,14 +1,13 @@
 <script setup>
 import { getTimezone, formatDateTime } from '@/libs/utils'
 import BaseModal from '@/components/BaseModal.vue'
-import StatusBadge from './StatusBadge.vue';
-import StatusSelector from './StatusSelector.vue';
-import { useRoute, useRouter } from 'vue-router';
-import { computed, onMounted, ref } from 'vue';
-import { createTask, getTaskById, updateTask } from '@/libs/taskManagement';
-import { useToastStore } from '@/stores/toast';
-import { useTaskStore } from '@/stores/task';
-import { useStatusStore } from '@/stores/status';
+import StatusBadge from './StatusBadge.vue'
+import StatusSelector from './StatusSelector.vue'
+import { useRoute, useRouter } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { createTask, getTaskById, updateTask } from '@/libs/taskManagement'
+import { useToastStore } from '@/stores/toast'
+import { useTaskStore } from '@/stores/task'
 
 defineProps({
   show: {
@@ -21,7 +20,6 @@ const route = useRoute()
 const router = useRouter()
 const taskStore = useTaskStore()
 const toastStore = useToastStore()
-const statusStore = useStatusStore()
 
 const taskModalMode = ref('view')
 const taskModalData = ref(null)
@@ -37,7 +35,7 @@ const disabledSaveButton = computed(() => {
         taskModalData.value.title === previousTaskData.title &&
         taskModalData.value.description === previousTaskData.description &&
         taskModalData.value.assignees === previousTaskData.assignees &&
-        taskModalData.value.statusId === previousTaskData.statusId
+        taskModalData.value.status.id === previousTaskData.status.id
       )
     )
 })
@@ -52,11 +50,10 @@ async function fetchTaskData() {
       description: 'An error has occurred, the task does not exist.',
       status: 'error'
     })
-    // router.back()
     router.replace({ name: 'all-task' })
   } else {
     if (taskModalMode.value === 'edit') {
-      previousTaskData = { ...taskModalData.value }
+      previousTaskData = { ...taskModalData.value, status: { ...taskModalData.value.status } }
     }
   }
 }
@@ -206,8 +203,8 @@ const handleClickConfirm = async () => {
             <div class="p-4">
               <div class="text-lg font-semibold">Status</div>
               <div v-if="taskModalMode === 'view'" class="w-full max-w-[16rem]">
-                <StatusBadge :statusData="statusStore.statuses.find(status => status.id === taskModalData.statusId)"
-                  width="100%" class="itbkk-status" />
+                <StatusBadge :statusData="taskModalData?.status" textWrapMode="wrap" width="100%"
+                  class="itbkk-status" />
               </div>
               <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="w-full max-w-[16rem]">
                 <StatusSelector v-model="taskModalData.status.id" />
@@ -242,9 +239,6 @@ const handleClickConfirm = async () => {
       <div
         class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200 rounded-b-lg">
         <div v-if="taskModalMode === 'view'" class="flex gap-2">
-          <!-- <button @click="$emit('clickOk')" class="itbkk-button btn btn-sm btn-success">
-            Ok
-          </button> -->
           <button @click="handleCLickClose" class="itbkk-button btn btn-sm btn-neutral">
             Close
           </button>
