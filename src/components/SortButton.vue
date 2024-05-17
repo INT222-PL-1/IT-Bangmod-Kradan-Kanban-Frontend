@@ -5,7 +5,7 @@ const emits = defineEmits(['clickSortButton'])
 
 const props = defineProps({
     currentSortBy: {
-        type: String,
+        type: [String, null],
         required: true
     },
     currentSortDirection: {
@@ -18,10 +18,6 @@ const props = defineProps({
     sortBy: {
         type: String,
         required: true
-    },
-    defaultSortBy: {
-        type: String,
-        require: true
     }
 })
 
@@ -34,8 +30,8 @@ const handleSortButtonClick = () => {
     if (props.currentSortBy === props.sortBy) {
         if (props.currentSortDirection === 'asc') sortData.sortDirection = 'desc'
         else if (props.currentSortDirection === 'desc') {
-            sortData.sortBy = props.defaultSortBy
-            sortData.sortDirection = 'asc'
+            sortData.sortBy = null
+            sortData.sortDirection = null
         }
     }
 
@@ -47,8 +43,10 @@ const handleSortButtonClick = () => {
 <template>
     <div @click="handleSortButtonClick" class="cursor-pointer">
         <Transition>
-            <IconSVG v-if="currentSortBy === sortBy && currentSortDirection === 'asc'" iconName="sort-alpha-down" color="#f04c1c" class="absolute" />
-            <IconSVG v-else-if="currentSortBy === sortBy && currentSortDirection === 'desc'" iconName="sort-alpha-up" color="#f04c1c" class="absolute" />
+            <IconSVG v-if="currentSortBy === sortBy && currentSortDirection === 'asc'" iconName="sort-alpha-down"
+                color="#f04c1c" class="absolute" />
+            <IconSVG v-else-if="currentSortBy === sortBy && currentSortDirection === 'desc'" iconName="sort-alpha-up"
+                color="#f04c1c" class="absolute" />
             <IconSVG v-else iconName="sort-alpha-down" class="absolute" />
         </Transition>
     </div>

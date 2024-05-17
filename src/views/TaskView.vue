@@ -1,5 +1,4 @@
 <script setup>
-import { useTaskStore } from '@/stores/task'
 import { onMounted, ref } from 'vue'
 // import LoadingModal from '@/components/LoadingModal.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
@@ -11,18 +10,16 @@ import BaseModal from '@/components/BaseModal.vue'
 import { deleteTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import SortButton from '@/components/SortButton.vue'
+import { useBoardStore } from '@/stores/board'
 
-const isLoading = ref(false)
 const router = useRouter()
 const toastStore = useToastStore()
-const taskStore = useTaskStore()
+const boardStore = useBoardStore()
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
 
 async function fetchTasks() {
-  isLoading.value = true
-  await taskStore.loadTasks()
-  isLoading.value = false
+  await boardStore.fetchTasks()
 }
 
 onMounted(async () => {
@@ -58,7 +55,7 @@ const handleDeleteTask = async (taskId) => {
       description: 'An error has occurred, the task does not exist.',
       status: 'error'
     })
-    await taskStore.loadTasks()
+    await fetchTasks()
   } else if (deletedTask === null) {
     toastStore.createToast({
       title: 'Error',
@@ -71,7 +68,7 @@ const handleDeleteTask = async (taskId) => {
       description: 'The task has been deleted',
       status: 'success'
     })
-    await taskStore.loadTasks()
+    await fetchTasks()
   }
   taskDeleteModalOpenState.value = false
 }
@@ -81,8 +78,7 @@ const handleManageStatusBtnCLick = () => {
 }
 
 const handleSort = (e) => {
-  taskStore.options.sortBy = e.sortBy
-  taskStore.options.sortDirection = e.sortDirection
+  boardStore.sortTasks(e.sortBy, e.sortDirection)
 }
 </script>
 
@@ -132,7 +128,7 @@ const handleSort = (e) => {
           <li>
             <button @click="handleRefreshBtnCLick" type="button"
               class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
-              <div :class="{ 'animate-spin': isLoading }">
+              <div :class="{ 'animate-spin': boardStore.isLoading }">
                 <IconSVG iconName="arrow-clockwise" :scale="1.25" />
               </div>Refresh Tasks
             </button>
@@ -146,7 +142,7 @@ const handleSort = (e) => {
         </template>
       </BaseMenu>
       <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
-        <div :class="{ 'animate-spin': isLoading }">
+        <div :class="{ 'animate-spin': boardStore.isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
         </div>Refresh Tasks
       </button>
@@ -164,33 +160,31 @@ const handleSort = (e) => {
           <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">
             <div class="flex gap-2">
               <div>Title</div>
-              <SortButton @clickSortButton="handleSort" sortBy="title" :currentSortBy="taskStore.options.sortBy"
-                :currentSortDirection="taskStore.options.sortDirection"
-                :defaultSortBy="taskStore.options.defaultSortBy" />
+              <SortButton @clickSortButton="handleSort" sortBy="title" :currentSortBy="boardStore.options.sortBy"
+                :currentSortDirection="boardStore.options.sortDirection" />
             </div>
           </th>
           <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">Assignees</th>
           <th class="min-w-44 max-w-44">
             <div class="flex gap-2">
               <div>Status</div>
-              <SortButton @clickSortButton="handleSort" sortBy="status.name" :currentSortBy="taskStore.options.sortBy"
-                :currentSortDirection="taskStore.options.sortDirection"
-                :defaultSortBy="taskStore.options.defaultSortBy" />
+              <SortButton @clickSortButton="handleSort" sortBy="status.name" :currentSortBy="boardStore.options.sortBy"
+                :currentSortDirection="boardStore.options.sortDirection" />
             </div>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-if="isLoading && taskStore.tasks.length === 0">
+        <tr v-if="boardStore.isLoading && boardStore.tasks.length === 0">
           <td colspan="4" class="text-center">Loading tasks...</td>
         </tr>
-        <tr v-else-if="taskStore.tasks === null">
+        <tr v-else-if="boardStore.tasks === null">
           <td colspan="4" class="text-center">Error while loading tasks from server. Please try again later.</td>
         </tr>
-        <tr v-else-if="taskStore.tasks.length === 0">
+        <tr v-else-if="boardStore.tasks.length === 0">
           <td colspan="4" class="text-center">No task</td>
         </tr>
-        <tr v-else v-for="(task, index) in taskStore.tasks" :key="task.id" class="itbkk-item">
+        <tr v-else v-for="(task, index) in boardStore.tasks" :key="task.id" class="itbkk-item">
           <td class="min-w-16 max-w-16">
             <div class="flex items-center justify-between gap-2">
               <div>{{ index + 1 }}</div>

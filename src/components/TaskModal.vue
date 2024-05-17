@@ -7,7 +7,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
 import { createTask, getTaskById, updateTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
-import { useTaskStore } from '@/stores/task'
+import { useBoardStore } from '@/stores/board'
 
 defineProps({
   show: {
@@ -16,9 +16,10 @@ defineProps({
   },
 })
 
+const BOARD_ID = import.meta.env.VITE_BOARD_ID
 const route = useRoute()
 const router = useRouter()
-const taskStore = useTaskStore()
+const boardStore = useBoardStore()
 const toastStore = useToastStore()
 
 const taskModalMode = ref('view')
@@ -65,7 +66,10 @@ onMounted(async () => {
       title: '',
       description: '',
       assignees: '',
-      statusId: 1
+      status: {
+        id: 1
+      },
+      boardId: BOARD_ID
     }
     return
   } else if (taskModalMode.value === 'edit') {
@@ -95,7 +99,7 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    taskStore.loadTasks()
+    boardStore.fetchTasks()
     router.push({ name: 'all-task' })
   } else if (taskModalMode.value === 'edit') {
     const updatedTask = await updateTask(taskModalData.value)
@@ -112,7 +116,7 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    taskStore.loadTasks()
+    boardStore.fetchTasks()
     router.push({ name: 'all-task' })
   }
 }
