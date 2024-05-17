@@ -210,7 +210,7 @@ const handleClickConfirm = async () => {
                   width="100%" class="itbkk-status" />
               </div>
               <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="w-full max-w-[16rem]">
-                <StatusSelector v-model="taskModalData.statusId" />
+                <StatusSelector v-model="taskModalData.status.id" />
               </div>
             </div>
           </div>

@@ -1,8 +1,8 @@
 <script setup>
 import { useStatusStore } from '@/stores/status';
 import StatusBadge from './StatusBadge.vue';
-import { computed, ref } from 'vue';
-import IconSVG from './IconSVG.vue';
+import { computed, onMounted, ref } from 'vue'
+import IconSVG from './IconSVG.vue'
 
 const props = defineProps({
   excludeStatusId: {
@@ -14,6 +14,10 @@ const props = defineProps({
 const model = defineModel()
 const searchTerm = ref('')
 const statusStore = useStatusStore()
+
+onMounted(async () => {
+  await statusStore.loadStatuses()
+})
 
 const statusList = computed(() => {
   const copiedStatuses = [...statusStore.statuses]
@@ -39,7 +43,7 @@ const filteredStatusList = computed(() => {
         </button>
       </div>
       <div tabindex="0"
-        class="dropdown-content menu p-2 mt-1 shadow bg-base-200 rounded-box w-72 gap-1 h-fit border border-base-300">
+        class="dropdown-content menu mt-1 shadow bg-base-200 rounded-box w-[19rem] gap-1 h-fit border border-base-300">
         <div class="flex items-center gap-2">
           <IconSVG iconName="search" size="2rem" />
           <input v-model="searchTerm" type="text" placeholder="Search status name"
@@ -48,7 +52,7 @@ const filteredStatusList = computed(() => {
         <div class="divider m-0"></div>
         <div v-show="filteredStatusList.length === 0" class="p-2 text-center">No status found</div>
         <div v-show="filteredStatusList.length > 0"
-          class="grid grid-flow-row grid-cols-2 content-start gap-2 h-[4.5rem] sm:h-28 overflow-y-auto">
+          class="grid grid-flow-row grid-cols-2 content-start gap-2 h-[4.5rem] sm:h-28 overflow-y-auto overflow-x-hidden custom-scroll">
           <button v-for="status in filteredStatusList" :key="status.id"
             class="active:scale-90 transition p-0 bg-base-200 hover:contrast-75 w-fit rounded-lg">
             <StatusBadge class="cursor-pointer" @click="model = status.id" :statusData="status"
@@ -64,3 +68,20 @@ const filteredStatusList = computed(() => {
     </option>
   </select>
 </template>
+
+<style scoped>
+.custom-scroll::-webkit-scrollbar {
+  background-color: #f5f5f520;
+  border-radius: 3px;
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: #a2a2a2;
+  border-radius: 3px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #676767;
+}
+</style>
