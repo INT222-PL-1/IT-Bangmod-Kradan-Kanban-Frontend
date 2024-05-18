@@ -37,11 +37,11 @@ onMounted(async () => {
   await fetchStatuses()
 })
 
-const handleRefreshBtnCLick = async () => {
+const handleRefreshBtnClick = async () => {
   await fetchStatuses()
 }
 
-const handleAddBtnCLick = () => {
+const handleAddBtnClick = () => {
   console.log('add button clicked')
   router.push({ name: 'status-add' })
 }
@@ -50,7 +50,7 @@ const handleStatusClick = (statusId) => {
   console.log('status clicked', statusId)
 }
 
-const handleEditBtnCLick = (statusId) => {
+const handleEditBtnClick = (statusId) => {
   router.push({ name: 'status-edit', params: { statusId } })
 }
 
@@ -254,10 +254,13 @@ const handleSaveSettingsStatus = async () => {
   </RouterView>
 
   <Teleport to="#navbar-item-left">
-    <button @click="$router.push({ name: 'all-task' })" type="button" class="btn btn-outline btn-sm hidden sm:flex">
-      <IconSVG iconName="house" :scale="1.25" />Home
-    </button>
+      <button @click="$router.push({ name: 'all-task'})" type="button"
+        class="btn btn-outline btn-sm hidden sm:flex">
+        <IconSVG iconName="house" :scale="1.25" />Home
+      </button>
+
   </Teleport>
+
   <Teleport to="#navbar-item-right">
     <div class="flex gap-2">
       <BaseMenu side="left" class="sm:hidden">
@@ -266,7 +269,7 @@ const handleSaveSettingsStatus = async () => {
         </template>
         <template #menu>
           <li>
-            <button @click="handleRefreshBtnCLick" type="button"
+            <button @click="handleRefreshBtnClick" type="button"
               class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
               <div :class="{ 'animate-spin': isLoading }">
                 <IconSVG iconName="arrow-clockwise" :scale="1.25" />
@@ -275,12 +278,12 @@ const handleSaveSettingsStatus = async () => {
           </li>
         </template>
       </BaseMenu>
-      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
+      <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
         <div :class="{ 'animate-spin': isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
         </div>Refresh Statuses
       </button>
-      <button @click="handleAddBtnCLick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
+      <button @click="handleAddBtnClick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
         <IconSVG iconName="plus" :scale="1.25" />Add Status
       </button>
     </div>
@@ -332,7 +335,7 @@ const handleSaveSettingsStatus = async () => {
               <button @click="handleSettingsBtnCLick(status)" class="btn btn-square btn-sm">
                 <IconSVG iconName="sliders2" />
               </button>
-              <ButtonWithIcon @click="handleEditBtnCLick(status.id)"
+              <ButtonWithIcon @click="handleEditBtnClick(status.id)"
                 className="itbkk-button-edit btn btn-sm justify-start flex flex-nowrap" iconName="pencil-square">
                 Edit
               </ButtonWithIcon>

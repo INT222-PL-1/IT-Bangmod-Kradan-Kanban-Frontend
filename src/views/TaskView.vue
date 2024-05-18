@@ -26,7 +26,7 @@ onMounted(async () => {
   await fetchTasks()
 })
 
-const handleRefreshBtnCLick = async () => {
+const handleRefreshBtnClick = async () => {
   await fetchTasks()
 }
 
@@ -34,12 +34,8 @@ const handleTaskClick = (taskId) => {
   router.push({ name: 'task-view', params: { taskId } })
 }
 
-const handleAddBtnCLick = () => {
+const handleAddBtnClick = () => {
   router.push({ name: 'task-add' })
-}
-
-const handleEditBtnCLick = (taskId) => {
-  router.push({ name: 'task-edit', params: { taskId } })
 }
 
 const handleOpenDeleteModal = (taskData) => {
@@ -73,9 +69,10 @@ const handleDeleteTask = async (taskId) => {
   taskDeleteModalOpenState.value = false
 }
 
-const handleManageStatusBtnCLick = () => {
+const handleManageStatusBtnClick = () => {
   router.push({ name: 'status-manage' })
 }
+
 
 const handleSort = (e) => {
   boardStore.sortTasks(e.sortBy, e.sortDirection)
@@ -112,12 +109,40 @@ const handleSort = (e) => {
     </Transition>
   </RouterView>
 
+  
   <Teleport to="#navbar-item-left">
-    <button @click="handleManageStatusBtnCLick" type="button"
-      class="itbkk-manage-status btn btn-outline btn-sm hidden sm:flex">
-      <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
-    </button>
+    <div class="flex gap-4">
+      <div>
+        <button @click="handleManageStatusBtnClick" type="button"
+          class="itbkk-manage-status btn btn-outline btn-sm hidden sm:flex">
+          <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
+        </button>
+      </div>
+
+      <div>
+      <div class="gap-2 self-center flex">
+        <div class="dropdown dropdown-down h-8 flex flex-row">
+        <div class="flex flex-col">
+          <div @click="handleFilterButtonClick" tabindex="0" role="button" class="flex flex-row h-7 w-72 self-center text-base bg-slate-50 text-gray-500 cursor-pointer"> Filter By Status(es) 
+          </div>
+          <div>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-1 shadow bg-base-100 rounded-box h-10 w-72">
+            
+            <li>meow</li>
+            <li>UWU</li>
+
+          </ul>
+          </div>        
+      </div>
+      <IconSVG iconName="x" :scale="1.25" class="self-center text-orange-600 pl-3 cursor-pointer"/>
+
+      </div>
+      </div>
+    </div>
+  </div>
+    
   </Teleport>
+
   <Teleport to="#navbar-item-right">
     <div class="flex gap-2">
       <BaseMenu side="left" class="sm:hidden">
@@ -126,7 +151,7 @@ const handleSort = (e) => {
         </template>
         <template #menu>
           <li>
-            <button @click="handleRefreshBtnCLick" type="button"
+            <button @click="handleRefreshBtnClick" type="button"
               class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
               <div :class="{ 'animate-spin': boardStore.isLoading }">
                 <IconSVG iconName="arrow-clockwise" :scale="1.25" />
@@ -134,19 +159,19 @@ const handleSort = (e) => {
             </button>
           </li>
           <li>
-            <button @click="handleManageStatusBtnCLick"
+            <button @click="handleManageStatusBtnClick"
               class="itbkk-manage-status btn btn-sm btn-ghost justify-start flex flex-nowrap">
               <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
             </button>
           </li>
         </template>
       </BaseMenu>
-      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
+      <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
         <div :class="{ 'animate-spin': boardStore.isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
         </div>Refresh Tasks
       </button>
-      <button @click="handleAddBtnCLick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
+      <button @click="handleAddBtnClick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
         <IconSVG iconName="plus" :scale="1.25" />Add Task
       </button>
     </div>
@@ -200,7 +225,7 @@ const handleSort = (e) => {
                 </template>
                 <template #menu>
                   <li>
-                    <ButtonWithIcon @click="handleEditBtnCLick(task.id)"
+                    <ButtonWithIcon @click="handleEditBtnClick(task.id)"
                       className="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap"
                       iconName="pencil-square">
                       Edit
