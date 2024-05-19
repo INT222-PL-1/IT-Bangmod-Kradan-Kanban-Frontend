@@ -10,9 +10,11 @@ import { useToastStore } from '@/stores/toast'
 import BaseModal from '@/components/BaseModal.vue'
 import StatusSelector from '@/components/StatusSelector.vue'
 import BaseMenu from '@/components/BaseMenu.vue'
+import { useBoardStore } from '@/stores/board'
 
 const isLoading = ref(false)
 const router = useRouter()
+const boardStore = useBoardStore()
 const statusStore = useStatusStore()
 const toastStore = useToastStore()
 
@@ -343,9 +345,19 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
               class="itbkk-status-description min-w-96 max-w-96 break-words">
               {{ status.description || 'No description is provided' }}
             </td>
-            <td class="min-w-16 max-w-16">
+            <td class="min-w-16 max-w-16 p-0">
               <div class="grid place-items-center">
-                <div>{{ status.count }}{{ status.is_limited_status ? '/' + status.maximum_limit : '' }}</div>
+                <div
+                  :class="{ 'text-error': status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status }"
+                  class="flex items-center gap-1">
+                  <IconSVG
+                    v-show="status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status"
+                    iconName="exclamation-diamond"
+                    title="Task limit exceeded! Please transfer some tasks to other statuses or increase the limit." />
+                  {{ status.count }}{{ boardStore.board.isLimitTasks && !status.is_fixed_status ? '/' +
+                    boardStore.board.taskLimitPerStatus : ''
+                  }}
+                </div>
               </div>
             </td>
             <td class="min-w-44 max-w-44">

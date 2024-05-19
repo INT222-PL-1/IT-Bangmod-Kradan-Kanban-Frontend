@@ -25,14 +25,14 @@ export async function getBoards() {
   }
 }
 
-export async function updateBoard(boardId, updateData) {
+export async function patchBoard(boardId, patchData) {
   try {
-    const res = await fetch(`${SERVER_URL}/v2/boards/${boardId}`, {
-      method: 'PUT',
+    const res = await fetch(`${SERVER_URL}/v2/boards/${boardId}/maximum-task`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(updateData)
+      body: JSON.stringify(patchData)
     })
     if (res.status === 404) {
       return null

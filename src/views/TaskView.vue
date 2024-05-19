@@ -193,15 +193,12 @@ const handleSettingsButtonCLick = () => {
       <div class="flex justify-between">
         <FilterStatus />
         <button @click="handleSettingsButtonCLick" type="button" class="btn btn-ghost btn-sm">
-          <IconSVG iconName="gear" :scale="1.25" />Status Settings
+          <IconSVG iconName="gear" :scale="1.25" />Board Settings
         </button>
       </div>
     </div>
     <div class="table-overflow-x-scroll px-4">
-
-    
-
-      <table class="table border border-base-300">
+      <table class="table border border-base-300 relative">
         <thead class="bg-base-200">
           <tr class="select-none">
             <th class="min-w-16 max-w-16"></th>

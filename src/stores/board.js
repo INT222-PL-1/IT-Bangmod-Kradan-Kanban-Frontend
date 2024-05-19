@@ -17,6 +17,7 @@ export const useBoardStore = defineStore('board', () => {
   async function fetchBoard() {
     isLoading.value = true
     board.value = await getBoardById(options.value.boardId)
+    console.log(board.value)
     isLoading.value = false
   }
 
