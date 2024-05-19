@@ -3,9 +3,9 @@ import { useBoardStore } from '@/stores/board';
 import BaseModal from './BaseModal.vue'
 import { useToastStore } from '@/stores/toast';
 import { computed, ref, watch } from 'vue';
-import { updateBoard } from '@/libs/boardManagement';
+import { patchBoard } from '@/libs/boardManagement';
 
-const emits = defineEmits(['clickClose'])
+defineEmits(['clickClose'])
 
 defineProps({
   show: {
@@ -23,8 +23,8 @@ const disabledSaveSettingsBtn = computed(() => {
 })
 
 const handleSaveSettingsStatus = async () => {
-  const updatedBoard = await updateBoard(boardStore.board.id, newSettings.value)
-  if (updatedBoard === null) {
+  const patchedBoard = await patchBoard(boardStore.board.id, newSettings.value)
+  if (patchedBoard === null) {
     toastStore.createToast({
       title: 'Error',
       description: 'An error has occurred, please try again later.',
@@ -36,14 +36,14 @@ const handleSaveSettingsStatus = async () => {
       description: 'The board settings have been updated.',
       status: 'success'
     })
-    await boardStore.loadBoard()
+    await boardStore.fetchBoard()
   }
-  emits('clickClose')
+  // emits('clickClose')
 }
 
 watch(() => boardStore.board, (newBoard) => {
   newSettings.value = { ...newBoard }
-})
+}, { immediate: true })
 
 </script>
 
@@ -69,7 +69,7 @@ watch(() => boardStore.board, (newBoard) => {
               class="flex items-center justify-between">
               <div>Set number of tasks limit</div>
               <input v-model="newSettings.taskLimitPerStatus" class="input input-bordered input-sm w-16" type="number"
-                min="0" max="9999" :disabled="disabledSaveSettingsBtn" />
+                min="0" max="9999" :disabled="newSettings.isLimitTasks === false" />
             </div>
           </div>
         </div>
@@ -77,10 +77,10 @@ watch(() => boardStore.board, (newBoard) => {
           <div class="flex gap-2">
             <button @click="handleSaveSettingsStatus" class="itbkk-button-confirm btn btn-sm btn-success"
               :disabled="disabledSaveSettingsBtn">
-              Save
+              Apply
             </button>
             <button @click="$emit('clickClose')" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
+              Go back
             </button>
           </div>
         </div>
