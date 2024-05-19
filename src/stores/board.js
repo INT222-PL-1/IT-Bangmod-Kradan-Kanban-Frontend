@@ -11,7 +11,7 @@ export const useBoardStore = defineStore('board', () => {
     boardId: 1,
     sortBy: null,
     sortDirection: null,
-    filterStatuses: null
+    filterStatuses: []
   })
 
   async function fetchBoard() {
@@ -33,6 +33,7 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   function addTaskFilterStatus(status) {
+    if (options.value.filterStatuses.includes(status)) return
     options.value.filterStatuses.push(status)
   }
 
@@ -42,6 +43,7 @@ export const useBoardStore = defineStore('board', () => {
 
   function clearTaskFilterStatus() {
     options.value.filterStatuses.splice(0, options.value.filterStatuses.length)
+    console.log('hello');
   }
 
   watch(() => options.value.boardId, fetchBoard, { immediate: true })

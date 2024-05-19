@@ -11,6 +11,7 @@ import { useToastStore } from '@/stores/toast'
 import SortButton from '@/components/SortButton.vue'
 import { useBoardStore } from '@/stores/board'
 import BoardSettingsModal from '@/components/BoardSettingsModal.vue'
+import FilterStatus from '@/components/FilterStatus.vue'
 
 const router = useRouter()
 const toastStore = useToastStore()
@@ -69,6 +70,7 @@ const handleDeleteTask = async (taskId) => {
   }
   taskDeleteModalOpenState.value = false
 }
+
 
 const handleEditBtnClick = (taskId) => {
   router.push({ name: 'task-edit', params: { taskId } })
@@ -164,12 +166,12 @@ const handleSettingsButtonCLick = () => {
         </template>
         <template #menu>
           <button @click="handleRefreshBtnClick" type="button"
-            class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
+            class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
             <div :class="{ 'animate-spin': boardStore.isLoading }">
               <IconSVG iconName="arrow-clockwise" :scale="1.25" />
             </div>Refresh Tasks
           </button>
-          <button @click="handleAddBtnClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
+          <button @click="handleAddBtnClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
             <IconSVG iconName="plus" :scale="1.25" />Add Task
           </button>
         </template>
@@ -187,8 +189,9 @@ const handleSettingsButtonCLick = () => {
   </Teleport>
 
   <div class="max-w-full pt-10 pb-20">
-    <div class="px-4 h-8 mb-2">
-      <div class="flex justify-end">
+    <div class="px-4 min-h-8 mb-2">
+      <div class="flex justify-between">
+        <FilterStatus />
         <button @click="handleSettingsButtonCLick" type="button" class="btn btn-ghost btn-sm">
           <IconSVG iconName="gear" :scale="1.25" />Board Settings
         </button>

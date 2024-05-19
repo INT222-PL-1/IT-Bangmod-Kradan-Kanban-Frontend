@@ -257,12 +257,12 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
         </template>
         <template #menu>
           <button @click="handleRefreshBtnClick" type="button"
-            class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
+            class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
             <div :class="{ 'animate-spin': isLoading }">
               <IconSVG iconName="arrow-clockwise" :scale="1.25" />
             </div>Refresh Statuses
           </button>
-          <button @click="handleAddBtnClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
+          <button @click="handleAddBtnClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
             <IconSVG iconName="plus" :scale="1.25" />Add Status
           </button>
         </template>
