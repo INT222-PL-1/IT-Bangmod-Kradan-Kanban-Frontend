@@ -27,11 +27,21 @@ defineProps({
       :class="{ 'btn btn-sm btn-ghost btn-square': mode === 'icon' }">
       <slot :name="mode === 'button' ? mode : 'icon'"></slot>
     </div>
-    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52 gap-1 flex flex-col"
+    <div tabindex="0" class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52 gap-1 flex flex-col"
       :style="{ 'z-index': zLayer, height: menuHeight }">
       <slot name="menu"></slot>
-    </ul>
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* Override DaisyUI dropdown content to fixed position absolute cause table padding issue */
+.dropdown-content {
+  display: none;
+}
+
+.dropdown:focus-within .dropdown-content {
+  position: absolute;
+  display: block;
+}
+</style>

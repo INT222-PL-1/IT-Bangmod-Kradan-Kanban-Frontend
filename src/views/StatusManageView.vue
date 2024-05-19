@@ -3,9 +3,9 @@ import { RouterView, useRouter } from 'vue-router'
 import { useStatusStore } from '@/stores/status'
 import IconSVG from '@/components/IconSVG.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
-import { deleteStatus, transferTasksStatus, updateStatus } from '@/libs/statusManagement'
+import { deleteStatus, transferTasksStatus } from '@/libs/statusManagement'
 import { useToastStore } from '@/stores/toast'
 import BaseModal from '@/components/BaseModal.vue'
 import StatusSelector from '@/components/StatusSelector.vue'
@@ -20,12 +20,6 @@ const statusModalData = ref(null)
 const statusDeleteModalOpenState = ref(false)
 const statusTransferModalOpenState = ref(false)
 const statusIdToTransfer = ref(1)
-const statusSettingsModalOpenState = ref(false)
-
-const currentStatusSettingsModalData = ref(null)
-const disabledSaveSettingsBtn = computed(() => {
-  return JSON.stringify(currentStatusSettingsModalData.value) === JSON.stringify(statusModalData.value)
-})
 
 async function fetchStatuses() {
   isLoading.value = true
@@ -52,12 +46,6 @@ const handleStatusClick = (statusId) => {
 
 const handleEditBtnClick = (statusId) => {
   router.push({ name: 'status-edit', params: { statusId } })
-}
-
-const handleSettingsBtnCLick = (statusData) => {
-  statusModalData.value = statusData
-  currentStatusSettingsModalData.value = { ...statusData }
-  statusSettingsModalOpenState.value = true
 }
 
 const handleOpenTransferModal = (statusData) => {
@@ -124,35 +112,34 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
   // await handleDeleteStatus(fromStatusId)
 }
 
-const handleSaveSettingsStatus = async () => {
-  const updatedStatus = await updateStatus(currentStatusSettingsModalData.value)
-  if (updatedStatus === null) {
-    toastStore.createToast({
-      title: 'Error',
-      description: 'An error has occurred, please try again later.',
-      status: 'error'
-    })
-  } else {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'The status settings have been updated.',
-      status: 'success'
-    })
-    await statusStore.loadStatuses()
-  }
-  statusSettingsModalOpenState.value = false
-}
+// const handleSaveSettingsStatus = async () => {
+//   const updatedStatus = await updateStatus(currentStatusSettingsModalData.value)
+//   if (updatedStatus === null) {
+//     toastStore.createToast({
+//       title: 'Error',
+//       description: 'An error has occurred, please try again later.',
+//       status: 'error'
+//     })
+//   } else {
+//     toastStore.createToast({
+//       title: 'Success',
+//       description: 'The status settings have been updated.',
+//       status: 'success'
+//     })
+//     await statusStore.loadStatuses()
+//   }
+//   statusSettingsModalOpenState.value = false
+// }
 
 </script>
 
 <template>
 
-  <Transition>
+  <!-- <Transition>
     <BaseModal @clickBG="statusSettingsModalOpenState = false" :show="statusSettingsModalOpenState"
       :mobileCenter="true">
       <div class="bg-base-100 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Status Settings - {{
-          statusModalData.name }}</div>
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Status Settings</div>
         <div class="flex flex-col gap-2 p-4 break-words">
           <div class="flex flex-col gap-2">
             <div class="flex-col">
@@ -164,7 +151,7 @@ const handleSaveSettingsStatus = async () => {
             </div>
             <div class="flex items-center justify-between">
               <div>Limit the number of tasks in this status</div>
-              <input v-model="currentStatusSettingsModalData.is_limited_status" class="toggle" type="checkbox">
+              <input v-model="boardStore.is_limit_task" class="toggle" type="checkbox">
             </div>
             <div
               :class="{ 'opacity-50 cursor-not-allowed': currentStatusSettingsModalData.is_limited_status === false }"
@@ -189,7 +176,7 @@ const handleSaveSettingsStatus = async () => {
         </div>
       </div>
     </BaseModal>
-  </Transition>
+  </Transition> -->
 
   <Transition>
     <BaseModal @clickBG="statusDeleteModalOpenState = false" :show="statusDeleteModalOpenState" :mobileCenter="true">
@@ -253,14 +240,43 @@ const handleSaveSettingsStatus = async () => {
     </Transition>
   </RouterView>
 
-  <Teleport to="#navbar-item-left">
-      <button @click="$router.push({ name: 'all-task'})" type="button"
-        class="btn btn-outline btn-sm hidden sm:flex">
-        <IconSVG iconName="house" :scale="1.25" />Home
+  <!-- <Teleport to="#navbar-item-left">
+    <button @click="$router.push({ name: 'all-task'})" type="button"
+      class="btn btn-outline btn-sm hidden sm:flex">
+      <IconSVG iconName="house" :scale="1.25" />Home
+    </button>
+  </Teleport> -->
+
+  <Teleport to="#navbar-item-right">
+    <div class="flex gap-2">
+      <BaseMenu side="left" class="sm:hidden">
+        <template #icon>
+          <IconSVG iconName="three-dots" scale="1.25" />
+        </template>
+        <template #menu>
+          <button @click="handleRefreshBtnClick" type="button"
+            class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
+            <div :class="{ 'animate-spin': isLoading }">
+              <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+            </div>Refresh Statuses
+          </button>
+          <button @click="handleAddBtnClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
+            <IconSVG iconName="plus" :scale="1.25" />Add Status
+          </button>
+        </template>
+      </BaseMenu>
+      <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
+        <div :class="{ 'animate-spin': isLoading }">
+          <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+        </div>Refresh Statuses
       </button>
-
+      <button @click="handleAddBtnClick" type="button"
+        class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
+        <IconSVG iconName="plus" :scale="1.25" />Add Status
+      </button>
+    </div>
   </Teleport>
-
+  <!-- 
   <Teleport to="#navbar-item-right">
     <div class="flex gap-2">
       <BaseMenu side="left" class="sm:hidden">
@@ -287,68 +303,71 @@ const handleSaveSettingsStatus = async () => {
         <IconSVG iconName="plus" :scale="1.25" />Add Status
       </button>
     </div>
-  </Teleport>
+  </Teleport> -->
 
-  <div class="px-4 max-w-full table-overflow-x-scroll py-20">
+  <div class="max-w-full pt-10 pb-20">
+    <div class="px-4 h-8 mb-2"></div>
     <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
-    <table class="table border border-base-300">
-      <thead class="bg-base-200">
-        <tr>
-          <th class="min-w-16 max-w-16"></th>
-          <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
-          <th class="min-w-96 max-w-96 sm:min-w-[35vw] sm:max-w-[35vw]">Description</th>
-          <th class="min-w-16 max-w-16">Tasks</th>
-          <th class="min-w-60 max-w-60">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="isLoading && statusStore.statuses.length === 0">
-          <td colspan="5" class="text-center">Loading statuses...</td>
-        </tr>
-        <tr v-else-if="statusStore.statuses === null">
-          <td colspan="5" class="text-center">Error while loading statuses from server. Please try again later.</td>
-        </tr>
-        <tr v-else-if="statusStore.statuses.length === 0">
-          <td colspan="5" class="text-center">No status</td>
-        </tr>
-        <tr v-else v-for="(status, index) in statusStore.statuses" :key="status.id" class="itbkk-item">
-          <td class="min-w-16 max-w-16">
-            <div class="grid place-items-center">
-              <div>{{ index + 1 }}</div>
-            </div>
-          </td>
-          <td class="overflow-hidden min-w-52 max-w-52">
-            <StatusBadge @click="handleStatusClick(status)" :statusData="status" textWrapMode="wrap"
-              class="itbkk-status-name cursor-default" width="100%" />
-          </td>
-          <td :class="{ 'italic text-[grey]': !status.description }"
-            class="itbkk-status-description min-w-96 max-w-96 break-words">
-            {{ status.description || 'No description is provided' }}
-          </td>
-          <td class="min-w-16 max-w-16">
-            <div class="grid place-items-center">
-              <div>{{ status.count }}{{ status.is_limited_status ? '/' + status.maximum_limit : '' }}</div>
-            </div>
-          </td>
-          <td class="min-w-44 max-w-44">
-            <div v-if="status.is_fixed_status === false" class="flex justify-center items-center gap-1 w-full">
-              <button @click="handleSettingsBtnCLick(status)" class="btn btn-square btn-sm">
-                <IconSVG iconName="sliders2" />
-              </button>
-              <ButtonWithIcon @click="handleEditBtnClick(status.id)"
-                className="itbkk-button-edit btn btn-sm justify-start flex flex-nowrap" iconName="pencil-square">
-                Edit
-              </ButtonWithIcon>
-              <ButtonWithIcon @click="handleOpenDeleteModal(status)"
-                className="itbkk-button-delete btn btn-sm justify-start text-error flex flex-nowrap"
-                iconName="trash-fill">
-                Delete
-              </ButtonWithIcon>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-overflow-x-scroll px-4">
+      <table class="table border border-base-300">
+        <thead class="bg-base-200">
+          <tr class="select-none">
+            <th class="min-w-16 max-w-16"></th>
+            <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
+            <th class="min-w-96 max-w-96 sm:min-w-[35vw] sm:max-w-[35vw]">Description</th>
+            <th class="min-w-16 max-w-16">Tasks</th>
+            <th class="min-w-60 max-w-60">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="isLoading && statusStore.statuses.length === 0">
+            <td colspan="5" class="text-center">Loading statuses...</td>
+          </tr>
+          <tr v-else-if="statusStore.statuses === null">
+            <td colspan="5" class="text-center">Error while loading statuses from server. Please try again later.</td>
+          </tr>
+          <tr v-else-if="statusStore.statuses.length === 0">
+            <td colspan="5" class="text-center">No status</td>
+          </tr>
+          <tr v-else v-for="(status, index) in statusStore.statuses" :key="status.id" class="itbkk-item">
+            <td class="min-w-16 max-w-16">
+              <div class="grid place-items-center">
+                <div>{{ index + 1 }}</div>
+              </div>
+            </td>
+            <td class="overflow-hidden min-w-52 max-w-52">
+              <StatusBadge @click="handleStatusClick(status)" :statusData="status" textWrapMode="wrap"
+                class="itbkk-status-name cursor-default" width="100%" />
+            </td>
+            <td :class="{ 'italic text-[grey]': !status.description }"
+              class="itbkk-status-description min-w-96 max-w-96 break-words">
+              {{ status.description || 'No description is provided' }}
+            </td>
+            <td class="min-w-16 max-w-16">
+              <div class="grid place-items-center">
+                <div>{{ status.count }}{{ status.is_limited_status ? '/' + status.maximum_limit : '' }}</div>
+              </div>
+            </td>
+            <td class="min-w-44 max-w-44">
+              <div v-if="status.is_fixed_status === false" class="flex justify-center items-center gap-1 w-full">
+                <!-- <button @click="handleSettingsBtnCLick(status)" class="btn btn-square btn-sm">
+                  <IconSVG iconName="sliders2" />
+                </button> -->
+                <ButtonWithIcon @click="handleEditBtnClick(status.id)"
+                  className="itbkk-button-edit btn btn-sm justify-start flex flex-nowrap" iconName="pencil-square">
+                  Edit
+                </ButtonWithIcon>
+                <ButtonWithIcon @click="handleOpenDeleteModal(status)"
+                  className="itbkk-button-delete btn btn-sm justify-start text-error flex flex-nowrap"
+                  iconName="trash-fill">
+                  Delete
+                </ButtonWithIcon>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <!-- <div class="h-24"></div> -->
   </div>
 </template>
