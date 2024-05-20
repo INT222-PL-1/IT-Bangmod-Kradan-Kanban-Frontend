@@ -32,7 +32,9 @@ const handleCloseToast = () => {
     </div>
     <div class="p-4">
       <div class="font-bold">{{ toastData.title }}</div>
-      <div class="itbkk-message break-words">{{ toastData.description }}</div>
+      <div class="itbkk-message break-words">
+        <div v-for="(description, index) of toastData.description.split('\n')" :key="index">{{ description }}</div>
+      </div>
     </div>
     <div class="h-2 bg-white animate-time-indicator opacity-50"></div>
   </div>

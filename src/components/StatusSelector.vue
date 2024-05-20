@@ -3,6 +3,7 @@ import { useStatusStore } from '@/stores/status';
 import StatusBadge from './StatusBadge.vue';
 import { computed, onMounted, ref } from 'vue'
 import IconSVG from './IconSVG.vue'
+import { useBoardStore } from '@/stores/board';
 
 const props = defineProps({
   excludeStatusId: {
@@ -14,6 +15,7 @@ const props = defineProps({
 const model = defineModel()
 const searchTerm = ref('')
 const statusStore = useStatusStore()
+const boardStore = useBoardStore()
 
 onMounted(async () => {
   await statusStore.loadStatuses()
@@ -36,11 +38,13 @@ const filteredStatusList = computed(() => {
   <div class="z-[60]">
     <div class="dropdown itbkk-button-action">
       <div tabindex="0" @click="handleClick" role="button">
-        <button class="active:scale-90 transition flex bg-base-200 rounded-xl p-2 hover:contrast-75">
-          <StatusBadge class="cursor-pointer" :statusData="statusList.find(status => status.id === model)"
-            textWrapMode="wrap" width="10rem" />
+        <div class="active:scale-90 transition flex bg-base-200 rounded-xl p-2 hover:contrast-75">
+          <div class="bg-base-100 rounded-lg">
+            <StatusBadge class="cursor-pointer" :statusData="statusList.find(status => status.id === model)"
+              textWrapMode="wrap" width="15rem" />
+          </div>
           <IconSVG iconName="chevron-down" size="2rem" />
-        </button>
+        </div>
       </div>
       <div tabindex="0"
         class="dropdown-content menu mt-1 shadow bg-base-200 rounded-box w-[19rem] gap-1 h-fit border border-base-300">
@@ -54,9 +58,9 @@ const filteredStatusList = computed(() => {
         <div v-show="filteredStatusList.length > 0"
           class="grid grid-flow-row grid-cols-2 content-start gap-2 h-[4.5rem] sm:h-28 overflow-y-auto overflow-x-hidden custom-scroll">
           <button v-for="status in filteredStatusList" :key="status.id"
-            class="active:scale-90 transition p-0 bg-base-200 hover:contrast-75 w-fit rounded-lg">
-            <StatusBadge class="cursor-pointer" @click="model = status.id" :statusData="status"
-              textWrapMode="truncate" />
+            class="active:scale-90 transition p-0 hover:contrast-75 w-fit rounded-lg bg-base-100">
+            <StatusBadge class="cursor-pointer" @click="model = status.id" :statusData="status" textWrapMode="truncate"
+              showCount :showLimit="boardStore.board.isLimitTasks" />
           </button>
         </div>
       </div>

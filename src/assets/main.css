@@ -4,6 +4,7 @@
 
 .table-overflow-x-scroll {
   overflow-x: auto;
+  /* overflow-x: auto; */
 }
 
 .table-overflow-x-scroll::-webkit-scrollbar {
@@ -24,7 +25,6 @@
 }
 
 @keyframes shake-x-in {
-
   0%,
   100% {
     transform: translateX(0);

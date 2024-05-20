@@ -43,16 +43,16 @@ const disabledSaveButton = computed(() => {
 
 async function fetchTaskData() {
   const taskId = route.params.taskId
-  taskModalData.value = await getTaskById(taskId)
-  console.log(taskModalData.value)
-  if (taskModalData.value === null) {
+  const responseObj = await getTaskById(taskId)
+  if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: 'An error has occurred, the task does not exist.',
+      description: `An error has occurred.\n${responseObj.message}`,
       status: 'error'
     })
     router.replace({ name: 'all-task' })
   } else {
+    taskModalData.value = responseObj.data
     if (taskModalMode.value === 'edit') {
       previousTaskData = { ...taskModalData.value, status: { ...taskModalData.value.status } }
     }
@@ -85,31 +85,33 @@ const handleCLickClose = () => {
 
 const handleClickConfirm = async () => {
   if (taskModalMode.value === 'add') {
-    const createdTask = await createTask(taskModalData.value)
-    if (createdTask === null) {
+    const responseObj = await createTask(taskModalData.value)
+    if (responseObj.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: 'An error occurred while adding the task',
+        description: `An error occurred while adding the task.\n${responseObj.message}`,
         status: 'error'
       })
     } else {
+      const createdTask = responseObj.data
       toastStore.createToast({
         title: 'Success',
-        description: `The task "${createdTask.title}" is added successfully`,
+        description: `The task "${createdTask.title}" is added successfully.`,
         status: 'success'
       })
     }
     boardStore.fetchTasks()
     router.push({ name: 'all-task' })
   } else if (taskModalMode.value === 'edit') {
-    const updatedTask = await updateTask(taskModalData.value)
-    if (updatedTask === null) {
+    const responseObj = await updateTask(taskModalData.value)
+    if (responseObj.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: 'An error occurred while updating the task',
+        description: `An error occurred while updating the task.\n${responseObj.message}`,
         status: 'error'
       })
     } else {
+      const updatedTask = responseObj.data
       toastStore.createToast({
         title: 'Success',
         description: `The task "${updatedTask.title}" is updated successfully`,
@@ -125,8 +127,7 @@ const handleClickConfirm = async () => {
 
 <template>
   <BaseModal :show="taskModalData !== null" @clickBG="handleCLickClose">
-    <div
-      class="itbkk-modal-task bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] flex flex-col">
+    <div class="itbkk-modal-task bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto flex flex-col">
       <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">
         <span v-if="taskModalMode === 'view'" class="itbkk-title">{{ taskModalData?.title }}</span>
         <span v-else-if="taskModalMode === 'add'">New Task</span>
@@ -205,12 +206,24 @@ const handleClickConfirm = async () => {
                 class="itbkk-assignees w-[20rem] outline-none focus:placeholder:opacity-50 bg-base-200 px-4 py-2 rounded-lg mt-2" />
             </div>
             <div class="p-4">
-              <div class="text-lg font-semibold">Status</div>
+              <div>
+                <span class="text-lg font-semibold">
+                  <span>Status </span>
+                  <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm"
+                    :class="boardStore.board.isLimitTasks ? 'text-warning' : 'opacity-50'">
+                    (Status limit {{ boardStore.board.isLimitTasks ? 'enabled' : 'disabled' }})
+                  </span>
+                </span>
+                <span v-if="['add', 'edit'].includes(taskModalMode)" v-show="taskModalData.assignees.length > 30"
+                  class="text-error text-xs text-nowrap">
+                  Assignees can not be more than 30 characters
+                </span>
+              </div>
               <div v-if="taskModalMode === 'view'" class="w-full max-w-[16rem]">
                 <StatusBadge :statusData="taskModalData?.status" textWrapMode="wrap" width="100%"
                   class="itbkk-status" />
               </div>
-              <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="w-full max-w-[16rem]">
+              <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="w-full max-w-[16rem] mt-2">
                 <StatusSelector v-model="taskModalData.status.id" />
               </div>
             </div>

@@ -46,24 +46,18 @@ const handleOpenDeleteModal = (taskData) => {
 }
 
 const handleDeleteTask = async (taskId) => {
-  const deletedTask = await deleteTask(taskId)
-  if (deletedTask?.errorStatus === 404) {
+  const responseObj = await deleteTask(taskId)
+  if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: 'An error has occurred, the task does not exist.',
+      description: `An error has occurred.\n${responseObj.message}.`,
       status: 'error'
     })
     await fetchTasks()
-  } else if (deletedTask === null) {
-    toastStore.createToast({
-      title: 'Error',
-      description: 'An error has occurred, please try again later.',
-      status: 'error'
-    })
   } else {
     toastStore.createToast({
       title: 'Success',
-      description: 'The task has been deleted',
+      description: 'The task has been deleted.',
       status: 'success'
     })
     await fetchTasks()
@@ -118,46 +112,6 @@ const handleSettingsButtonCLick = () => {
     </Transition>
   </RouterView>
 
-  <!-- <Teleport to="#navbar-item-left">
-    <div class="flex gap-4">
-      <div class="flex">
-        <RouterLink :to="{ name: 'all-task' }" type="button" exact-active-class="btn-neutral"
-          class="btn btn-sm hidden sm:flex">
-          <IconSVG iconName="house" :scale="1.25" />Home
-        </RouterLink>
-        <div class="divider divider-horizontal m-0"></div>
-        <RouterLink :to="{ name: 'status-manage' }" type="button" exact-active-class="btn-neutral"
-          class="itbkk-manage-status btn btn-sm hidden sm:flex">
-          <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
-        </RouterLink>
-      </div>
-
-      <div>
-        <div class="gap-2 self-center flex">
-          <div class="dropdown dropdown-down h-8 flex flex-row">
-            <div class="flex flex-col">
-              <div @click="handleFilterButtonClick" tabindex="0" role="button"
-                class="flex flex-row h-7 w-72 self-center text-base bg-slate-50 text-gray-500 cursor-pointer"> Filter By
-                Status(es)
-              </div>
-              <div>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-1 shadow bg-base-100 rounded-box h-10 w-72">
-
-                  <li>meow</li>
-                  <li>UWU</li>
-
-                </ul>
-              </div>
-            </div>
-            <IconSVG iconName="x" :scale="1.25" class="self-center text-orange-600 pl-3 cursor-pointer" />
-
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </Teleport> -->
-
   <Teleport to="#navbar-item-right">
     <div class="flex gap-2">
       <BaseMenu side="left" class="sm:hidden">
@@ -171,7 +125,8 @@ const handleSettingsButtonCLick = () => {
               <IconSVG iconName="arrow-clockwise" :scale="1.25" />
             </div>Refresh Tasks
           </button>
-          <button @click="handleAddBtnClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+          <button @click="handleAddBtnClick" type="button"
+            class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
             <IconSVG iconName="plus" :scale="1.25" />Add Task
           </button>
         </template>
@@ -198,7 +153,7 @@ const handleSettingsButtonCLick = () => {
       </div>
     </div>
     <div class="table-overflow-x-scroll px-4">
-      <table class="table border border-base-300 relative">
+      <table class="table border border-base-300">
         <thead class="bg-base-200">
           <tr class="select-none">
             <th class="min-w-16 max-w-16"></th>
@@ -236,7 +191,7 @@ const handleSettingsButtonCLick = () => {
             <td colspan="4" class="text-center">No task</td>
           </tr>
           <tr v-else v-for="(task, index) in boardStore.tasks" :key="task.id" class="itbkk-item">
-            <td class="min-w-24 max-w-24">
+            <td class="min-w-16 max-w-16">
               <div class="flex items-center justify-between gap-2">
                 <div>{{ index + 1 }}</div>
                 <BaseMenu>
@@ -263,7 +218,7 @@ const handleSettingsButtonCLick = () => {
               </div>
             </td>
             <td @click="handleTaskClick(task.id)"
-              class="overflow-hidden min-w-52 max-w-52 md:max-w-72 lg:max-w-96 hover:underline hover:cursor-pointer">
+              class="overflow-hidden min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw] hover:underline hover:cursor-pointer">
               <div :class="{ 'itbkk-title': $route.name === 'all-task' }" class="break-words font-semibold">
                 {{ task.title }}
               </div>
@@ -279,8 +234,8 @@ const handleSettingsButtonCLick = () => {
           </tr>
         </tbody>
       </table>
+      <div class="h-20"></div>
     </div>
-    <!-- <div class="h-24"></div> -->
   </div>
 </template>
 

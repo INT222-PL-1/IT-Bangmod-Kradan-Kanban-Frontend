@@ -8,11 +8,10 @@ import { useBoardStore } from '@/stores/board';
 const boardStore = useBoardStore()
 const statusStore = useStatusStore()
 const searchTerm = ref('')
-const selectedStatus = ref([])
 
 onMounted(async () => {
   await statusStore.loadStatuses()
-})  
+})
 
 const statusList = computed(() => {
   const copiedStatuses = [...statusStore.statuses]
@@ -23,7 +22,6 @@ const filteredStatusList = computed(() => {
 })
 
 const handleStatusClick = (statusName) => {
-  // selectedStatus.value.push(status.name)
   if (boardStore.options.filterStatuses.includes(statusName)) {
     boardStore.removeTaskFilterStatus(statusName)
   } else boardStore.addTaskFilterStatus(statusName)
@@ -38,25 +36,35 @@ const handleClearFilterButtonClick = () => {
 <template>
 
   <div class="dropdown">
-    <div class="flex items-center border bg-secondary border-base-300 rounded-lg">
-      <button class="btn btn-sm btn-square btn-ghost">
-        <IconSVG iconName="filter" scale="1.25" />
-      </button>
-      <div tabindex="0" role="button" class="flex gap-1 items-center py-1 px-2 w-96 cursor-pointer border-x border-base-content">
-        <div v-show="boardStore.options.filterStatuses.length === 0">Filter By Status(es)</div>
+    <div class="flex items-center border-2 border-base-300 rounded-lg overflow-hidden h-full">
+      <div class="bg-base-200 hover:contrast-50 transition-[filter] h-full">
+        <button class="active:scale-90">
+          <IconSVG iconName="filter" scale="1.25" size="2rem" />
+        </button>
+      </div>
+      <div tabindex="0" role="button"
+        class="flex gap-1 items-center py-1 px-2 w-36 sm:w-72 md:w-96 h-full cursor-pointer border-x-2 border-base-300">
+        <div v-show="boardStore.options.filterStatuses.length === 0" class="text-sm font-semibold opacity-50">Filter By
+          Status(es)
+        </div>
         <div v-show="boardStore.options.filterStatuses.length > 0" class="flex flex-wrap gap-2 ">
-          <div v-for="statusName of boardStore.options.filterStatuses" :key="statusName" @click="handleStatusClick(statusName)" class="p-1 bg-base-100 rounded-lg max-w-[7rem] truncate">
+          <div v-for="statusName of boardStore.options.filterStatuses" :key="statusName"
+            @click="handleStatusClick(statusName)"
+            class="hover:line-through hover:contrast-[0.90] transition-[filter] px-2 bg-base-200 rounded-lg max-w-[7rem] truncate relative">
+            <!-- <div class="w-full bg-[#0005] absolute text-center">a</div> -->
             {{ statusName }}
           </div>
         </div>
       </div>
-
-      <button @click="handleClearFilterButtonClick" class="btn btn-sm btn-square btn-ghost">
-        <IconSVG iconName="x" scale="1.25" size="2rem" class="cursor-pointer"/>
-      </button>
+      <div class="bg-base-200 hover:contrast-50 transition-[filter] h-full">
+        <button @click="handleClearFilterButtonClick" class="active:scale-90">
+          <IconSVG iconName="x" scale="1.25" size="2rem" class="cursor-pointer" />
+        </button>
+      </div>
     </div>
 
-    <div tabindex="0" class="dropdown-content menu mt-1 shadow bg-base-200 rounded-box w-[19rem] gap-1 h-fit border border-base-300 z-10">
+    <div tabindex="0"
+      class="dropdown-content menu mt-1 shadow bg-base-200 rounded-box w-[19rem] gap-1 h-fit border border-base-300 z-10">
       <div class="flex items-center gap-2">
         <IconSVG iconName="search" size="2rem" />
         <input v-model="searchTerm" type="text" placeholder="Search status name"
@@ -67,12 +75,12 @@ const handleClearFilterButtonClick = () => {
       <div v-show="filteredStatusList.length > 0"
         class="grid grid-flow-row grid-cols-2 content-start gap-2 h-[4.5rem] sm:h-28 overflow-y-auto overflow-x-hidden custom-scroll">
         <button v-for="status in filteredStatusList" :key="status.id" @click="handleStatusClick(status.name)"
-          class="active:scale-90 transition p-0 bg-base-200 hover:contrast-75 w-fit rounded-lg" :class="{ 'contrast-50': boardStore.options.filterStatuses.includes(status.name) }">
-          <StatusBadge class="cursor-pointer" :statusData="status"
-            textWrapMode="truncate" />
+          class="active:scale-90 transition p-0 bg-base-100 hover:contrast-75 w-fit rounded-lg"
+          :class="{ 'contrast-50': boardStore.options.filterStatuses.includes(status.name) }">
+          <StatusBadge class="cursor-pointer" :statusData="status" textWrapMode="truncate" showCount />
         </button>
       </div>
-    </div>        
+    </div>
   </div>
 
 </template>

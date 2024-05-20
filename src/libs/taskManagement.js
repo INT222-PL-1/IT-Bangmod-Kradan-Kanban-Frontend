@@ -1,3 +1,5 @@
+import { ResponseObject } from './classes/ResponseObject'
+
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 export async function getTasks(options = {}) {
@@ -11,14 +13,16 @@ export async function getTasks(options = {}) {
 
   try {
     const res = await fetch(`${url}?${params}`)
-    if (res.status === 404) {
-      return null
-    }
     const data = await res.json()
-    for (const key in data) {
-      if (data[key] === null) data[key] = ''
+
+    if (res.ok) {
+      for (const key in data) {
+        if (data[key] === null) data[key] = ''
+      }
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
     }
-    return data
   } catch (error) {
     console.error(error)
     return null
@@ -28,16 +32,16 @@ export async function getTasks(options = {}) {
 export async function getTaskById(taskId) {
   try {
     const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`)
-    if (res.status === 404) {
-      // console.log(res)
-      return null
-    }
     const data = await res.json()
-    // console.log(data)
-    for (const key in data) {
-      if (data[key] === null) data[key] = ''
+
+    if (res.ok) {
+      for (const key in data) {
+        if (data[key] === null) data[key] = ''
+      }
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
     }
-    return data
   } catch (error) {
     console.error(error)
     return null
@@ -60,10 +64,12 @@ export async function createTask({ title, description, assignees, status, boardI
       })
     })
 
+    const data = await res.json()
     if (res.ok) {
-      const data = await res.json()
-      return data
-    } else return null
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null
@@ -86,10 +92,12 @@ export async function updateTask({ id: taskId, title, description, assignees, st
       })
     })
 
+    const data = await res.json()
     if (res.ok) {
-      const data = await res.json()
-      return data
-    } else return null
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null
@@ -99,12 +107,14 @@ export async function updateTask({ id: taskId, title, description, assignees, st
 export async function deleteTask(taskId) {
   try {
     const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`, { method: 'DELETE' })
+
+    const data = await res.json()
+
     if (res.ok) {
-      const data = await res.json()
-      return data
-    } else if (res.status === 404) {
-      return { errorStatus: res.status }
-    } else return null
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null

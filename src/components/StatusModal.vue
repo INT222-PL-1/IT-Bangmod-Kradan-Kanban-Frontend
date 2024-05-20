@@ -35,17 +35,17 @@ const disabledSaveButton = computed(() => {
 
 async function fetchStatusData() {
   const statusId = route.params.statusId
-  statusModalData.value = await getStatusById(statusId, { count: true })
-  console.log(statusModalData.value)
-  if (statusModalData.value === null) {
+  const responseObj = await getStatusById(statusId, { count: true })
+  if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: 'An error has occurred, the status does not exist.',
+      description: `An error has occurred.\n${responseObj.message}`,
       status: 'error'
     })
     // router.back()
     router.replace({ name: 'status-manage' })
   } else {
+    statusModalData.value = responseObj.data
     if (statusModalMode.value === 'edit') {
       previousStatusData = { ...statusModalData.value }
     }
@@ -74,14 +74,15 @@ const handleClickClose = () => {
 
 const handleClickConfirm = async () => {
   if (statusModalMode.value === 'add') {
-    const createdStatus = await createStatus(statusModalData.value)
-    if (createdStatus === null) {
+    const responseObj = await createStatus(statusModalData.value)
+    if (responseObj.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: 'An error occurred while adding the status',
+        description: `An error has occurred.\n${responseObj.message}`,
         status: 'error'
       })
     } else {
+      const createdStatus = responseObj.data
       toastStore.createToast({
         title: 'Success',
         description: `The status "${createdStatus.name}" is added successfully`,
@@ -91,14 +92,15 @@ const handleClickConfirm = async () => {
     statusStore.loadStatuses()
     router.push({ name: 'status-manage' })
   } else if (statusModalMode.value === 'edit') {
-    const updatedStatus = await updateStatus(statusModalData.value)
-    if (updatedStatus === null) {
+    const responseObj = await updateStatus(statusModalData.value)
+    if (responseObj.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: 'An error occurred while updating the status',
+        description: `An error has occurred.\n${responseObj.message}`,
         status: 'error'
       })
     } else {
+      const updatedStatus = responseObj.data
       toastStore.createToast({
         title: 'Success',
         description: `The task "${updatedStatus.name}" is updated successfully`,

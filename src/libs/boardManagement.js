@@ -1,3 +1,5 @@
+import { ResponseObject } from './classes/ResponseObject'
+
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 export async function getBoardById(boardId) {
@@ -6,8 +8,14 @@ export async function getBoardById(boardId) {
     if (res.status === 404) {
       return null
     }
+
     const data = await res.json()
-    return data
+
+    if (res.ok) {
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null
@@ -18,7 +26,12 @@ export async function getBoards() {
   try {
     const res = await fetch(`${SERVER_URL}/v2/boards`)
     const data = await res.json()
-    return data
+
+    if (res.ok) {
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null
@@ -34,11 +47,14 @@ export async function patchBoard(boardId, patchData) {
       },
       body: JSON.stringify(patchData)
     })
-    if (res.status === 404) {
-      return null
-    }
+
     const data = await res.json()
-    return data
+
+    if (res.ok) {
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null
