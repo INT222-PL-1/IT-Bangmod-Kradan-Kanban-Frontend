@@ -120,7 +120,7 @@ watch(() => boardStore.board, (newBoard) => {
         </div>
       </div>
       <Transition>
-        <BaseModal :show="confirmLimitOpenState" @clickBG="handleCancelConfirmLimit">
+        <BaseModal :show="confirmLimitOpenState" @clickBG="handleCancelConfirmLimit" :mobileCenter="true">
           <div class="absolute bg-base-100 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
             <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Confirm {{
               newSettings.isLimitTasks ? 'Enable' : 'Disable' }} Limit</div>
@@ -144,7 +144,7 @@ watch(() => boardStore.board, (newBoard) => {
         </BaseModal>
       </Transition>
       <Transition>
-        <BaseModal :show="exceedLimitOpenState" @clickBG="handleCloseExceedLimitModal">
+        <BaseModal :show="exceedLimitOpenState" @clickBG="handleCloseExceedLimitModal" :mobileCenter="true">
           <div class="absolute bg-base-100 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
             <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Status Exceed Limit
             </div>
