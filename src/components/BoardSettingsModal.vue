@@ -37,7 +37,7 @@ const handleSaveSettingsStatus = async ({ message }) => {
   } else {
     toastStore.createToast({
       title: 'Success',
-      description: `The board settings have been updated. ${message || ''}`,
+      description: `The board settings have been updated.\n${message || ''}`,
       status: 'success'
     })
     await boardStore.fetchBoard()
