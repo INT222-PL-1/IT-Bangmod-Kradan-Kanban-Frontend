@@ -57,7 +57,7 @@ const handleClearFilterButtonClick = () => {
       </div>
       <div class="bg-base-200 hover:contrast-50 transition-[filter] h-full">
         <button @click="handleClearFilterButtonClick" class="active:scale-90" title="Clear Filter">
-          <IconSVG iconName="x" scale="1" size="2rem" class="cursor-pointer" />
+          <IconSVG iconName="x" scale="1.25" size="2rem" class="cursor-pointer" />
         </button>
       </div>
     </div>
