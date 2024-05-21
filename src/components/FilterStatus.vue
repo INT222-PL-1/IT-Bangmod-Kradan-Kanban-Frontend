@@ -34,18 +34,17 @@ const handleClearFilterButtonClick = () => {
 </script>
 
 <template>
-
   <div class="dropdown">
     <div class="flex items-center border-2 border-base-300 rounded-lg overflow-hidden h-full">
       <div class="bg-base-200 hover:contrast-50 transition-[filter] h-full">
-        <button class="active:scale-90">
+        <button class="active:scale-90" title="Choose Filter">
           <IconSVG iconName="filter" scale="1.25" size="2rem" />
         </button>
       </div>
       <div tabindex="0" role="button"
-        class="flex gap-1 items-center py-1 px-2 w-36 sm:w-72 md:w-96 h-full cursor-pointer border-x-2 border-base-300">
-        <div v-show="boardStore.options.filterStatuses.length === 0" class="text-sm font-semibold opacity-50">Filter By
-          Status(es)
+        class="flex gap-1 items-center py-1 px-2 w-36 sm:w-72 md:w-96 h-full cursor-pointer border-x-2 border-base-300 bg-neutral">
+        <div v-show="boardStore.options.filterStatuses.length === 0" class="text-sm font-semibold opacity-50">
+          Filter By Status(es)
         </div>
         <div v-show="boardStore.options.filterStatuses.length > 0" class="flex flex-wrap gap-2 ">
           <div v-for="statusName of boardStore.options.filterStatuses" :key="statusName"
@@ -57,8 +56,8 @@ const handleClearFilterButtonClick = () => {
         </div>
       </div>
       <div class="bg-base-200 hover:contrast-50 transition-[filter] h-full">
-        <button @click="handleClearFilterButtonClick" class="active:scale-90">
-          <IconSVG iconName="x" scale="1.25" size="2rem" class="cursor-pointer" />
+        <button @click="handleClearFilterButtonClick" class="active:scale-90" title="Clear Filter">
+          <IconSVG iconName="x" scale="1" size="2rem" class="cursor-pointer" />
         </button>
       </div>
     </div>
