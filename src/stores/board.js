@@ -33,6 +33,12 @@ export const useBoardStore = defineStore('board', () => {
       tasks.value = responseObj.data
     }
     isLoading.value = false
+
+    let ids = []
+    for (const t of tasks.value) {
+      ids.push(t.id)
+    }
+    console.log(ids)
   }
 
   function sortTasks(sortBy, sortDirection) {

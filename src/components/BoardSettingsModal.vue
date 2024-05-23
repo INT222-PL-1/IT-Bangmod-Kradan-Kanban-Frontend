@@ -6,7 +6,7 @@ import { computed, ref, watch } from 'vue';
 import { patchBoard } from '@/libs/boardManagement';
 import StatusBadge from './StatusBadge.vue';
 
-defineEmits(['clickClose'])
+const emits = defineEmits(['clickClose'])
 
 defineProps({
   show: {
@@ -17,7 +17,10 @@ defineProps({
 
 const boardStore = useBoardStore()
 const toastStore = useToastStore()
-const newSettings = ref(null)
+const newSettings = ref({
+  isLimitTasks: false,
+  taskLimitPerStatus: 10
+})
 const disabledSaveSettingsBtn = computed(() => {
   return newSettings.value.isLimitTasks === boardStore.board.isLimitTasks &&
     newSettings.value.taskLimitPerStatus === boardStore.board.taskLimitPerStatus
@@ -60,8 +63,9 @@ const handleConfirmLimit = async () => {
 
 const handleCancelConfirmLimit = () => {
   console.log('newSettings.value.isLimitTasks', newSettings.value.isLimitTasks)
-  newSettings.value.isLimitTasks = !newSettings.value.isLimitTasks
+  newSettings.value.isLimitTasks = boardStore.board.isLimitTasks
   confirmLimitOpenState.value = false
+  emits('clickClose')
 }
 
 const handleCloseExceedLimitModal = () => {
@@ -70,7 +74,7 @@ const handleCloseExceedLimitModal = () => {
 }
 
 watch(() => newSettings.value?.isLimitTasks, (newVal) => {
-  if (newVal !== boardStore.board.isLimitTasks) {
+  if (newVal !== boardStore.board?.isLimitTasks) {
     confirmLimitOpenState.value = true
   }
 })
@@ -97,7 +101,7 @@ watch(() => boardStore.board, (newBoard) => {
             </div>
             <div class="flex items-center justify-between">
               <div>Limit the number of tasks in this status</div>
-              <input v-model="newSettings.isLimitTasks" class="toggle" type="checkbox">
+              <input v-model="newSettings.isLimitTasks" class="itbkk-limit-task toggle" type="checkbox">
             </div>
             <div :class="{ 'opacity-50 cursor-not-allowed': newSettings.isLimitTasks === false }"
               class="flex items-center justify-between">
@@ -109,11 +113,12 @@ watch(() => boardStore.board, (newBoard) => {
         </div>
         <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
           <div class="flex gap-2">
-            <button @click="handleSaveSettingsStatus" class="itbkk-button-confirm btn btn-sm btn-success"
-              :disabled="disabledSaveSettingsBtn">
+            <button @click="handleSaveSettingsStatus" class="btn btn-sm btn-success"
+              :class="{ 'itbkk-button-confirm': confirmLimitOpenState === false }" :disabled="disabledSaveSettingsBtn">
               Apply
             </button>
-            <button @click="$emit('clickClose')" class="itbkk-button-cancel btn btn-sm btn-neutral">
+            <button @click="$emit('clickClose')" class="btn btn-sm btn-neutral"
+              :class="{ 'itbkk-button-cancel': confirmLimitOpenState === false }">
               Go back
             </button>
           </div>

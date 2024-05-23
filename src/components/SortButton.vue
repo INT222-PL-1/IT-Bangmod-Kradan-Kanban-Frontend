@@ -41,7 +41,7 @@ const handleSortButtonClick = () => {
 </script>
 
 <template>
-    <div @click="handleSortButtonClick" class="cursor-pointer">
+    <div @click="handleSortButtonClick" class="cursor-pointer w-4 h-4">
         <Transition>
             <IconSVG v-if="currentSortBy === sortBy && currentSortDirection === 'asc'" iconName="sort-alpha-down"
                 color="#f04c1c" class="absolute" />

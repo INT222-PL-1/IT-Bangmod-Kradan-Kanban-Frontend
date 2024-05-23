@@ -37,7 +37,7 @@ const handleClearFilterButtonClick = () => {
   <div class="dropdown">
     <div class="flex items-center border-2 border-base-300 rounded-lg overflow-hidden h-full">
       <div class="bg-base-200 hover:contrast-50 transition-[filter] h-full">
-        <button class="active:scale-90" title="Choose Filter">
+        <button class="itbkk-status-filter active:scale-90" title="Choose Filter">
           <IconSVG iconName="filter" scale="1.25" size="2rem" />
         </button>
       </div>
@@ -76,7 +76,8 @@ const handleClearFilterButtonClick = () => {
         <button v-for="status in filteredStatusList" :key="status.id" @click="handleStatusClick(status.name)"
           class="active:scale-90 transition p-0 bg-base-100 hover:contrast-75 w-fit rounded-lg"
           :class="{ 'contrast-50': boardStore.options.filterStatuses.includes(status.name) }">
-          <StatusBadge class="cursor-pointer" :statusData="status" textWrapMode="truncate" showCount />
+          <StatusBadge class="itbkk-status-choice cursor-pointer" :statusData="status" textWrapMode="truncate"
+            showCount />
         </button>
       </div>
     </div>

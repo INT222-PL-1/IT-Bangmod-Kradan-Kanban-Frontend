@@ -147,7 +147,7 @@ const handleSettingsButtonCLick = () => {
     <div class="px-4 min-h-8 mb-2">
       <div class="flex justify-between">
         <FilterStatus />
-        <button @click="handleSettingsButtonCLick" type="button" class="btn btn-ghost btn-sm">
+        <button @click="handleSettingsButtonCLick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm">
           <IconSVG iconName="gear" :scale="1.25" />Board Settings
         </button>
       </div>
@@ -174,7 +174,7 @@ const handleSettingsButtonCLick = () => {
             <th class="min-w-44 max-w-44">
               <div class="flex gap-2">
                 <div>Status</div>
-                <SortButton @clickSortButton="handleSort" sortBy="status.name"
+                <SortButton class="itbkk-status-sort" @clickSortButton="handleSort" sortBy="status.name"
                   :currentSortBy="boardStore.options.sortBy" :currentSortDirection="boardStore.options.sortDirection" />
               </div>
             </th>
