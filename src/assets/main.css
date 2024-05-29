@@ -4,6 +4,7 @@
 
 .table-overflow-x-scroll {
   overflow-x: auto;
+  /* overflow-x: auto; */
 }
 
 .table-overflow-x-scroll::-webkit-scrollbar {
@@ -44,6 +45,7 @@
     transform: translateX(5px);
   }
 }
+
 /* 
 html::-webkit-scrollbar {
   width: 12px;

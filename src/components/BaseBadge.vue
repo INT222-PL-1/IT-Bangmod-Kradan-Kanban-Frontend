@@ -37,14 +37,16 @@ const validatedColor = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-lg cursor-default drop-shadow-lg" :style="{
+  <div class="rounded-lg cursor-default" :style="{
     border: `1px solid ${validatedColor}`,
     backgroundColor: validatedColor + 11,
     width
-  }" :title="label">
+  }" :title="description">
     <div class="my-1 flex justify-center items-center" :style="{ width }">
-      <div :class="textWrapMode === 'truncate' ? 'truncate' : 'break-words'" class="max-w-[95%]"
-        :style="{ color: validatedColor }">{{ label }}</div>
+      <div :class="textWrapMode === 'truncate' ? 'truncate' : 'break-words'" class="max-w-[90%]"
+        :style="{ color: validatedColor }">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>

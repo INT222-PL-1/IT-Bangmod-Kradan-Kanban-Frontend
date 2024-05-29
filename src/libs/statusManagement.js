@@ -1,3 +1,5 @@
+import { ResponseObject } from './classes/ResponseObject'
+
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 /**
@@ -14,10 +16,12 @@ export async function getStatuses(options = {}) {
   try {
     const res = await fetch(url)
     const data = await res.json()
-    if (res.status === 500) {
-      return null
+
+    if (res.ok) {
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
     }
-    return data
   } catch (error) {
     console.error(error)
     return null
@@ -43,11 +47,15 @@ export async function getStatusById(statusId, options = {}) {
       return null
     }
     const data = await res.json()
-    // console.log(data)
-    for (const key in data) {
-      if (data[key] === null) data[key] = ''
+
+    if (res.ok) {
+      for (const key in data) {
+        if (data[key] === null) data[key] = ''
+      }
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
     }
-    return data
   } catch (error) {
     console.error(error)
     return null
@@ -68,17 +76,27 @@ export async function createStatus({ name, description, color }) {
       })
     })
 
+    const data = await res.json()
+
     if (res.ok) {
-      const data = await res.json()
-      return data
-    } else return null
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null
   }
 }
 
-export async function updateStatus({ id: statusId, name, description, color }) {
+export async function updateStatus({
+  id: statusId,
+  name,
+  description,
+  color,
+  is_limited_status,
+  maximum_limit
+}) {
   try {
     const res = await fetch(`${SERVER_URL}/v2/statuses/${statusId}`, {
       method: 'PUT',
@@ -88,14 +106,19 @@ export async function updateStatus({ id: statusId, name, description, color }) {
       body: JSON.stringify({
         name,
         description: description === '' ? null : description,
-        color: color === '' ? '#666666' : color
+        color: color === '' ? '#666666' : color,
+        is_limited_status,
+        maximum_limit
       })
     })
 
+    const data = await res.json()
+
     if (res.ok) {
-      const data = await res.json()
-      return data
-    } else return null
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null
@@ -107,29 +130,33 @@ export async function deleteStatus(statusId) {
     const res = await fetch(`${SERVER_URL}/v2/statuses/${statusId}`, {
       method: 'DELETE'
     })
+
+    const data = await res.json()
+
     if (res.ok) {
-      const data = await res.json()
-      return data
-    } else if (res.status === 404) {
-      return { errorStatus: res.status }
-    } else return null
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null
   }
 }
 
-export async function transferTasksStatus(fromStatusId, toStatusId) {
+export async function deleteStatusAndTransferTasks(fromStatusId, toStatusId) {
   try {
     const res = await fetch(`${SERVER_URL}/v2/statuses/${fromStatusId}/${toStatusId}`, {
       method: 'DELETE'
     })
+
+    const data = await res.json()
+
     if (res.ok) {
-      const data = await res.json()
-      return data
-    } else if (res.status === 404) {
-      return { errorStatus: res.status }
-    } else return null
+      return ResponseObject.success(data)
+    } else {
+      return ResponseObject.error(data.message)
+    }
   } catch (error) {
     console.error(error)
     return null

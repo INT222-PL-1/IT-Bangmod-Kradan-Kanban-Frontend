@@ -1,7 +1,5 @@
 <script setup>
-import { useTaskStore } from '@/stores/task'
 import { onMounted, ref } from 'vue'
-// import LoadingModal from '@/components/LoadingModal.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
@@ -10,47 +8,36 @@ import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import BaseModal from '@/components/BaseModal.vue'
 import { deleteTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
-import { useStatusStore } from '@/stores/status'
-// import { useToastStore } from '@/stores/toast';
+import SortButton from '@/components/SortButton.vue'
+import { useBoardStore } from '@/stores/board'
+import BoardSettingsModal from '@/components/BoardSettingsModal.vue'
+import FilterStatus from '@/components/FilterStatus.vue'
 
-
-const isLoading = ref(false)
 const router = useRouter()
 const toastStore = useToastStore()
-const taskStore = useTaskStore()
-const statusStore = useStatusStore()
-
+const boardStore = useBoardStore()
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
-// const toastStore = useToastStore()
+const boardSettingsModalOpenState = ref(false)
+
+async function fetchTasks() {
+  await boardStore.fetchTasks()
+}
 
 onMounted(async () => {
-  isLoading.value = true
-  await taskStore.loadTasks()
-  await statusStore.loadStatuses()
-
-  console.log(taskStore.tasks)
-  console.log(statusStore.statuses)
-
-  isLoading.value = false
+  await fetchTasks()
 })
+
+const handleRefreshBtnClick = async () => {
+  await fetchTasks()
+}
 
 const handleTaskClick = (taskId) => {
   router.push({ name: 'task-view', params: { taskId } })
 }
 
-const handleRefreshBtnCLick = async () => {
-  isLoading.value = true
-  await taskStore.loadTasks()
-  isLoading.value = false
-}
-
-const handleAddBtnCLick = () => {
+const handleAddBtnClick = () => {
   router.push({ name: 'task-add' })
-}
-
-const handleEditBtnCLick = (taskId) => {
-  router.push({ name: 'task-edit', params: { taskId } })
 }
 
 const handleOpenDeleteModal = (taskData) => {
@@ -59,39 +46,42 @@ const handleOpenDeleteModal = (taskData) => {
 }
 
 const handleDeleteTask = async (taskId) => {
-  const deletedTask = await deleteTask(taskId)
-  if (deletedTask?.errorStatus === 404) {
+  const responseObj = await deleteTask(taskId)
+  if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: 'An error has occurred, the task does not exist.',
+      description: `An error has occurred.\n${responseObj.message}.`,
       status: 'error'
     })
-    await taskStore.loadTasks()
-  } else if (deletedTask === null) {
-    toastStore.createToast({
-      title: 'Error',
-      description: 'An error has occurred, please try again later.',
-      status: 'error'
-    })
+    await fetchTasks()
   } else {
     toastStore.createToast({
       title: 'Success',
-      description: 'The task has been deleted',
+      description: 'The task has been deleted.',
       status: 'success'
     })
-    await taskStore.loadTasks()
+    await fetchTasks()
   }
   taskDeleteModalOpenState.value = false
 }
 
-const handleManageStatusBtnCLick = () => {
-  router.push({ name: 'status-manage' })
+
+const handleEditBtnClick = (taskId) => {
+  router.push({ name: 'task-edit', params: { taskId } })
 }
 
+const handleSort = (e) => {
+  boardStore.sortTasks(e.sortBy, e.sortDirection)
+}
+
+const handleSettingsButtonClick = () => {
+  boardSettingsModalOpenState.value = true
+}
 </script>
 
 <template>
-  <!-- <LoadingModal :isLoading="isLoading" /> -->
+
+  <BoardSettingsModal :show="boardSettingsModalOpenState" @clickClose="boardSettingsModalOpenState = false" />
 
   <Transition>
     <BaseModal @clickBG="taskDeleteModalOpenState = false" :show="taskDeleteModalOpenState" :mobileCenter="true">
@@ -122,112 +112,130 @@ const handleManageStatusBtnCLick = () => {
     </Transition>
   </RouterView>
 
-  <!-- <Teleport to="#header-right">
-      <button @click="handleAddBtnCLick" type="button" class="btn btn-primary btn-sm text-neutral">
-        <IconSVG iconName="plus" :scale="1.25" />Add Task
-      </button>
-    </Teleport> -->
-  <Teleport to="#navbar-item">
+  <Teleport to="#navbar-item-right">
     <div class="flex gap-2">
       <BaseMenu side="left" class="sm:hidden">
         <template #icon>
-          <IconSVG iconName="three-dots" />
+          <IconSVG iconName="three-dots" scale="1.25" />
         </template>
         <template #menu>
-          <li>
-            <button @click="handleRefreshBtnCLick" type="button"
-              class="btn btn-sm btn-ghost justify-start flex flex-nowrap">
-              <div :class="{ 'animate-spin': isLoading }">
-                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-              </div>Refresh Tasks
-            </button>
-          </li>
-          <li>
-            <button @click="handleManageStatusBtnCLick"
-              class="itbkk-manage-status btn btn-sm btn-ghost justify-start flex flex-nowrap">
-              <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
-            </button>
-          </li>
+          <button @click="handleRefreshBtnClick" type="button"
+            class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+            <div :class="{ 'animate-spin': boardStore.isLoading }">
+              <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+            </div>Refresh Tasks
+          </button>
+          <button @click="handleAddBtnClick" type="button"
+            class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+            <IconSVG iconName="plus" :scale="1.25" />Add Task
+          </button>
         </template>
       </BaseMenu>
-      <button @click="handleManageStatusBtnCLick" type="button"
-        class="itbkk-manage-status btn btn-outline btn-sm hidden sm:flex">
-        <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
-      </button>
-      <button @click="handleRefreshBtnCLick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
-        <div :class="{ 'animate-spin': isLoading }">
+      <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
+        <div :class="{ 'animate-spin': boardStore.isLoading }">
           <IconSVG iconName="arrow-clockwise" :scale="1.25" />
         </div>Refresh Tasks
       </button>
-      <button @click="handleAddBtnCLick" type="button" class="itbkk-button-add btn btn-primary btn-sm text-neutral">
+      <button @click="handleAddBtnClick" type="button"
+        class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
         <IconSVG iconName="plus" :scale="1.25" />Add Task
       </button>
     </div>
   </Teleport>
 
-  <div class="px-4 max-w-full table-overflow-x-scroll py-20">
-    <!-- <div class="text-center p-2 text-xl font-semibold">Task Table</div> -->
-    <table class="table border border-base-300">
-      <thead class="bg-base-200">
-        <tr>
-          <th class="min-w-16 max-w-16"></th>
-          <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Title</th>
-          <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">Assignees</th>
-          <th class="min-w-44 max-w-44">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="taskStore.tasks === null">
-          <td colspan="4" class="text-center">Error while loading tasks from server. Please try again later.</td>
-        </tr>
-        <tr v-else-if="taskStore.tasks.length === 0">
-          <td colspan="4" class="text-center">No task</td>
-        </tr>
-        <tr v-else v-for="(task, index) in taskStore.tasks" :key="task.id" class="itbkk-item">
-          <td class="min-w-16 max-w-16">
-            <div class="flex items-center justify-between gap-2">
-              <div>{{ index + 1 }}</div>
-              <BaseMenu>
-                <template #icon>
-                  <IconSVG iconName="three-dots-vertical" />
-                </template>
-                <template #menu>
-                  <li>
-                    <ButtonWithIcon @click="handleEditBtnCLick(task.id)"
-                      className="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap"
-                      iconName="pencil-square">
-                      Edit
-                    </ButtonWithIcon>
-                  </li>
-                  <li>
-                    <ButtonWithIcon @click="handleOpenDeleteModal(task)"
-                      className="itbkk-button-delete btn btn-sm btn-ghost justify-start text-error flex flex-nowrap"
-                      iconName="trash-fill">
-                      Delete
-                    </ButtonWithIcon>
-                  </li>
-                </template>
-              </BaseMenu>
-            </div>
-          </td>
-          <td @click="handleTaskClick(task.id)"
-            class="overflow-hidden min-w-52 max-w-52 md:max-w-72 lg:max-w-96 hover:underline hover:cursor-pointer">
-            <div :class="{ 'itbkk-title': $route.name === 'all-task' }" class="break-words font-semibold">
-              {{ task.title }}
-            </div>
-          </td>
-          <td :class="{ 'italic text-[grey]': !task.assignees, 'itbkk-assignees': $route.name === 'all-task' }"
-            class="min-w-60 w-60">
-            {{ task.assignees || 'Unassigned' }}
-          </td>
-          <td class="min-w-44 max-w-44">
-            <StatusBadge :statusData="statusStore.statuses.find(status => status.id === task.statusId)"
-              textWrapMode="truncate" width="100%" :class="{ 'itbkk-status': $route.name === 'all-task' }" />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <!-- <div class="h-24"></div> -->
+  <div class="max-w-full pt-10 pb-20">
+    <div class="px-4 min-h-8 mb-2">
+      <div class="flex justify-between">
+        <FilterStatus />
+        <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm">
+          <IconSVG iconName="gear" :scale="1.25" />Board Settings
+        </button>
+      </div>
+    </div>
+    <div class="table-overflow-x-scroll px-4">
+      <table class="table border border-base-300">
+        <thead class="bg-base-200">
+          <tr class="select-none">
+            <th class="min-w-16 max-w-16"></th>
+            <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">
+              <div class="flex gap-2">
+                <div>Title</div>
+                <SortButton @clickSortButton="handleSort" sortBy="title" :currentSortBy="boardStore.options.sortBy"
+                  :currentSortDirection="boardStore.options.sortDirection" />
+              </div>
+            </th>
+            <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">
+              <div class="flex gap-2">
+                <div>Assignees</div>
+                <SortButton @clickSortButton="handleSort" sortBy="assignees" :currentSortBy="boardStore.options.sortBy"
+                  :currentSortDirection="boardStore.options.sortDirection" />
+              </div>
+            </th>
+            <th class="min-w-44 max-w-44">
+              <div class="flex gap-2">
+                <div>Status</div>
+                <SortButton class="itbkk-status-sort" @clickSortButton="handleSort" sortBy="status.name"
+                  :currentSortBy="boardStore.options.sortBy" :currentSortDirection="boardStore.options.sortDirection" />
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="boardStore.isLoading && boardStore.tasks.length === 0">
+            <td colspan="4" class="text-center">Loading tasks...</td>
+          </tr>
+          <tr v-else-if="boardStore.tasks === null">
+            <td colspan="4" class="text-center">Error while loading tasks from server. Please try again later.</td>
+          </tr>
+          <tr v-else-if="boardStore.tasks.length === 0">
+            <td colspan="4" class="text-center">No task</td>
+          </tr>
+          <tr v-else v-for="(task, index) in boardStore.tasks" :key="task.id" class="itbkk-item">
+            <td class="min-w-16 max-w-16">
+              <div class="flex items-center justify-between gap-2">
+                <div>{{ index + 1 }}</div>
+                <BaseMenu>
+                  <template #icon>
+                    <IconSVG iconName="three-dots-vertical" />
+                  </template>
+                  <template #menu>
+                    <li>
+                      <ButtonWithIcon @click="handleEditBtnClick(task.id)"
+                        className="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap"
+                        iconName="pencil-square">
+                        Edit
+                      </ButtonWithIcon>
+                    </li>
+                    <li>
+                      <ButtonWithIcon @click="handleOpenDeleteModal(task)"
+                        className="itbkk-button-delete btn btn-sm btn-ghost justify-start text-error flex flex-nowrap"
+                        iconName="trash-fill">
+                        Delete
+                      </ButtonWithIcon>
+                    </li>
+                  </template>
+                </BaseMenu>
+              </div>
+            </td>
+            <td @click="handleTaskClick(task.id)"
+              class="overflow-hidden min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw] hover:underline hover:cursor-pointer">
+              <div :class="{ 'itbkk-title': $route.name === 'all-task' }" class="break-words font-semibold">
+                {{ task.title }}
+              </div>
+            </td>
+            <td :class="{ 'italic text-[grey]': !task.assignees, 'itbkk-assignees': $route.name === 'all-task' }"
+              class="min-w-60 w-60">
+              {{ task.assignees || 'Unassigned' }}
+            </td>
+            <td class="min-w-44 max-w-44">
+              <StatusBadge :statusData="task.status" textWrapMode="truncate" width="100%"
+                :class="{ 'itbkk-status': $route.name === 'all-task' }" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="h-20"></div>
+    </div>
   </div>
 </template>
 

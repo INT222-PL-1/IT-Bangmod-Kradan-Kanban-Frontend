@@ -8,6 +8,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ColorPalette from './ColorPalette.vue'
 import StatusBadge from './StatusBadge.vue';
 import { colorValidator } from '@/libs/utils';
+import IconSVG from './IconSVG.vue';
 
 const route = useRoute()
 const router = useRouter()
@@ -34,17 +35,17 @@ const disabledSaveButton = computed(() => {
 
 async function fetchStatusData() {
   const statusId = route.params.statusId
-  statusModalData.value = await getStatusById(statusId, { count: true })
-  console.log(statusModalData.value)
-  if (statusModalData.value === null) {
+  const responseObj = await getStatusById(statusId, { count: true })
+  if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: 'An error has occurred, the status does not exist.',
+      description: `An error has occurred.\n${responseObj.message}`,
       status: 'error'
     })
     // router.back()
     router.replace({ name: 'status-manage' })
   } else {
+    statusModalData.value = responseObj.data
     if (statusModalMode.value === 'edit') {
       previousStatusData = { ...statusModalData.value }
     }
@@ -67,20 +68,21 @@ onMounted(async () => {
   }
 })
 
-const handleCLickClose = () => {
+const handleClickClose = () => {
   router.replace({ name: 'status-manage' })
 }
 
 const handleClickConfirm = async () => {
   if (statusModalMode.value === 'add') {
-    const createdStatus = await createStatus(statusModalData.value)
-    if (createdStatus === null) {
+    const responseObj = await createStatus(statusModalData.value)
+    if (responseObj.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: 'An error occurred while adding the status',
+        description: `An error has occurred.\n${responseObj.message}`,
         status: 'error'
       })
     } else {
+      const createdStatus = responseObj.data
       toastStore.createToast({
         title: 'Success',
         description: `The status "${createdStatus.name}" is added successfully`,
@@ -90,14 +92,15 @@ const handleClickConfirm = async () => {
     statusStore.loadStatuses()
     router.push({ name: 'status-manage' })
   } else if (statusModalMode.value === 'edit') {
-    const updatedStatus = await updateStatus(statusModalData.value)
-    if (updatedStatus === null) {
+    const responseObj = await updateStatus(statusModalData.value)
+    if (responseObj.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: 'An error occurred while updating the status',
+        description: `An error has occurred.\n${responseObj.message}`,
         status: 'error'
       })
     } else {
+      const updatedStatus = responseObj.data
       toastStore.createToast({
         title: 'Success',
         description: `The task "${updatedStatus.name}" is updated successfully`,
@@ -112,7 +115,7 @@ const handleClickConfirm = async () => {
 </script>
 
 <template>
-  <BaseModal :show="statusModalData !== null" @clickBG="handleCLickClose">
+  <BaseModal :show="statusModalData !== null" @clickBG="handleClickClose">
     <div
       class="itbkk-modal-status bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
       <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">
@@ -169,8 +172,8 @@ const handleClickConfirm = async () => {
             </div>
             <div class="mt-2">
               <ColorPalette v-model="statusModalData.color" :colorList="[
-                '#DC143C', '#ff5500', '#FFA500', '#3CB371', '#40E0D0', '#20B2AA',
-                '#1E90FF', '#9370DB', '#BA55D3', '#FF1493', '#ffffff', '#A9A9A9'
+                '#DC143C', '#ff5500', '#FFA500', '#80ff00', '#3CB371', '#40E0D0',
+                '#20B2AA', '#1E90FF', '#9370DB', '#BA55D3', '#FF1493', '#A9A9A9'
               ]" />
             </div>
           </div>
@@ -182,10 +185,18 @@ const handleClickConfirm = async () => {
             </span>
           </div>
           <div class="mt-2 md:flex-auto flex flex-col h-52 border-[3px] border-base-200 rounded-lg overflow-hidden">
-            <div class="flex-auto grid place-items-center w-full bg-[#1f232a]">
+            <div class="flex-auto grid place-items-center w-full bg-[#1f232a] relative">
+              <div class="flex items-center gap-2 absolute top-2 left-3 text-sm text-[#ccced0]">
+                <IconSVG iconName="moon-fill" />
+                <div>Dark mode</div>
+              </div>
               <StatusBadge :statusData="statusModalData" textWrapMode="wrap" width="20rem" />
             </div>
-            <div class="flex-auto grid place-items-center w-full bg-[#ffffff]">
+            <div class="flex-auto grid place-items-center w-full bg-[#ffffff] relative">
+              <div class="flex items-center gap-2 absolute top-2 left-3 text-sm text-[#374151]">
+                <IconSVG iconName="sun-fill" />
+                <div>Light mode</div>
+              </div>
               <StatusBadge :statusData="statusModalData" textWrapMode="wrap" width="20rem" />
             </div>
           </div>
@@ -226,7 +237,7 @@ const handleClickConfirm = async () => {
             class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledSaveButton">
             Save
           </button>
-          <button @click="handleCLickClose" class="itbkk-button-cancel btn btn-sm btn-neutral">
+          <button @click="handleClickClose" class="itbkk-button-cancel btn btn-sm btn-neutral">
             Cancel
           </button>
         </div>

@@ -6,7 +6,11 @@ export const useStatusStore = defineStore('status', () => {
   const statuses = ref([])
 
   async function loadStatuses() {
-    statuses.value = await getStatuses({ count: true })
+    // statuses.value = await getStatuses({ count: true })
+    const responseObj = await getStatuses()
+    if (responseObj.status === 'success') {
+      statuses.value = responseObj.data
+    }
   }
 
   return { statuses, loadStatuses }
