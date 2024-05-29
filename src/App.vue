@@ -17,7 +17,6 @@ import IconSVG from './components/IconSVG.vue';
   </header>
   <nav
     class="sticky top-20 z-20 px-4 h-12 flex justify-between items-center box-border border-b-2 border-base-300 bg-base-200 drop-shadow-md">
-    <!-- <div id="navbar-item-left"></div> -->
     <div class="flex gap-4">
       <div class="flex">
         <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100 "

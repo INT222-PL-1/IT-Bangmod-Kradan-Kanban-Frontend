@@ -202,34 +202,6 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <!-- <div class="grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 flex-auto">
-        <div>
-        </div> -->
-      <!-- <div class="flex flex-col justify-between">
-          <div v-if="['edit'].includes(statusModalMode)">
-            <div class="p-4 flex flex-col gap-1">
-              <div class="flex">
-                <div class="flex-[2] font-semibold">Timezone</div>
-                <div class="itbkk-timezone flex-[3] text-sm bg-base-200 rounded-lg px-2">
-                  {{ getTimezone() }}
-                </div>
-              </div>
-              <div class="flex">
-                <div class="flex-[2] font-semibold">Created On</div>
-                <div class="itbkk-created-on flex-[3] text-sm bg-base-200 rounded-lg px-2">
-                  {{ formatDateTime(statusModalData?.createdOn) }}
-                </div>
-              </div>
-              <div class="flex">
-                <div class="flex-[2] font-semibold">Updated On</div>
-                <div class="itbkk-updated-on flex-[3] text-sm bg-base-200 rounded-lg px-2">
-                  {{ formatDateTime(statusModalData?.updatedOn) }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> -->
-      <!-- </div> -->
       <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
         <div class="flex gap-2">
           <button @click="handleClickConfirm"

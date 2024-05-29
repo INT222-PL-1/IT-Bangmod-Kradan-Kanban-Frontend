@@ -28,10 +28,10 @@ const count = computed(() => {
 <template>
   <BaseBadge :bgcolor="statusData?.color" :description="statusData?.description">
     <div v-if="showCount" class="grid grid-cols-[1fr_auto] gap-1">
-      <div class="truncate">{{ statusData?.name }}</div>
+      <div class="truncate">{{ statusData?.name || 'Status' }}</div>
       <div>{{ count }}</div>
     </div>
-    <span v-else>{{ statusData?.name }}</span>
+    <span v-else>{{ statusData?.name || 'Status' }}</span>
   </BaseBadge>
 </template>
 

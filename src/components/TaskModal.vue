@@ -230,7 +230,6 @@ const handleClickConfirm = async () => {
           </div>
           <div v-if="['view', 'edit'].includes(taskModalMode)">
             <div class="p-4 flex flex-col gap-1">
-              <!-- <div class="text-lg font-bold">Timezone</div> -->
               <div class="flex">
                 <div class="flex-[2] font-semibold">Timezone</div>
                 <div class="itbkk-timezone flex-[3] text-sm bg-base-200 rounded-lg px-2">

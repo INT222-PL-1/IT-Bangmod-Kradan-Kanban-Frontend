@@ -50,7 +50,6 @@ const handleClearFilterButtonClick = () => {
           <div v-for="statusName of boardStore.options.filterStatuses" :key="statusName"
             @click="handleStatusClick(statusName)"
             class="hover:line-through hover:contrast-[0.90] transition-[filter] px-2 bg-base-200 rounded-lg max-w-[7rem] truncate relative">
-            <!-- <div class="w-full bg-[#0005] absolute text-center">a</div> -->
             {{ statusName }}
           </div>
         </div>
@@ -101,5 +100,4 @@ const handleClearFilterButtonClick = () => {
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background-color: #676767;
 }
-  
 </style>
