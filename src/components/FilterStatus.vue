@@ -101,4 +101,5 @@ const handleClearFilterButtonClick = () => {
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background-color: #676767;
 }
+  
 </style>
