@@ -12,14 +12,11 @@ const isSystemDark = ref(false)
 
 function themeSetup() {
   themeSetting.value = localStorage.getItem('theme') || 'system'
-  // console.log('themeSetting', themeSetting)
   const html = document.documentElement
   const darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
   isSystemDark.value = darkQuery.matches
   darkQuery.addEventListener('change', (e) => {
-    // console.log('hello')
     isSystemDark.value = e.matches
-    // console.log('isSystemDark', isSystemDark.value)
   })
 
   if (themeSetting.value === 'dark') {
@@ -32,11 +29,9 @@ function themeSetup() {
 }
 
 watch(isSystemDark, (value) => {
-  // console.log('isSystemDark', value);
   if (themeSetting.value !== 'system') return
   const html = document.documentElement
   html.dataset.theme = value ? DARKMODE_THEME : LIGHTMODE_THEME
-  // console.log(html.dataset.theme);
 }, { immediate: true })
 
 onMounted(() => {

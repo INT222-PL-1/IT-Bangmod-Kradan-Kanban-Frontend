@@ -14,8 +14,6 @@ export function convertStatus(status) {
 }
 
 export function formatDateTime(dateTime) {
-  // console.log(dateTime)
-
   const options = {
     day: '2-digit',
     month: '2-digit',
@@ -51,37 +49,42 @@ export function colorValidator(value) {
 
 export function superArraySorter(array, sortBy, sortDirection) {
   if (!['asc', 'desc'].includes(sortDirection)) {
-    throw new Error('Sort direction must be "asc" or "desc"');
+    throw new Error('Sort direction must be "asc" or "desc"')
   }
 
-  if (!array.length) return [];
+  if (!array.length) return []
 
-  const copyArray = [...array];
+  const copyArray = [...array]
 
   const getField = (obj, path) => {
-    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-  };
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj)
+  }
 
   if (array.some((obj) => getField(obj, sortBy) === undefined)) {
-    throw new Error('Invalid sortBy key');
+    throw new Error('Invalid sortBy key')
   }
 
-  const fieldTypes = array.map(obj => typeof getField(obj, sortBy));
-  const uniqueFieldTypes = new Set(fieldTypes);
+  const fieldTypes = array.map((obj) => typeof getField(obj, sortBy))
+  const uniqueFieldTypes = new Set(fieldTypes)
 
   if (uniqueFieldTypes.size > 1) {
-    throw new Error('Mixed types for sortBy key');
+    throw new Error('Mixed types for sortBy key')
   }
 
-  const fieldType = fieldTypes[0];
+  const fieldType = fieldTypes[0]
 
   if (fieldType === 'string') {
-    copyArray.sort((a, b) => (getField(a, sortBy).localeCompare(getField(b, sortBy))) * (sortDirection === 'asc' ? 1 : -1));
+    copyArray.sort(
+      (a, b) =>
+        getField(a, sortBy).localeCompare(getField(b, sortBy)) * (sortDirection === 'asc' ? 1 : -1)
+    )
   } else if (fieldType === 'number') {
-    copyArray.sort((a, b) => (getField(a, sortBy) - getField(b, sortBy)) * (sortDirection === 'asc' ? 1 : -1));
+    copyArray.sort(
+      (a, b) => (getField(a, sortBy) - getField(b, sortBy)) * (sortDirection === 'asc' ? 1 : -1)
+    )
   } else {
-    throw new Error('Invalid sortBy key type');
+    throw new Error('Invalid sortBy key type')
   }
 
-  return copyArray;
+  return copyArray
 }

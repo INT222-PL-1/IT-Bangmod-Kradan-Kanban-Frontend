@@ -62,7 +62,6 @@ const handleConfirmLimit = async () => {
 }
 
 const handleCancelConfirmLimit = () => {
-  console.log('newSettings.value.isLimitTasks', newSettings.value.isLimitTasks)
   newSettings.value.isLimitTasks = boardStore.board.isLimitTasks
   confirmLimitOpenState.value = false
   emits('clickClose')
