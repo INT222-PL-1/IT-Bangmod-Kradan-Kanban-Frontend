@@ -38,12 +38,7 @@ const handleRefreshBtnClick = async () => {
 }
 
 const handleAddBtnClick = () => {
-  console.log('add button clicked')
   router.push({ name: 'status-add' })
-}
-
-const handleStatusClick = (statusId) => {
-  console.log('status clicked', statusId)
 }
 
 const handleEditBtnClick = (statusId) => {

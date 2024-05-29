@@ -100,7 +100,7 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    boardStore.fetchTasks()
+    await boardStore.fetchTasks()
     router.push({ name: 'all-task' })
   } else if (taskModalMode.value === 'edit') {
     const responseObj = await updateTask(taskModalData.value)
@@ -118,7 +118,7 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    boardStore.fetchTasks()
+    await boardStore.fetchTasks()
     router.push({ name: 'all-task' })
   }
 }

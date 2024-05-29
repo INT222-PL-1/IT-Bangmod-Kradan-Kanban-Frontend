@@ -8,13 +8,9 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL
  * @param {Number} options.count
  * @returns
  */
-export async function getStatuses(options = {}) {
-  let url = `${SERVER_URL}/v2/statuses`
-
-  if (options.count) url += `?count=${options.count}`
-
+export async function getStatuses() {
   try {
-    const res = await fetch(url)
+    const res = await fetch(`${SERVER_URL}/v2/statuses`)
     const data = await res.json()
 
     if (res.ok) {
@@ -31,21 +27,11 @@ export async function getStatuses(options = {}) {
 /**
  * Get status by id
  * @param {Number} statusId
- * @param {Object} options
- * @param {Number} options.count
  * @returns
  */
-export async function getStatusById(statusId, options = {}) {
-  let url = `${SERVER_URL}/v2/statuses/${statusId}`
-
-  if (options.count) url += `?count=${options.count}`
-
+export async function getStatusById(statusId) {
   try {
-    const res = await fetch(url)
-    if (res.status === 404) {
-      // console.log(res)
-      return null
-    }
+    const res = await fetch(`${SERVER_URL}/v2/statuses/${statusId}`)
     const data = await res.json()
 
     if (res.ok) {
@@ -106,7 +92,7 @@ export async function updateStatus({
       body: JSON.stringify({
         name,
         description: description === '' ? null : description,
-        color: color === '' ? '#666666' : color,
+        color: color === '' ? '#999999' : color,
         is_limited_status,
         maximum_limit
       })

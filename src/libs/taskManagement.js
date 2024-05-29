@@ -107,7 +107,6 @@ export async function updateTask({ id: taskId, title, description, assignees, st
 export async function deleteTask(taskId) {
   try {
     const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`, { method: 'DELETE' })
-
     const data = await res.json()
 
     if (res.ok) {
