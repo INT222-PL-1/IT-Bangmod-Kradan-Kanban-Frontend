@@ -16,29 +16,20 @@ export const useBoardStore = defineStore('board', () => {
 
   async function fetchBoard() {
     isLoading.value = true
-    // board.value = await getBoardById(options.value.boardId)
     const responseObj = await getBoardById(options.value.boardId)
     if (responseObj.status === 'success') {
       board.value = responseObj.data
     }
-    console.log(board.value)
     isLoading.value = false
   }
 
   async function fetchTasks() {
     isLoading.value = true
-    // tasks.value = await getTasks(options.value)
     const responseObj = await getTasks(options.value)
     if (responseObj.status === 'success') {
       tasks.value = responseObj.data
     }
     isLoading.value = false
-
-    let ids = []
-    for (const t of tasks.value) {
-      ids.push(t.id)
-    }
-    console.log(ids)
   }
 
   function sortTasks(sortBy, sortDirection) {
@@ -46,18 +37,17 @@ export const useBoardStore = defineStore('board', () => {
     options.value.sortDirection = sortDirection
   }
 
-  function addTaskFilterStatus(status) {
-    if (options.value.filterStatuses.includes(status)) return
-    options.value.filterStatuses.push(status)
+  function addTaskFilterStatus(statusName) {
+    if (options.value.filterStatuses.includes(statusName)) return
+    options.value.filterStatuses.push(statusName)
   }
 
-  function removeTaskFilterStatus(status) {
-    options.value.filterStatuses.splice(options.value.filterStatuses.indexOf(status), 1)
+  function removeTaskFilterStatus(statusName) {
+    options.value.filterStatuses.splice(options.value.filterStatuses.indexOf(statusName), 1)
   }
 
   function clearTaskFilterStatus() {
     options.value.filterStatuses.splice(0, options.value.filterStatuses.length)
-    console.log('hello')
   }
 
   watch(() => options.value.boardId, fetchBoard, { immediate: true })
