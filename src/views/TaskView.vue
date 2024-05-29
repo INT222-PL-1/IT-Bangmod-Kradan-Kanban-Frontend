@@ -74,7 +74,7 @@ const handleSort = (e) => {
   boardStore.sortTasks(e.sortBy, e.sortDirection)
 }
 
-const handleSettingsButtonCLick = () => {
+const handleSettingsButtonClick = () => {
   boardSettingsModalOpenState.value = true
 }
 </script>
@@ -147,7 +147,7 @@ const handleSettingsButtonCLick = () => {
     <div class="px-4 min-h-8 mb-2">
       <div class="flex justify-between">
         <FilterStatus />
-        <button @click="handleSettingsButtonCLick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm">
+        <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm">
           <IconSVG iconName="gear" :scale="1.25" />Board Settings
         </button>
       </div>
