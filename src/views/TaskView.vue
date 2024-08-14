@@ -112,7 +112,7 @@ const handleSettingsButtonClick = () => {
     </Transition>
   </RouterView>
 
-  <Teleport to="#navbar-item-right">
+  <!-- <Teleport to="#navbar-item-right">
     <div class="flex gap-2">
       <BaseMenu side="left" class="sm:hidden">
         <template #icon>
@@ -141,15 +141,46 @@ const handleSettingsButtonClick = () => {
         <IconSVG iconName="plus" :scale="1.25" />Add Task
       </button>
     </div>
-  </Teleport>
+  </Teleport> -->
 
   <div class="max-w-full pt-10 pb-20">
     <div class="px-4 min-h-8 mb-2">
       <div class="flex justify-between">
         <FilterStatus />
-        <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm">
-          <IconSVG iconName="gear" :scale="1.25" />Board Settings
-        </button>
+        <div class="flex gap-2">
+          <BaseMenu side="left" class="sm:hidden">
+            <template #icon>
+              <IconSVG iconName="three-dots" scale="1.25" />
+            </template>
+            <template #menu>
+              <button @click="handleRefreshBtnClick" type="button"
+                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <div :class="{ 'animate-spin': boardStore.isLoading }">
+                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+                </div>Refresh Tasks
+              </button>
+              <button @click="handleAddBtnClick" type="button"
+                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <IconSVG iconName="plus" :scale="1.25" />Add Task
+              </button>
+              <button @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <IconSVG iconName="gear" :scale="1.25" />Board Settings
+              </button>
+            </template>
+          </BaseMenu>
+          <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
+            <div :class="{ 'animate-spin': boardStore.isLoading }">
+              <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+            </div>Refresh Tasks
+          </button>
+          <button @click="handleAddBtnClick" type="button"
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
+            <IconSVG iconName="plus" :scale="1.25" />Add Task
+          </button>
+          <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden sm:flex">
+            <IconSVG iconName="gear" :scale="1.25" />Board Settings
+          </button>
+        </div>
       </div>
     </div>
     <div class="table-overflow-x-scroll px-4">
