@@ -168,6 +168,9 @@ const handleSettingsButtonClick = () => {
               </button>
             </template>
           </BaseMenu>
+          <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden sm:flex">
+            <IconSVG iconName="gear" :scale="1.25" />Board Settings
+          </button>
           <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
             <div :class="{ 'animate-spin': boardStore.isLoading }">
               <IconSVG iconName="arrow-clockwise" :scale="1.25" />
@@ -176,9 +179,6 @@ const handleSettingsButtonClick = () => {
           <button @click="handleAddBtnClick" type="button"
             class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
             <IconSVG iconName="plus" :scale="1.25" />Add Task
-          </button>
-          <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden sm:flex">
-            <IconSVG iconName="gear" :scale="1.25" />Board Settings
           </button>
         </div>
       </div>
