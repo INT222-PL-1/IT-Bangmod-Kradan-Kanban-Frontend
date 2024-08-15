@@ -1,9 +1,13 @@
 <script setup>
 import IconSVG from '@/components/IconSVG.vue';
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
-const usernameInput = ref('')
-const passwordInput = ref('')
+const username = ref('')
+const password = ref('')
+
+watch(username, (newValue) => {
+    if (newValue.length >= 50) username.value = newValue.substring(0, 50)
+})
 
 </script>
 
@@ -15,15 +19,13 @@ const passwordInput = ref('')
             <span>Welcome to IT-Bangmod Kradan Kanban.</span>
             <span>A productive and easy-to-manage task board.</span>
             <div class="flex flex-col mt-[1rem]">
-                <input :value @input="event => username = event.target.value" type="username" placeholder="Username"
+                <input v-model="username" type="username" placeholder="Username"
                     class="input input-bordered bg-[#252B33] text-[#6F7378] my-[1rem]" />
-                <span v-if="usernameInput.length > 50">Username can not be more than 50 characters</span>
-                {{ usernameInput.length }}
-                <input v-model="passwordInput" type="text" placeholder="Password"
+
+                <input v-model="password" type="password" placeholder="Password"
                     class="input input-bordered bg-[#252B33] text-[#6F7378]" />
-                <span v-if="passwordInput.length > 50">Username can not be more than 50 characters</span>
-                {{ passwordInput.lenght }}
-                <button class="mt-[2rem] btn btn-secondary text-base rounded-full">Login</button>
+                <button :disabled="username.length === 0 || password.length === 0"
+                    class="mt-[2rem] btn btn-secondary text-base rounded-full">Login</button>
             </div>
         </div>
     </main>
