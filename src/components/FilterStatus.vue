@@ -73,8 +73,8 @@ const handleClearFilterButtonClick = () => {
       <div v-show="filteredStatusList.length > 0"
         class="grid grid-flow-row grid-cols-2 content-start gap-2 h-[4.5rem] sm:h-28 overflow-y-auto overflow-x-hidden custom-scroll">
         <button v-for="status in filteredStatusList" :key="status.id" @click="handleStatusClick(status.name)"
-          class="active:scale-90 transition p-0 bg-base-100 hover:contrast-75 w-fit rounded-lg"
-          :class="{ 'contrast-50': boardStore.options.filterStatuses.includes(status.name) }">
+          :class="{ 'opacity-25': !boardStore.options.filterStatuses.includes(status.name) }"
+          class="active:scale-90 transition p-0 bg-base-100 hover:contrast-75 w-fit rounded-lg">
           <StatusBadge class="itbkk-status-choice cursor-pointer" :statusData="status" textWrapMode="truncate"
             showCount />
         </button>
