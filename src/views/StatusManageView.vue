@@ -11,7 +11,6 @@ import BaseModal from '@/components/BaseModal.vue'
 import StatusSelector from '@/components/StatusSelector.vue'
 import BaseMenu from '@/components/BaseMenu.vue'
 import { useBoardStore } from '@/stores/board'
-import MainLayout from '@/layouts/MainLayout.vue'
 
 const isLoading = ref(false)
 const router = useRouter()
@@ -198,7 +197,6 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     </div>
   </Teleport> -->
 
-  <MainLayout>
     <div class="max-w-full pt-10 pb-20">
       <div class="px-4 h-8 mb-2">
         <div class="flex justify-end">
@@ -301,7 +299,6 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
         <div class="h-20"></div>
       </div>
     </div>
-  </MainLayout>
 </template>
 
 <style scoped>

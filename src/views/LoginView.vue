@@ -1,10 +1,12 @@
 <script setup>
 import IconSVG from '@/components/IconSVG.vue'
 import ThemeSwitch from '@/components/ThemeSwitch.vue';
-import { ref, watch } from 'vue'
+import { useToastStore } from '@/stores/toast';
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const toastStore = useToastStore()
 
 const username = ref('')
 const password = ref('')
@@ -15,17 +17,33 @@ watch(username, (newValue) => {
     if (newValue.length >= 50) username.value = newValue.substring(0, 50)
 })
 
+onMounted(() => {
+    if (localStorage.getItem('itbkk-token')) {
+        router.push({ name: 'all-task' })
+    }
+})
+
 const handleLoginSubmit = () => {
     if (username.value === 'admin' && password.value === 'admin') {
-        // router.push({ name: 'all-task' })
         isLoggingIn.value = true
         isLoginFailed.value = false
         setTimeout(() => {
+            localStorage.setItem('itbkk-token', 'meow')
             router.push({ name: 'all-task' })
         }, 4000)
         return
     } else {
-        isLoginFailed.value = true
+        isLoggingIn.value = true
+        isLoginFailed.value = false
+        setTimeout(() => {
+            toastStore.createToast({
+                status: 'error',
+                title: 'Login Failed',
+                description: 'Invalid username or password.'
+            })
+            isLoggingIn.value = false
+            isLoginFailed.value = true
+        }, 4000)
     }
 }
 

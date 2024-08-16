@@ -12,7 +12,6 @@ import SortButton from '@/components/SortButton.vue'
 import { useBoardStore } from '@/stores/board'
 import BoardSettingsModal from '@/components/BoardSettingsModal.vue'
 import FilterStatus from '@/components/FilterStatus.vue'
-import MainLayout from '@/layouts/MainLayout.vue'
 
 const router = useRouter()
 const toastStore = useToastStore()
@@ -143,7 +142,6 @@ const handleSettingsButtonClick = () => {
       </button>
     </div>
   </Teleport> -->
-  <MainLayout>
     <div class="max-w-full pt-10 pb-20">
       <div class="px-4 min-h-8 mb-2">
         <div class="flex justify-between">
@@ -269,7 +267,6 @@ const handleSettingsButtonClick = () => {
         <div class="h-20"></div>
       </div>
     </div>
-  </MainLayout>
 </template>
 
 <style scoped>
