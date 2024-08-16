@@ -1,5 +1,5 @@
 <script setup>
-import IconSVG from '@/components/IconSVG.vue';
+import IconSVG from '@/components/IconSVG.vue'
 import { ref, watch } from 'vue'
 
 const username = ref('')
