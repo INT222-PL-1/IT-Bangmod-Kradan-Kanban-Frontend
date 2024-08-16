@@ -197,108 +197,108 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     </div>
   </Teleport> -->
 
-  <div class="max-w-full pt-10 pb-20">
-    <div class="px-4 h-8 mb-2">
-      <div class="flex justify-end">
-        <div class="flex gap-2">
-          <BaseMenu side="left" class="sm:hidden">
-            <template #icon>
-              <IconSVG iconName="three-dots" scale="1.25" />
-            </template>
-            <template #menu>
-              <button @click="handleRefreshBtnClick" type="button"
-                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                <div :class="{ 'animate-spin': isLoading }">
-                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-                </div>Refresh Statuses
-              </button>
-              <button @click="handleAddBtnClick" type="button"
-                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                <IconSVG iconName="plus" :scale="1.25" />Add Status
-              </button>
-            </template>
-          </BaseMenu>
-          <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
-            <div :class="{ 'animate-spin': isLoading }">
-              <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-            </div>Refresh Statuses
-          </button>
-          <button @click="handleAddBtnClick" type="button"
-            class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
-            <IconSVG iconName="plus" :scale="1.25" />Add Status
-          </button>
+    <div class="max-w-full pt-10 pb-20">
+      <div class="px-4 h-8 mb-2">
+        <div class="flex justify-end">
+          <div class="flex gap-2">
+            <BaseMenu side="left" class="sm:hidden">
+              <template #icon>
+                <IconSVG iconName="three-dots" scale="1.25" />
+              </template>
+              <template #menu>
+                <button @click="handleRefreshBtnClick" type="button"
+                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                  <div :class="{ 'animate-spin': isLoading }">
+                    <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+                  </div>Refresh Statuses
+                </button>
+                <button @click="handleAddBtnClick" type="button"
+                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                  <IconSVG iconName="plus" :scale="1.25" />Add Status
+                </button>
+              </template>
+            </BaseMenu>
+            <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
+              <div :class="{ 'animate-spin': isLoading }">
+                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+              </div>Refresh Statuses
+            </button>
+            <button @click="handleAddBtnClick" type="button"
+              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
+              <IconSVG iconName="plus" :scale="1.25" />Add Status
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="table-overflow-x-scroll px-4">
-      <table class="table border border-base-300">
-        <thead class="bg-base-200">
-          <tr class="select-none">
-            <th class="min-w-16 max-w-16"></th>
-            <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
-            <th class="min-w-96 max-w-96 sm:min-w-[35vw] sm:max-w-[35vw]">Description</th>
-            <th class="min-w-16 max-w-16">Tasks</th>
-            <th class="min-w-60 max-w-60">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="isLoading && statusStore.statuses.length === 0">
-            <td colspan="5" class="text-center">Loading statuses...</td>
-          </tr>
-          <tr v-else-if="statusStore.statuses === null">
-            <td colspan="5" class="text-center">Error while loading statuses from server. Please try again later.</td>
-          </tr>
-          <tr v-else-if="statusStore.statuses.length === 0">
-            <td colspan="5" class="text-center">No status</td>
-          </tr>
-          <tr v-else v-for="(status, index) in statusStore.statuses" :key="status.id" class="itbkk-item">
-            <td class="min-w-16 max-w-16">
-              <div class="grid place-items-center">
-                <div>{{ index + 1 }}</div>
-              </div>
-            </td>
-            <td class="overflow-hidden min-w-52 max-w-52">
-              <StatusBadge @click="handleStatusClick(status)" :statusData="status" textWrapMode="wrap"
-                class="itbkk-status-name cursor-default" width="100%" />
-            </td>
-            <td :class="{ 'italic text-[grey]': !status.description }"
-              class="itbkk-status-description min-w-96 max-w-96 break-words">
-              {{ status.description || 'No description is provided' }}
-            </td>
-            <td class="min-w-16 max-w-16 p-0">
-              <div class="grid place-items-center">
-                <div
-                  :class="{ 'text-error': status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status }"
-                  class="flex items-center gap-1">
-                  <IconSVG
-                    v-show="status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status"
-                    iconName="exclamation-diamond"
-                    title="Task limit exceeded! Please transfer some tasks to other statuses or increase the limit." />
-                  {{ status.count }}{{ boardStore.board.isLimitTasks && !status.is_fixed_status ? '/' +
-                    boardStore.board.taskLimitPerStatus : ''
-                  }}
+      <div class="table-overflow-x-scroll px-4">
+        <table class="table border border-base-300">
+          <thead class="bg-base-200">
+            <tr class="select-none">
+              <th class="min-w-16 max-w-16"></th>
+              <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
+              <th class="min-w-96 max-w-96 sm:min-w-[35vw] sm:max-w-[35vw]">Description</th>
+              <th class="min-w-16 max-w-16">Tasks</th>
+              <th class="min-w-60 max-w-60">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="isLoading && statusStore.statuses.length === 0">
+              <td colspan="5" class="text-center">Loading statuses...</td>
+            </tr>
+            <tr v-else-if="statusStore.statuses === null">
+              <td colspan="5" class="text-center">Error while loading statuses from server. Please try again later.</td>
+            </tr>
+            <tr v-else-if="statusStore.statuses.length === 0">
+              <td colspan="5" class="text-center">No status</td>
+            </tr>
+            <tr v-else v-for="(status, index) in statusStore.statuses" :key="status.id" class="itbkk-item">
+              <td class="min-w-16 max-w-16">
+                <div class="grid place-items-center">
+                  <div>{{ index + 1 }}</div>
                 </div>
-              </div>
-            </td>
-            <td class="min-w-44 max-w-44">
-              <div v-if="status.is_fixed_status === false" class="flex justify-center items-center gap-1 w-full">
-                <ButtonWithIcon @click="handleEditBtnClick(status.id)"
-                  className="itbkk-button-edit btn btn-sm justify-start flex flex-nowrap" iconName="pencil-square">
-                  Edit
-                </ButtonWithIcon>
-                <ButtonWithIcon @click="handleOpenDeleteModal(status)"
-                  className="itbkk-button-delete btn btn-sm justify-start text-error flex flex-nowrap"
-                  iconName="trash-fill">
-                  Delete
-                </ButtonWithIcon>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="h-20"></div>
+              </td>
+              <td class="overflow-hidden min-w-52 max-w-52">
+                <StatusBadge @click="handleStatusClick(status)" :statusData="status" textWrapMode="wrap"
+                  class="itbkk-status-name cursor-default" width="100%" />
+              </td>
+              <td :class="{ 'italic text-[grey]': !status.description }"
+                class="itbkk-status-description min-w-96 max-w-96 break-words">
+                {{ status.description || 'No description is provided' }}
+              </td>
+              <td class="min-w-16 max-w-16 p-0">
+                <div class="grid place-items-center">
+                  <div
+                    :class="{ 'text-error': status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status }"
+                    class="flex items-center gap-1">
+                    <IconSVG
+                      v-show="status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status"
+                      iconName="exclamation-diamond"
+                      title="Task limit exceeded! Please transfer some tasks to other statuses or increase the limit." />
+                    {{ status.count }}{{ boardStore.board.isLimitTasks && !status.is_fixed_status ? '/' +
+                      boardStore.board.taskLimitPerStatus : ''
+                    }}
+                  </div>
+                </div>
+              </td>
+              <td class="min-w-44 max-w-44">
+                <div v-if="status.is_fixed_status === false" class="flex justify-center items-center gap-1 w-full">
+                  <ButtonWithIcon @click="handleEditBtnClick(status.id)"
+                    className="itbkk-button-edit btn btn-sm justify-start flex flex-nowrap" iconName="pencil-square">
+                    Edit
+                  </ButtonWithIcon>
+                  <ButtonWithIcon @click="handleOpenDeleteModal(status)"
+                    className="itbkk-button-delete btn btn-sm justify-start text-error flex flex-nowrap"
+                    iconName="trash-fill">
+                    Delete
+                  </ButtonWithIcon>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="h-20"></div>
+      </div>
     </div>
-  </div>
 </template>
 
 <style scoped>
