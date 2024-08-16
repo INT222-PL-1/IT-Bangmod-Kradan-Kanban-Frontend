@@ -4,6 +4,7 @@ import BaseMenu from './BaseMenu.vue';
 import IconSVG from './IconSVG.vue';
 import ButtonWithIcon from './ButtonWithIcon.vue';
 
+const LOCAL_STORAGE_PREFIX = 'itbkk-'
 const DARKMODE_THEME = 'itbkk-dark'
 const LIGHTMODE_THEME = 'itbkk-light'
 
@@ -11,7 +12,7 @@ let themeSetting = ref('')
 const isSystemDark = ref(false)
 
 function themeSetup() {
-  themeSetting.value = localStorage.getItem('theme') || 'system'
+  themeSetting.value = localStorage.getItem(`${LOCAL_STORAGE_PREFIX}theme`) || 'system'
   const html = document.documentElement
   const darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
   isSystemDark.value = darkQuery.matches
@@ -39,7 +40,7 @@ onMounted(() => {
 })
 
 const handleSetTheme = (theme) => {
-  localStorage.setItem('theme', theme)
+  localStorage.setItem(`${LOCAL_STORAGE_PREFIX}theme`, theme)
   themeSetup()
 }
 
