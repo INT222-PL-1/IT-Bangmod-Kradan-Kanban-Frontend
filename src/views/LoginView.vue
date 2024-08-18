@@ -48,7 +48,6 @@ const handleLoginSubmit = async () => {
 </script>
 
 <template>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <div class="fixed top-4 right-4 z-40">
         <ThemeSwitch />
     </div>
