@@ -9,8 +9,8 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const toastStore = useToastStore()
 
-const username = ref('itbkk.pichet')
-const password = ref('ip23/PIC')
+const username = ref('')
+const password = ref('')
 const isLoggingIn = ref(false)
 const isLoginFailed = ref(false)
 
