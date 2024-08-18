@@ -3,8 +3,12 @@ import { RouterLink, useRouter } from 'vue-router'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import BackToTopButton from '@/components/BackToTopButton.vue'
 import IconSVG from '@/components/IconSVG.vue'
+import { useUserStore } from '@/stores/user';
+import BaseMenu from '@/components/BaseMenu.vue';
 
 const router = useRouter()
+const userStore = useUserStore()
+
 const handleSignOutClick = () => {
   localStorage.removeItem('itbkk-token')
   router.push({ name: 'login'})
@@ -17,7 +21,22 @@ const handleSignOutClick = () => {
   <header class="sticky top-0 z-30 flex justify-between items-center bg-base-200 px-6 h-20">
     <div class="text-xl sm:text-2xl font-bold">IT-Bangmod Kradan Kanban</div>
     <div class="flex gap-2">
-      <button @click="handleSignOutClick" class="btn btn-ghost btn-sm">Sign out</button>
+      <BaseMenu side="left" mode="button">
+        <template #button>
+          <button class="btn btn-ghost btn-sm">
+            <div class="flex gap-3">
+              <IconSVG iconName="person-circle" scale="1.5" size="1.5" />
+              <div>{{ userStore.user.name }}</div>
+            </div>
+          </button>
+        </template>
+        <template #menu>
+          <button @click="handleSignOutClick" class="btn btn-ghost btn-sm flex gap-4 w-full justify-start">
+            <IconSVG iconName="box-arrow-left" scale="1.5" size="1.5" />
+            <div>Sign Out</div>
+          </button>
+        </template>
+      </BaseMenu>
       <ThemeSwitch />
     </div>
   </header>
