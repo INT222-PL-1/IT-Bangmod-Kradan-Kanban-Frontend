@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TaskView from '@/views/TaskView.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
+import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -70,7 +71,11 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (['login', 'not-found'].includes(to.name)) next()
-  else if (localStorage.getItem('itbkk-token')) next()
+  else if (localStorage.getItem('itbkk-token')) {
+    const userStore = useUserStore()
+    userStore.loadUserData()
+    next()
+  }
   else next({ name: 'login' })
 })
 

@@ -143,7 +143,7 @@ const handleSettingsButtonClick = () => {
     </div>
   </Teleport> -->
     <div class="max-w-full pt-10 pb-20">
-      <div class="px-4 min-h-8 mb-2">
+      <div class="px-4 min-h-8 mb-2 sticky top-[8rem] z-10 bg-base-100 py-3 border-b-base-200 border-b-2">
         <div class="flex justify-between">
           <FilterStatus />
           <div class="flex gap-2">

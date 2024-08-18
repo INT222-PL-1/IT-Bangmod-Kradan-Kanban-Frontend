@@ -3,25 +3,19 @@ import IconSVG from '@/components/IconSVG.vue'
 import ThemeSwitch from '@/components/ThemeSwitch.vue';
 import { login } from '@/libs/userManagement';
 import { useToastStore } from '@/stores/toast';
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const toastStore = useToastStore()
 
-const username = ref('')
-const password = ref('')
+const username = ref('itbkk.pichet')
+const password = ref('ip23/PIC')
 const isLoggingIn = ref(false)
 const isLoginFailed = ref(false)
 
 watch(username, (newValue) => {
     if (newValue.length >= 50) username.value = newValue.substring(0, 50)
-})
-
-onMounted(() => {
-    if (localStorage.getItem('itbkk-token')) {
-        router.push({ name: 'all-task' })
-    }
 })
 
 const handleLoginSubmit = async () => {
@@ -30,8 +24,10 @@ const handleLoginSubmit = async () => {
 
     const responseObject = await login(username.value, password.value)
 
+    console.log(responseObject)
+
     if (responseObject.status === 'success') {
-        localStorage.setItem('itbkk-token', 'testToken1234')
+        localStorage.setItem('itbkk-token', responseObject.data.access_token)
         router.push({ name: 'all-task' })
     } else {
         toastStore.createToast({
