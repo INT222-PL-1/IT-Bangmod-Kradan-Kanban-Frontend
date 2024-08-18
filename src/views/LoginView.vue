@@ -48,28 +48,30 @@ const handleLoginSubmit = async () => {
 </script>
 
 <template>
-    <div class="fixed top-4 right-4">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <div class="fixed top-4 right-4 z-40">
         <ThemeSwitch />
     </div>
-    <main class="fixed w-screen h-screen overflow-hidden">
+    <main class="fixed h-screen w-screen overflow-hidden">
         <div :class="{ '-translate-x-[100vw]': isLoggingIn }"
             class="w-[200vw] h-screen flex transition-transform duration-1000">
             <div class="w-screen h-screen grid place-items-center">
-                <div class="flex flex-col bg-base-200 rounded-xl px-14 py-14 animate-slide-in">
+                <div
+                    class="flex flex-col w-screen h-screen md:w-auto md:h-auto bg-base-200 rounded-xl px-14 py-14 animate-slide-in">
                     <IconSVG iconName="itbkk-logo" :scale="4" size="4rem" />
                     <span class="text-[2rem] mt-[1rem] mb-[0.5rem]">Login</span>
-                    <span>Welcome to IT-Bangmod Kradan Kanban.</span>
-                    <span>A productive and easy-to-manage task board.</span>
+                    <span class="opacity-80">Welcome to IT-Bangmod Kradan Kanban.</span>
+                    <span class="opacity-80">A productive and easy-to-manage task board.</span>
                     <form @submit.prevent="handleLoginSubmit" class="flex flex-col mt-[0.5rem]">
                         <span v-if="isLoginFailed" class="text-error">Invalid username or password.</span>
                         <input v-model="username" type="username" placeholder="Username"
                             :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
-                            class="input input-bordered border-2 bg-base-100 my-[1rem]" />
+                            class="itbkk-username input input-bordered border-2 bg-base-100 my-[1rem]" />
                         <input v-model="password" type="password" placeholder="Password"
                             :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
-                            class="input input-bordered border-2 bg-base-100" />
+                            class="itbkk-password input input-bordered border-2 bg-base-100" />
                         <button type="submit" :disabled="username.length === 0 || password.length === 0"
-                            class="mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
+                            class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
                     </form>
                 </div>
             </div>
@@ -87,8 +89,10 @@ const handleLoginSubmit = async () => {
 </template>
 
 <style scoped>
-.animate-slide-in {
-    animation: slide-in 1s ease;
+@media (width >=768px) {
+    .animate-slide-in {
+        animation: slide-in 1s ease;
+    }
 }
 
 @keyframes slide-in {
