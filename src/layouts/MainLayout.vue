@@ -3,8 +3,8 @@ import { RouterLink, useRouter } from 'vue-router'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import BackToTopButton from '@/components/BackToTopButton.vue'
 import IconSVG from '@/components/IconSVG.vue'
-import { useUserStore } from '@/stores/user';
-import BaseMenu from '@/components/BaseMenu.vue';
+import { useUserStore } from '@/stores/user'
+import BaseMenu from '@/components/BaseMenu.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -15,11 +15,11 @@ const handleSignOutClick = () => {
 }
 </script>
 
-
 <template>
   <BackToTopButton />
   <header class="sticky top-0 z-30 flex justify-between items-center bg-base-200 px-6 h-20">
-    <div class="text-xl sm:text-2xl font-bold">IT-Bangmod Kradan Kanban</div>
+    <div class="hidden sm:block sm:text-2xl font-bold">IT-Bangmod Kradan Kanban</div>
+    <div class="text-xl block sm:hidden font-bold">ITBKK</div>
     <div class="flex gap-2">
       <BaseMenu side="left" mode="button">
         <template #button>

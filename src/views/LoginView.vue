@@ -1,8 +1,8 @@
 <script setup>
 import IconSVG from '@/components/IconSVG.vue'
-import ThemeSwitch from '@/components/ThemeSwitch.vue';
-import { login } from '@/libs/userManagement';
-import { useToastStore } from '@/stores/toast';
+import ThemeSwitch from '@/components/ThemeSwitch.vue'
+import { login } from '@/libs/userManagement'
+import { useToastStore } from '@/stores/toast'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 

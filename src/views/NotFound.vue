@@ -1,5 +1,5 @@
 <script setup>
-import ThemeSwitch from '@/components/ThemeSwitch.vue';
+import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import { RouterLink } from 'vue-router'
 
 </script>
