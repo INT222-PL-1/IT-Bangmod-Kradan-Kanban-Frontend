@@ -18,6 +18,10 @@ watch(username, (newValue) => {
     if (newValue.length >= 50) username.value = newValue.substring(0, 50)
 })
 
+watch(password, (newValue) => {
+    if (newValue.length >= 14) password.value = newValue.substring(0, 14)
+})
+
 const handleLoginSubmit = async () => {
     isLoggingIn.value = true
     isLoginFailed.value = false
@@ -33,7 +37,7 @@ const handleLoginSubmit = async () => {
         toastStore.createToast({
             status: 'error',
             title: 'Login Failed',
-            description: 'Invalid username or password.'
+            description: 'Username or Password is incorrect'
         })
     }
 
@@ -66,6 +70,7 @@ const handleLoginSubmit = async () => {
                             :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
                             class="itbkk-password input input-bordered border-2 bg-base-100" />
                         <button type="submit" :disabled="username.length === 0 || password.length === 0"
+                            :class="{ 'disabled': username.length === 0 || password.length === 0 }"
                             class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
                     </form>
                 </div>

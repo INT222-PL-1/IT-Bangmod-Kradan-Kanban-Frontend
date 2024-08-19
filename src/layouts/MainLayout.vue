@@ -26,7 +26,7 @@ const handleSignOutClick = () => {
           <button class="btn btn-ghost btn-sm">
             <div class="flex gap-3">
               <IconSVG iconName="person-circle" scale="1.5" size="1.5" />
-              <div>{{ userStore.user.name }}</div>
+              <div class="itbkk-fullname">{{ userStore.user.name }}</div>
             </div>
           </button>
         </template>
