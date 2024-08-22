@@ -18,8 +18,11 @@ const handleSignOutClick = () => {
 <template>
   <BackToTopButton />
   <header class="sticky top-0 z-30 flex justify-between items-center bg-base-200 px-6 h-20">
-    <div class="hidden sm:block sm:text-2xl font-bold">IT-Bangmod Kradan Kanban</div>
-    <div class="text-xl block sm:hidden font-bold">ITBKK</div>
+    <div class="flex gap-3">
+      <IconSVG iconName="itbkk-logo" size="2rem" scale="2" />
+      <div class="hidden sm:block sm:text-2xl font-bold">IT-Bangmod Kradan Kanban</div>
+      <div class="text-xl block sm:hidden font-bold">ITBKK</div>
+    </div>
     <div class="flex gap-2">
       <BaseMenu side="left" mode="button">
         <template #button>

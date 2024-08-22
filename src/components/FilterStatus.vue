@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue';
 import IconSVG from './IconSVG.vue';
 import StatusBadge from './StatusBadge.vue';
 import { useBoardStore } from '@/stores/board';
+import NotificationIndicator from './NotificationIndicator.vue';
 
 const boardStore = useBoardStore()
 const statusStore = useStatusStore()
@@ -17,6 +18,7 @@ const statusList = computed(() => {
   const copiedStatuses = [...statusStore.statuses]
   return copiedStatuses
 })
+
 const filteredStatusList = computed(() => {
   return statusList.value.filter(status => status.name.toLowerCase().includes(searchTerm.value.toLowerCase())).sort((a, b) => b.id - a.id)
 })
@@ -35,6 +37,7 @@ const handleClearFilterButtonClick = () => {
 
 <template>
   <div class="dropdown">
+    <NotificationIndicator v-show="boardStore.options.filterStatuses.length > 0" type="warning" class="absolute top-0 left-0" />
     <div class="flex items-center border-2 border-base-300 rounded-lg overflow-hidden h-full">
       <div class="bg-base-200 hover:contrast-50 transition-[filter] h-full">
         <button class="itbkk-status-filter active:scale-90" title="Choose Filter">
@@ -46,10 +49,10 @@ const handleClearFilterButtonClick = () => {
         <div v-show="boardStore.options.filterStatuses.length === 0" class="text-sm font-semibold opacity-50">
           Filter By Status(es)
         </div>
-        <div v-show="boardStore.options.filterStatuses.length > 0" class="flex flex-wrap gap-2 ">
+        <div v-show="boardStore.options.filterStatuses.length > 0" class="flex flex-wrap gap-2">
           <div v-for="statusName of boardStore.options.filterStatuses" :key="statusName"
             @click="handleStatusClick(statusName)"
-            class="hover:line-through hover:contrast-[0.90] transition-[filter] px-2 bg-base-200 rounded-lg max-w-[7rem] truncate relative">
+            class="hover:line-through hover:contrast-[0.90] transition-[filter] px-2 bg-base-200 rounded-lg flex-shrink-0 max-w-[7rem] truncate relative">
             {{ statusName }}
           </div>
         </div>

@@ -20,16 +20,16 @@ const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
 const boardSettingsModalOpenState = ref(false)
 
-async function fetchTasks() {
-  await boardStore.fetchTasks()
+async function refreshBoard() {
+  await boardStore.fetchBoard()
 }
 
 onMounted(async () => {
-  await fetchTasks()
+  await refreshBoard()
 })
 
 const handleRefreshBtnClick = async () => {
-  await fetchTasks()
+  await refreshBoard()
 }
 
 const handleTaskClick = (taskId) => {
@@ -53,14 +53,14 @@ const handleDeleteTask = async (taskId) => {
       description: `An error has occurred.\n${responseObj.message}.`,
       status: 'error'
     })
-    await fetchTasks()
+    await refreshBoard()
   } else {
     toastStore.createToast({
       title: 'Success',
       description: 'The task has been deleted.',
       status: 'success'
     })
-    await fetchTasks()
+    await refreshBoard()
   }
   taskDeleteModalOpenState.value = false
 }
