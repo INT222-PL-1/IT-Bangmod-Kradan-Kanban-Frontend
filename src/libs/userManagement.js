@@ -3,7 +3,7 @@ import { ResponseObject } from "./classes/ResponseObject"
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 export async function login(username, password) {
-    const url = `${SERVER_URL}/v2/login`
+    const url = `${SERVER_URL}/login`
 
     try {
         const res = await fetch(url, {
