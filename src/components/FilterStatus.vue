@@ -37,9 +37,9 @@ const handleClearFilterButtonClick = () => {
 
 <template>
   <div class="dropdown">
-    <NotificationIndicator v-show="boardStore.options.filterStatuses.length > 0" type="warning" class="absolute top-0 left-0" />
+    <NotificationIndicator v-show="boardStore.options.filterStatuses.length > 0" type="warning" class="absolute top-[0.125rem] left-[0.125rem]" />
     <div class="flex items-center border-2 border-base-300 rounded-lg overflow-hidden h-full">
-      <div class="bg-base-200 hover:contrast-50 transition-[filter] h-full">
+      <div class="bg-base-200 hover:bg-base-300 h-full">
         <button class="itbkk-status-filter active:scale-90" title="Choose Filter">
           <IconSVG iconName="filter" scale="1.25" size="2rem" />
         </button>
@@ -57,7 +57,7 @@ const handleClearFilterButtonClick = () => {
           </div>
         </div>
       </div>
-      <div class="bg-base-200 hover:contrast-50 transition-[filter] h-full">
+      <div class="bg-base-200 hover:bg-base-300 h-full">
         <button @click="handleClearFilterButtonClick" class="active:scale-90" title="Clear Filter">
           <IconSVG iconName="x" scale="1.25" size="2rem" class="cursor-pointer" />
         </button>
