@@ -11,6 +11,7 @@ const toastStore = useToastStore()
 
 const username = ref('')
 const password = ref('')
+const isPasswordShow = ref(false)
 const isLoggingIn = ref(false)
 const isLoginFailed = ref(false)
 
@@ -21,6 +22,10 @@ watch(username, (newValue) => {
 watch(password, (newValue) => {
     if (newValue.length >= 14) password.value = newValue.substring(0, 14)
 })
+
+const handleTogglePasswordShow = () => {
+    isPasswordShow.value = !isPasswordShow.value
+}
 
 const handleLoginSubmit = async () => {
     isLoggingIn.value = true
@@ -66,11 +71,21 @@ const handleLoginSubmit = async () => {
                         <input v-model="username" type="username" placeholder="Username"
                             :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
                             class="itbkk-username input input-bordered border-2 bg-base-100 my-[1rem]" />
-                        <input v-model="password" type="password" placeholder="Password"
-                            :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
-                            class="itbkk-password input input-bordered border-2 bg-base-100" />
+                        <div>
+                            <input v-model="password" :type="isPasswordShow ? 'text' : 'password'"
+                                placeholder="Password" :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
+                                class="itbkk-password input input-bordered border-2 w-full bg-base-100" />
+                            <button type="button" @click="handleTogglePasswordShow"
+                                class="absolute -translate-x-full opacity-75">
+                                <div v-show="!isPasswordShow">
+                                    <IconSVG iconName="eye" size="3rem" :scale="1.5" />
+                                </div>
+                                <div v-show="isPasswordShow">
+                                    <IconSVG iconName="eye-slash" size="3rem" :scale="1.5" />
+                                </div>
+                            </button>
+                        </div>
                         <button type="submit" :disabled="username.length === 0 || password.length === 0"
-                            :class="{ 'disabled': username.length === 0 || password.length === 0 }"
                             class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
                     </form>
                 </div>
