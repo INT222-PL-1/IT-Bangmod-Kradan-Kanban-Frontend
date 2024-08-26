@@ -86,6 +86,7 @@ const handleLoginSubmit = async () => {
                             </button>
                         </div>
                         <button type="submit" :disabled="username.length === 0 || password.length === 0"
+                            :class="{ 'disabled': username.length === 0 || password.length === 0 }"
                             class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
                     </form>
                 </div>
