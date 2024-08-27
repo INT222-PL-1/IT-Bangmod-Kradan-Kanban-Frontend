@@ -88,3 +88,7 @@ export function superArraySorter(array, sortBy, sortDirection) {
 
   return copyArray
 }
+
+export function parseJwtPayload(token) {
+  return JSON.parse(atob(token.split('.')[1]));
+}

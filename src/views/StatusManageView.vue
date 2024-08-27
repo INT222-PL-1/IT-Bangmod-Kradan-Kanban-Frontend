@@ -166,39 +166,39 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     </Transition>
   </RouterView>
 
-  <Teleport to="#navbar-item-right">
-    <div class="flex gap-2">
-      <BaseMenu side="left" class="sm:hidden">
-        <template #icon>
-          <IconSVG iconName="three-dots" scale="1.25" />
-        </template>
-        <template #menu>
-          <button @click="handleRefreshBtnClick" type="button"
-            class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+  <div class="max-w-full pt-10 pb-20">
+    <div class="px-4 min-h-8 mb-2 sticky top-[8rem] z-10 bg-base-100 py-3 border-b-base-200 border-b-2">
+      <div class="flex justify-end">
+        <div class="flex gap-2">
+          <BaseMenu side="left" class="sm:hidden">
+            <template #icon>
+              <IconSVG iconName="three-dots" scale="1.25" />
+            </template>
+            <template #menu>
+              <button @click="handleRefreshBtnClick" type="button"
+                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <div :class="{ 'animate-spin': isLoading }">
+                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+                </div>Refresh Statuses
+              </button>
+              <button @click="handleAddBtnClick" type="button"
+                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <IconSVG iconName="plus" :scale="1.25" />Add Status
+              </button>
+            </template>
+          </BaseMenu>
+          <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
             <div :class="{ 'animate-spin': isLoading }">
               <IconSVG iconName="arrow-clockwise" :scale="1.25" />
             </div>Refresh Statuses
           </button>
           <button @click="handleAddBtnClick" type="button"
-            class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
             <IconSVG iconName="plus" :scale="1.25" />Add Status
           </button>
-        </template>
-      </BaseMenu>
-      <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
-        <div :class="{ 'animate-spin': isLoading }">
-          <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-        </div>Refresh Statuses
-      </button>
-      <button @click="handleAddBtnClick" type="button"
-        class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
-        <IconSVG iconName="plus" :scale="1.25" />Add Status
-      </button>
+        </div>
+      </div>
     </div>
-  </Teleport>
-
-  <div class="max-w-full pt-10 pb-20">
-    <div class="px-4 h-8 mb-2"></div>
     <div class="table-overflow-x-scroll px-4">
       <table class="table border border-base-300">
         <thead class="bg-base-200">
