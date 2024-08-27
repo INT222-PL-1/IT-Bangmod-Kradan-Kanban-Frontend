@@ -1,4 +1,5 @@
 import { ResponseObject } from './classes/ResponseObject'
+import zyos from './zyos'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
@@ -12,17 +13,8 @@ export async function getTasks(options = {}) {
   }
 
   try {
-    const res = await fetch(`${url}?${params}`)
-    const data = await res.json()
-
-    if (res.ok) {
-      for (const key in data) {
-        if (data[key] === null) data[key] = ''
-      }
-      return ResponseObject.success(data)
-    } else {
-      return ResponseObject.error(data.message)
-    }
+    const resObj = await zyos.fetch(url)
+    return resObj
   } catch (error) {
     console.error(error)
     return null
@@ -30,8 +22,11 @@ export async function getTasks(options = {}) {
 }
 
 export async function getTaskById(taskId) {
+
+  const url = `${SERVER_URL}/v2/tasks/${taskId}`
+
   try {
-    const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`)
+    const res = await fetch(url)
     const data = await res.json()
 
     if (res.ok) {
