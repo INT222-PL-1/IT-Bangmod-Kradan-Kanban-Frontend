@@ -13,22 +13,23 @@ export const useBoardStore = defineStore('board', () => {
     sortDirection: null,
     filterStatuses: []
   })
-
-  async function fetchBoard() {
-    isLoading.value = true
-    const responseObj = await getBoardById(options.value.boardId)
-    if (responseObj.status === 'success') {
-      board.value = responseObj.data
-    }
-    isLoading.value = false
-  }
-
+  
   async function fetchTasks() {
     isLoading.value = true
     const responseObj = await getTasks(options.value)
     if (responseObj.status === 'success') {
       tasks.value = responseObj.data
     }
+    isLoading.value = false
+  }
+  
+  async function fetchBoard() {
+    isLoading.value = true
+    const responseObj = await getBoardById(options.value.boardId)
+    if (responseObj.status === 'success') {
+      board.value = responseObj.data
+    }
+    await fetchTasks()
     isLoading.value = false
   }
 
