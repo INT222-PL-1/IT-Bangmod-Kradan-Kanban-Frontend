@@ -1,17 +1,13 @@
-import { ResponseObject } from './classes/ResponseObject'
+import zyos from 'zyos'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 export async function getBoardById(boardId) {
-  try {
-    const res = await fetch(`${SERVER_URL}/v2/boards/${boardId}`)
-    const data = await res.json()
+  const url = `${SERVER_URL}/v2/boards/${boardId}`
 
-    if (res.ok) {
-      return ResponseObject.success(data)
-    } else {
-      return ResponseObject.error(data.message)
-    }
+  try {
+    const res = await zyos.fetch(url, { useToken: true })
+    return res
   } catch (error) {
     console.error(error)
     return null
@@ -19,15 +15,11 @@ export async function getBoardById(boardId) {
 }
 
 export async function getBoards() {
-  try {
-    const res = await fetch(`${SERVER_URL}/v2/boards`)
-    const data = await res.json()
+  const url = `${SERVER_URL}/v2/boards`
 
-    if (res.ok) {
-      return ResponseObject.success(data)
-    } else {
-      return ResponseObject.error(data.message)
-    }
+  try {
+    const res = await zyos.fetch(url, { useToken: true })
+    return res
   } catch (error) {
     console.error(error)
     return null
@@ -35,22 +27,15 @@ export async function getBoards() {
 }
 
 export async function patchBoard(boardId, patchData) {
+  const url = `${SERVER_URL}/v2/boards/${boardId}/maximum-task`
+
   try {
-    const res = await fetch(`${SERVER_URL}/v2/boards/${boardId}/maximum-task`, {
+    const res = await zyos.fetch(url, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(patchData)
+      body: patchData,
+      useToken: true
     })
-
-    const data = await res.json()
-
-    if (res.ok) {
-      return ResponseObject.success(data)
-    } else {
-      return ResponseObject.error(data.message)
-    }
+    return res
   } catch (error) {
     console.error(error)
     return null

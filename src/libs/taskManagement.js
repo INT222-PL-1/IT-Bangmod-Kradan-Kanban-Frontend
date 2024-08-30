@@ -1,4 +1,3 @@
-import { ResponseObject } from './classes/ResponseObject'
 import zyos from 'zyos'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
@@ -13,8 +12,8 @@ export async function getTasks(options = {}) {
   }
 
   try {
-    const resObj = await zyos.fetch(url)
-    return resObj
+    const res = await zyos.fetch(`${url}?${params}`, { useToken: true })
+    return res
   } catch (error) {
     console.error(error)
     return null
@@ -22,19 +21,19 @@ export async function getTasks(options = {}) {
 }
 
 export async function getTaskById(taskId) {
-
   const url = `${SERVER_URL}/v2/tasks/${taskId}`
 
   try {
-    const resObj = await zyos.fetch(url, {
+    const res = await zyos.fetch(url, {
       computeFunction: (data) => {
         for (const key in data) {
           if (data[key] === null) data[key] = ''
         }
         return data
-      }
+      },
+      useToken: true
     })
-    return resObj
+    return res
   } catch (error) {
     console.error(error)
     return null
@@ -42,27 +41,21 @@ export async function getTaskById(taskId) {
 }
 
 export async function createTask({ title, description, assignees, status, boardId }) {
+  const url = `${SERVER_URL}/v2/tasks`
+
   try {
-    const res = await fetch(`${SERVER_URL}/v2/tasks`, {
+    const res = await zyos.fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+      body: {
         title,
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
         statusId: status.id,
         boardId
-      })
+      },
+      useToken: true
     })
-
-    const data = await res.json()
-    if (res.ok) {
-      return ResponseObject.success(data)
-    } else {
-      return ResponseObject.error(data.message)
-    }
+    return res
   } catch (error) {
     console.error(error)
     return null
@@ -70,27 +63,21 @@ export async function createTask({ title, description, assignees, status, boardI
 }
 
 export async function updateTask({ id: taskId, title, description, assignees, status, boardId }) {
+  const url = `${SERVER_URL}/v2/tasks/${taskId}`
+
   try {
-    const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`, {
+    const res = await zyos.fetch(url, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+      body: {
         title,
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
         statusId: status.id,
         boardId
-      })
+      },
+      useToken: true
     })
-
-    const data = await res.json()
-    if (res.ok) {
-      return ResponseObject.success(data)
-    } else {
-      return ResponseObject.error(data.message)
-    }
+    return res
   } catch (error) {
     console.error(error)
     return null
@@ -98,15 +85,14 @@ export async function updateTask({ id: taskId, title, description, assignees, st
 }
 
 export async function deleteTask(taskId) {
-  try {
-    const res = await fetch(`${SERVER_URL}/v2/tasks/${taskId}`, { method: 'DELETE' })
-    const data = await res.json()
+  const url = `${SERVER_URL}/v2/tasks/${taskId}`
 
-    if (res.ok) {
-      return ResponseObject.success(data)
-    } else {
-      return ResponseObject.error(data.message)
-    }
+  try {
+    const res = await zyos.fetch(url, {
+      method: 'DELETE',
+      useToken: true
+    })
+    return res
   } catch (error) {
     console.error(error)
     return null

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import TaskView from '@/views/TaskView.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import { useUserStore } from '@/stores/user'
+import zyos from 'zyos'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -69,12 +70,23 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   if (['login', 'not-found'].includes(to.name)) next()
   else if (localStorage.getItem('itbkk-token')) {
-    const userStore = useUserStore()
-    userStore.loadUserData()
-    next()
+    try {
+      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/validate-token`, { useToken: true })
+      if (res.status !== 'success') {
+        localStorage.removeItem('itbkk-token')
+        throw new Error('Invalid token')
+      }
+      const userStore = useUserStore()
+      userStore.loadUserData()
+      next()
+    } catch (error) {
+      console.error(error)
+      next({ name: 'login' })
+      return
+    }
   }
   else next({ name: 'login' })
 })

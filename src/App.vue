@@ -4,10 +4,7 @@ import ToastContainer from './components/ToastContainer.vue'
 import zyos from 'zyos'
 
 zyos.defineConfig({
-  defaultTokenGetter: () => localStorage.getItem('itbkk-token'),
-  defaultHeaders: {
-    'test': 'test',
-  },
+  defaultTokenGetter: () => `Bearer ${localStorage.getItem('itbkk-token')}`
 })
 </script>
 
