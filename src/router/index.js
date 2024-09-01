@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import TaskView from '@/views/TaskView.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import { useUserStore } from '@/stores/user'
 import zyos from 'zyos'
+import BoardView from '@/views/BoardView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,16 +10,21 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      redirect: { name: 'all-task' }
+      redirect: { name: 'board' }
     },
     {
-      path: '/',
+      path: '/board',
+      name: 'board',
+      component: BoardView
+    },
+    {
+      path: '/board/:boardId',
       component: MainLayout,
       children: [
         {
           path: 'task',
           name: 'all-task',
-          component: TaskView,
+          component: () => import('@/views/TaskView.vue'),
           children: [
             {
               path: ':taskId',
@@ -44,12 +49,12 @@ const router = createRouter({
           component: () => import('@/views/StatusManageView.vue'),
           children: [
             {
-              path: '/status/add',
+              path: '/board/:boardId/status/add',
               name: 'status-add',
               component: () => import('@/components/StatusModal.vue')
             },
             {
-              path: '/status/:statusId/edit',
+              path: '/board/:boardId/status/:statusId/edit',
               name: 'status-edit',
               component: () => import('@/components/StatusModal.vue')
             }

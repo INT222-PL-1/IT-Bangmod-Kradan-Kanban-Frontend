@@ -33,21 +33,18 @@ const handleLoginSubmit = async () => {
 
     const responseObject = await login(username.value, password.value)
 
-    console.log(responseObject)
-
     if (responseObject.status === 'success') {
         localStorage.setItem('itbkk-token', responseObject.data.access_token)
-        router.push({ name: 'all-task' })
+        router.push({ name: 'board' })
     } else {
         toastStore.createToast({
             status: 'error',
             title: 'Login Failed',
             description: 'Username or Password is incorrect'
         })
+        isLoginFailed.value = true
     }
-
     isLoggingIn.value = false
-    isLoginFailed.value = true
 }
 
 </script>
@@ -68,8 +65,7 @@ const handleLoginSubmit = async () => {
                     <span class="opacity-80">A productive and easy-to-manage task board.</span>
                     <form @submit.prevent="handleLoginSubmit" class="flex flex-col mt-[0.5rem]">
                         <span v-if="isLoginFailed" class="text-error">Invalid username or password.</span>
-                        <input v-model="username" type="username" placeholder="Username"
-                            :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
+                        <input v-model="username" type="text" placeholder="Username" :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
                             class="itbkk-username input input-bordered border-2 bg-base-100 my-[1rem]" />
                         <div>
                             <input v-model="password" :type="isPasswordShow ? 'text' : 'password'"

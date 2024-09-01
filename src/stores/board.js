@@ -1,35 +1,52 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { getBoardById } from '@/libs/boardManagement'
-import { getTasks } from '@/libs/taskManagement'
+import { getBoardById, getBoards, getTasks } from '@/libs/boardManagement'
 
 export const useBoardStore = defineStore('board', () => {
   const isLoading = ref(false)
-  const board = ref(null)
+  const boards = ref([])
+  const selectedBoard = ref(null)
   const tasks = ref([])
   const options = ref({
-    boardId: 1,
     sortBy: null,
     sortDirection: null,
     filterStatuses: []
   })
   
-  async function fetchTasks() {
+  // async function fetchTasks() {
+  //   isLoading.value = true
+  //   const responseObj = await getTasks(options.value)
+  //   if (responseObj.status === 'success') {
+  //     tasks.value = responseObj.data
+  //   }
+  //   isLoading.value = false
+  // }
+  
+  async function loadTasks(boardId) {
     isLoading.value = true
-    const responseObj = await getTasks(options.value)
-    if (responseObj.status === 'success') {
-      tasks.value = responseObj.data
+    const res = await getTasks(boardId, options.value)
+    if (res.status === 'success') {
+      tasks.value = res.data
     }
     isLoading.value = false
   }
-  
-  async function fetchBoard() {
+
+  async function loadAllBoards() {
     isLoading.value = true
-    const responseObj = await getBoardById(options.value.boardId)
-    if (responseObj.status === 'success') {
-      board.value = responseObj.data
+    const res = await getBoards()
+    if (res.status === 'success') {
+      boards.value = res.data
     }
-    await fetchTasks()
+    isLoading.value = false
+  }
+
+  async function loadBoard(boardId) {
+    isLoading.value = true
+    const res = await getBoardById(boardId)
+    if (res.status === 'success') {
+      selectedBoard.value = res.data
+      await loadTasks()
+    }
     isLoading.value = false
   }
 
@@ -51,17 +68,17 @@ export const useBoardStore = defineStore('board', () => {
     options.value.filterStatuses.splice(0, options.value.filterStatuses.length)
   }
 
-  watch(() => options.value.boardId, fetchBoard, { immediate: true })
+  // watch(() => options.value.boardId, fetchBoard, { immediate: true })
 
-  watch(options, fetchTasks, { deep: true, immediate: true })
+  // watch(options, fetchTasks, { deep: true, immediate: true })
 
   return {
     isLoading,
-    board,
+    boards,
     tasks,
     options,
-    fetchBoard,
-    fetchTasks,
+    loadAllBoards,
+    loadBoard,
     sortTasks,
     addTaskFilterStatus,
     removeTaskFilterStatus,
