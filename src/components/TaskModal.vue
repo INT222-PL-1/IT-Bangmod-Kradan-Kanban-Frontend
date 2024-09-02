@@ -16,7 +16,6 @@ defineProps({
   },
 })
 
-const BOARD_ID = import.meta.env.VITE_BOARD_ID
 const route = useRoute()
 const router = useRouter()
 const boardStore = useBoardStore()
@@ -41,18 +40,18 @@ const disabledSaveButton = computed(() => {
     )
 })
 
-async function fetchTaskData() {
-  const taskId = route.params.taskId
-  const responseObj = await getTaskById(taskId)
-  if (responseObj.status === 'error') {
+async function loadSelectedTaskData() {
+  const { taskId, boardId } = route.params
+  const res = await getTaskById(taskId, boardId)
+  if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${responseObj.message}`,
+      description: `An error has occurred.\n${res.message}`,
       status: 'error'
     })
     router.replace({ name: 'all-task' })
   } else {
-    taskModalData.value = responseObj.data
+    taskModalData.value = res.data
     if (taskModalMode.value === 'edit') {
       previousTaskData = { ...taskModalData.value, status: { ...taskModalData.value.status } }
     }
@@ -69,13 +68,13 @@ onMounted(async () => {
       status: {
         id: 1
       },
-      boardId: BOARD_ID
+      boardId: route.params.boardId
     }
     return
   } else if (taskModalMode.value === 'edit') {
-    await fetchTaskData()
+    await loadSelectedTaskData()
   } else {
-    await fetchTaskData()
+    await loadSelectedTaskData()
   }
 })
 
@@ -85,40 +84,40 @@ const handleClickClose = () => {
 
 const handleClickConfirm = async () => {
   if (taskModalMode.value === 'add') {
-    const responseObj = await createTask(taskModalData.value)
-    if (responseObj.status === 'error') {
+    const res = await createTask(taskModalData.value)
+    if (res.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: `An error occurred while adding the task.\n${responseObj.message}`,
+        description: `An error occurred while adding the task.\n${res.message}`,
         status: 'error'
       })
     } else {
-      const createdTask = responseObj.data
+      const createdTask = res.data
       toastStore.createToast({
         title: 'Success',
         description: `The task "${createdTask.title}" is added successfully.`,
         status: 'success'
       })
     }
-    await boardStore.fetchTasks()
+    await boardStore.loadTasks()
     router.push({ name: 'all-task' })
   } else if (taskModalMode.value === 'edit') {
-    const responseObj = await updateTask(taskModalData.value)
-    if (responseObj.status === 'error') {
+    const res = await updateTask(taskModalData.value)
+    if (res.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: `An error occurred while updating the task.\n${responseObj.message}`,
+        description: `An error occurred while updating the task.\n${res.message}`,
         status: 'error'
       })
     } else {
-      const updatedTask = responseObj.data
+      const updatedTask = res.data
       toastStore.createToast({
         title: 'Success',
         description: `The task "${updatedTask.title}" is updated successfully`,
         status: 'success'
       })
     }
-    await boardStore.fetchTasks()
+    await boardStore.loadTasks()
     router.push({ name: 'all-task' })
   }
 }
@@ -210,8 +209,8 @@ const handleClickConfirm = async () => {
                 <span class="text-lg font-semibold">
                   <span>Status </span>
                   <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm"
-                    :class="boardStore.board.isLimitTasks ? 'text-warning' : 'opacity-50'">
-                    (Status limit {{ boardStore.board.isLimitTasks ? 'enabled' : 'disabled' }})
+                    :class="boardStore.currentBoard.isLimitTasks ? 'text-warning' : 'opacity-50'">
+                    (Status limit {{ boardStore.currentBoard.isLimitTasks ? 'enabled' : 'disabled' }})
                   </span>
                 </span>
                 <span v-if="['add', 'edit'].includes(taskModalMode)" v-show="taskModalData.assignees.length > 30"

@@ -1,7 +1,6 @@
 <script setup>
 import BaseModal from '@/components/BaseModal.vue'
 import { createStatus, getStatusById, updateStatus } from '@/libs/statusManagement';
-import { useStatusStore } from '@/stores/status';
 import { useToastStore } from '@/stores/toast';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
@@ -9,11 +8,12 @@ import ColorPalette from './ColorPalette.vue'
 import StatusBadge from './StatusBadge.vue';
 import { colorValidator } from '@/libs/utils';
 import IconSVG from './IconSVG.vue';
+import { useBoardStore } from '@/stores/board';
 
 const route = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
-const statusStore = useStatusStore()
+const boardStore = useBoardStore()
 
 const statusModalMode = ref('')
 const statusModalData = ref(null)
@@ -33,9 +33,9 @@ const disabledSaveButton = computed(() => {
     )
 })
 
-async function fetchStatusData() {
-  const statusId = route.params.statusId
-  const responseObj = await getStatusById(statusId, { count: true })
+async function loadSelectedStatusData() {
+  const { statusId, boardId } = route.params
+  const responseObj = await getStatusById(statusId, boardId)
   if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
@@ -62,9 +62,9 @@ onMounted(async () => {
     }
     return
   } else if (statusModalMode.value === 'edit') {
-    await fetchStatusData()
+    await loadSelectedStatusData()
   } else {
-    await fetchStatusData()
+    await loadSelectedStatusData()
   }
 })
 
@@ -73,8 +73,9 @@ const handleClickClose = () => {
 }
 
 const handleClickConfirm = async () => {
+  const { boardId } = route.params
   if (statusModalMode.value === 'add') {
-    const responseObj = await createStatus(statusModalData.value)
+    const responseObj = await createStatus(statusModalData.value, boardId)
     if (responseObj.status === 'error') {
       toastStore.createToast({
         title: 'Error',
@@ -89,10 +90,10 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    statusStore.loadStatuses()
+    boardStore.loadStatuses()
     router.push({ name: 'status-manage' })
   } else if (statusModalMode.value === 'edit') {
-    const responseObj = await updateStatus(statusModalData.value)
+    const responseObj = await updateStatus(statusModalData.value, boardId)
     if (responseObj.status === 'error') {
       toastStore.createToast({
         title: 'Error',
@@ -107,7 +108,7 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    statusStore.loadStatuses()
+    boardStore.loadStatuses()
     router.push({ name: 'status-manage' })
   }
 }

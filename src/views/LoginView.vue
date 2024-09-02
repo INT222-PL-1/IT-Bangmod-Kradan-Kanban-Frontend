@@ -35,7 +35,7 @@ const handleLoginSubmit = async () => {
 
     if (responseObject.status === 'success') {
         localStorage.setItem('itbkk-token', responseObject.data.access_token)
-        router.push({ name: 'board' })
+        router.push({ name: 'all-board' })
     } else {
         toastStore.createToast({
             status: 'error',

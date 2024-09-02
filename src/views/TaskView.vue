@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
 import BaseMenu from '@/components/BaseMenu.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
@@ -11,25 +11,27 @@ import { useToastStore } from '@/stores/toast'
 import SortButton from '@/components/SortButton.vue'
 import { useBoardStore } from '@/stores/board'
 import BoardSettingsModal from '@/components/BoardSettingsModal.vue'
-import FilterStatus from '@/components/FilterStatus.vue'
+import StatusFilterBar from '@/components/StatusFilterBar.vue'
 
+const route = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
 const boardStore = useBoardStore()
+
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
 const boardSettingsModalOpenState = ref(false)
 
-async function refreshBoard() {
-  await boardStore.fetchBoard()
+async function refreshBoardTasks() {
+  await boardStore.loadBoard()
 }
 
 onMounted(async () => {
-  await refreshBoard()
+  await refreshBoardTasks()
 })
 
 const handleRefreshBtnClick = async () => {
-  await refreshBoard()
+  await refreshBoardTasks()
 }
 
 const handleTaskClick = (taskId) => {
@@ -46,21 +48,21 @@ const handleOpenDeleteModal = (taskData) => {
 }
 
 const handleDeleteTask = async (taskId) => {
-  const responseObj = await deleteTask(taskId)
+  const responseObj = await deleteTask(taskId, route.params.boardId)
   if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
       description: `An error has occurred.\n${responseObj.message}.`,
       status: 'error'
     })
-    await refreshBoard()
+    await refreshBoardTasks()
   } else {
     toastStore.createToast({
       title: 'Success',
       description: 'The task has been deleted.',
       status: 'success'
     })
-    await refreshBoard()
+    await refreshBoardTasks()
   }
   taskDeleteModalOpenState.value = false
 }
@@ -115,7 +117,7 @@ const handleSettingsButtonClick = () => {
   <div class="max-w-full pt-10 pb-20">
     <div class="px-4 min-h-8 mb-2 sticky top-[8rem] z-10 bg-base-100 py-3 border-b-base-200 border-b-2">
       <div class="flex justify-between">
-        <FilterStatus />
+        <StatusFilterBar />
         <div class="flex gap-2">
           <BaseMenu side="left" class="sm:hidden">
             <template #icon>
@@ -124,7 +126,7 @@ const handleSettingsButtonClick = () => {
             <template #menu>
               <button @click="handleRefreshBtnClick" type="button"
                 class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                <div :class="{ 'animate-spin': boardStore.isLoading }">
+                <div :class="{ 'animate-spin': boardStore.isLoading.task }">
                   <IconSVG iconName="arrow-clockwise" :scale="1.25" />
                 </div>Refresh Tasks
               </button>
@@ -141,7 +143,7 @@ const handleSettingsButtonClick = () => {
             <IconSVG iconName="gear" :scale="1.25" />Board Settings
           </button>
           <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
-            <div :class="{ 'animate-spin': boardStore.isLoading }">
+            <div :class="{ 'animate-spin': boardStore.isLoading.task }">
               <IconSVG iconName="arrow-clockwise" :scale="1.25" />
             </div>Refresh Tasks
           </button>
@@ -181,7 +183,7 @@ const handleSettingsButtonClick = () => {
           </tr>
         </thead>
         <tbody>
-          <tr v-if="boardStore.isLoading && boardStore.tasks.length === 0">
+          <tr v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
             <td colspan="4" class="text-center">Loading tasks...</td>
           </tr>
           <tr v-else-if="boardStore.tasks === null">

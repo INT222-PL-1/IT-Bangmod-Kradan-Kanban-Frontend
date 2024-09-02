@@ -1,21 +1,19 @@
 <script setup>
-import { useStatusStore } from '@/stores/status';
-import { computed, onMounted, ref } from 'vue';
-import IconSVG from './IconSVG.vue';
-import StatusBadge from './StatusBadge.vue';
-import { useBoardStore } from '@/stores/board';
-import NotificationIndicator from './NotificationIndicator.vue';
+import { computed, onMounted, ref } from 'vue'
+import IconSVG from './IconSVG.vue'
+import StatusBadge from './StatusBadge.vue'
+import { useBoardStore } from '@/stores/board'
+import NotificationIndicator from './NotificationIndicator.vue'
 
 const boardStore = useBoardStore()
-const statusStore = useStatusStore()
 const searchTerm = ref('')
 
 onMounted(async () => {
-  await statusStore.loadStatuses()
+  await boardStore.loadStatuses()
 })
 
 const statusList = computed(() => {
-  const copiedStatuses = [...statusStore.statuses]
+  const copiedStatuses = [...boardStore.statuses]
   return copiedStatuses
 })
 

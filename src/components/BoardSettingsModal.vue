@@ -22,15 +22,15 @@ const newSettings = ref({
   taskLimitPerStatus: 10
 })
 const disabledSaveSettingsBtn = computed(() => {
-  return newSettings.value.isLimitTasks === boardStore.board.isLimitTasks &&
-    newSettings.value.taskLimitPerStatus === boardStore.board.taskLimitPerStatus
+  return newSettings.value.isLimitTasks === boardStore.currentBoard.isLimitTasks &&
+    newSettings.value.taskLimitPerStatus === boardStore.currentBoard.taskLimitPerStatus
 })
 const confirmLimitOpenState = ref(false)
 const exceedLimitOpenState = ref(false)
 const exceedLimitStatus = ref([])
 
 const handleSaveSettingsStatus = async ({ message }) => {
-  const responseObj = await patchBoard(boardStore.board.id, newSettings.value)
+  const responseObj = await patchBoard(boardStore.currentBoard.id, newSettings.value)
   if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
@@ -43,7 +43,7 @@ const handleSaveSettingsStatus = async ({ message }) => {
       description: `The board settings have been updated.\n${message || ''}`,
       status: 'success'
     })
-    await boardStore.fetchBoard()
+    await boardStore.loadBoard()
   }
 
   const patchedBoard = responseObj.data
@@ -62,7 +62,7 @@ const handleConfirmLimit = async () => {
 }
 
 const handleCancelConfirmLimit = () => {
-  newSettings.value.isLimitTasks = boardStore.board.isLimitTasks
+  newSettings.value.isLimitTasks = boardStore.currentBoard.isLimitTasks
   confirmLimitOpenState.value = false
   emits('clickClose')
 }
@@ -73,12 +73,12 @@ const handleCloseExceedLimitModal = () => {
 }
 
 watch(() => newSettings.value?.isLimitTasks, (newVal) => {
-  if (newVal !== boardStore.board?.isLimitTasks) {
+  if (newVal !== boardStore.currentBoard?.isLimitTasks) {
     confirmLimitOpenState.value = true
   }
 })
 
-watch(() => boardStore.board, (newBoard) => {
+watch(() => boardStore.currentBoard, (newBoard) => {
   newSettings.value = { ...newBoard }
 }, { immediate: true })
 
@@ -160,10 +160,10 @@ watch(() => boardStore.board, (newBoard) => {
               <div class="flex flex-col gap-2">
                 <div v-for="status of exceedLimitStatus" :key="status" class="flex items-center gap-2">
                   <StatusBadge :statusData="status" textWrapMode="truncate" />
-                  <div>has <span class="text-error">{{ status.count }}/{{ boardStore.board.taskLimitPerStatus }}</span>
+                  <div>has <span class="text-error">{{ status.count }}/{{ boardStore.currentBoard.taskLimitPerStatus }}</span>
                     tasks</div>
-                  <div class="text-error">({{ status.count - boardStore.board.taskLimitPerStatus }} task{{
-                    status.count - boardStore.board.taskLimitPerStatus > 1 ? 's' : '' }} over limit)</div>
+                  <div class="text-error">({{ status.count - boardStore.currentBoard.taskLimitPerStatus }} task{{
+                    status.count - boardStore.currentBoard.taskLimitPerStatus > 1 ? 's' : '' }} over limit)</div>
                 </div>
               </div>
             </div>

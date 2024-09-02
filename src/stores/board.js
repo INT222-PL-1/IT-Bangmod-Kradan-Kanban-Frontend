@@ -1,53 +1,64 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { getBoardById, getBoards, getTasks } from '@/libs/boardManagement'
+import { getBoardById, getBoards } from '@/libs/boardManagement'
+import { getStatuses } from '@/libs/statusManagement'
+import { getTasks } from '@/libs/taskManagement'
+import { useRoute } from 'vue-router'
 
 export const useBoardStore = defineStore('board', () => {
-  const isLoading = ref(false)
+  const route = useRoute()
+  const isLoading = ref({
+    board: false,
+    task: false,
+    status: false
+  })
   const boards = ref([])
-  const selectedBoard = ref(null)
+  const currentBoard = ref(null)
   const tasks = ref([])
+  const statuses = ref([])
   const options = ref({
     sortBy: null,
     sortDirection: null,
     filterStatuses: []
   })
   
-  // async function fetchTasks() {
-  //   isLoading.value = true
-  //   const responseObj = await getTasks(options.value)
-  //   if (responseObj.status === 'success') {
-  //     tasks.value = responseObj.data
-  //   }
-  //   isLoading.value = false
-  // }
-  
-  async function loadTasks(boardId) {
-    isLoading.value = true
-    const res = await getTasks(boardId, options.value)
+  async function loadTasks(boardId = route.params.boardId) {
+    isLoading.value.task = true
+    const res = await getTasks(options.value, boardId)
     if (res.status === 'success') {
       tasks.value = res.data
     }
-    isLoading.value = false
+    isLoading.value.task = false
+  }
+
+  async function loadStatuses(boardId = route.params.boardId) {
+    isLoading.value.status = true
+    const res = await getStatuses(boardId)
+    if (res.status === 'success') {
+      statuses.value = res.data
+    }
+    isLoading.value.status = false
   }
 
   async function loadAllBoards() {
-    isLoading.value = true
+    isLoading.value.board = true
     const res = await getBoards()
     if (res.status === 'success') {
       boards.value = res.data
     }
-    isLoading.value = false
+    isLoading.value.board = false    
   }
 
-  async function loadBoard(boardId) {
-    isLoading.value = true
+  async function loadBoard(boardId = route.params.boardId) {
+    console.log(route.params.boardId)
+    isLoading.value.board = true
     const res = await getBoardById(boardId)
     if (res.status === 'success') {
-      selectedBoard.value = res.data
-      await loadTasks()
+      currentBoard.value = res.data
+      await loadTasks(boardId)
+      await loadStatuses(boardId)
     }
-    isLoading.value = false
+    isLoading.value.board = false
   }
 
   function sortTasks(sortBy, sortDirection) {
@@ -70,13 +81,17 @@ export const useBoardStore = defineStore('board', () => {
 
   // watch(() => options.value.boardId, fetchBoard, { immediate: true })
 
-  // watch(options, fetchTasks, { deep: true, immediate: true })
+  watch(options, () => loadTasks, { deep: true })
 
   return {
     isLoading,
     boards,
     tasks,
+    statuses,
+    currentBoard,
     options,
+    loadTasks,
+    loadStatuses,
     loadAllBoards,
     loadBoard,
     sortTasks,

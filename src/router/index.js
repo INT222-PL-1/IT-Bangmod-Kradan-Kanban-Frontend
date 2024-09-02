@@ -10,12 +10,19 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      redirect: { name: 'board' }
+      redirect: { name: 'all-board' }
     },
     {
       path: '/board',
-      name: 'board',
-      component: BoardView
+      name: 'all-board',
+      component: BoardView,
+      children: [
+        {
+          path: 'add',
+          name: 'board-add',
+          component: () => import('@/components/BoardAddModal.vue')
+        }
+      ]
     },
     {
       path: '/board/:boardId',

@@ -1,9 +1,9 @@
 <script setup>
-import { useStatusStore } from '@/stores/status';
-import StatusBadge from './StatusBadge.vue';
+import StatusBadge from './StatusBadge.vue'
 import { computed, onMounted, ref } from 'vue'
 import IconSVG from './IconSVG.vue'
-import { useBoardStore } from '@/stores/board';
+import { useBoardStore } from '@/stores/board'
+import { useRoute } from 'vue-router'
 
 const props = defineProps({
   excludeStatusId: {
@@ -12,17 +12,17 @@ const props = defineProps({
   },
 })
 
+const route = useRoute()
 const model = defineModel()
 const searchTerm = ref('')
-const statusStore = useStatusStore()
 const boardStore = useBoardStore()
 
 onMounted(async () => {
-  await statusStore.loadStatuses()
+  await boardStore.loadStatuses(route.params.boardId)
 })
 
 const statusList = computed(() => {
-  const copiedStatuses = [...statusStore.statuses]
+  const copiedStatuses = [...boardStore.statuses]
   if (props.excludeStatusId !== -1) {
     copiedStatuses.splice(copiedStatuses.findIndex(status => status.id === props.excludeStatusId), 1)
   }
@@ -60,7 +60,7 @@ const filteredStatusList = computed(() => {
           <button v-for="status in filteredStatusList" :key="status.id"
             class="active:scale-90 transition p-0 hover:contrast-75 w-fit rounded-lg bg-base-100">
             <StatusBadge class="cursor-pointer" @click="model = status.id" :statusData="status" textWrapMode="truncate"
-              showCount :showLimit="boardStore.board.isLimitTasks" />
+              showCount :showLimit="boardStore.currentBoard?.isLimitTasks" />
           </button>
         </div>
       </div>

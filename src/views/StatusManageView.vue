@@ -1,6 +1,5 @@
 <script setup>
-import { RouterView, useRouter } from 'vue-router'
-import { useStatusStore } from '@/stores/status'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import { onMounted, ref } from 'vue'
@@ -12,29 +11,26 @@ import StatusSelector from '@/components/StatusSelector.vue'
 import BaseMenu from '@/components/BaseMenu.vue'
 import { useBoardStore } from '@/stores/board'
 
-const isLoading = ref(false)
+const route = useRoute()
 const router = useRouter()
-const boardStore = useBoardStore()
-const statusStore = useStatusStore()
 const toastStore = useToastStore()
+const boardStore = useBoardStore()
 
 const statusModalData = ref(null)
 const statusDeleteModalOpenState = ref(false)
 const statusTransferModalOpenState = ref(false)
 const statusIdToTransfer = ref(1)
 
-async function fetchStatuses() {
-  isLoading.value = true
-  await statusStore.loadStatuses()
-  isLoading.value = false
+async function refreshBoardStatuses() {
+  await boardStore.loadStatuses(route.params.boardId)
 }
 
 onMounted(async () => {
-  await fetchStatuses()
+  await refreshBoardStatuses()
 })
 
 const handleRefreshBtnClick = async () => {
-  await fetchStatuses()
+  await refreshBoardStatuses()
 }
 
 const handleAddBtnClick = () => {
@@ -60,7 +56,8 @@ const handleOpenDeleteModal = (statusData) => {
 }
 
 const handleTransferStatus = async (fromStatusId, toStatusId) => {
-  const responseObj = await deleteStatusAndTransferTasks(fromStatusId, toStatusId)
+  const { boardId } = route.params
+  const responseObj = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
   if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
@@ -73,27 +70,28 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
       description: 'The tasks have been transferred and the status has been deleted.',
       status: 'success'
     })
-    await statusStore.loadStatuses()
+    await boardStore.loadStatuses()
   }
   statusTransferModalOpenState.value = false
 }
 
 const handleDeleteStatus = async (statusId) => {
-  const responseObj = await deleteStatus(statusId)
+  const { boardId } = route.params
+  const responseObj = await deleteStatus(statusId, boardId)
   if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
       description: `An error has occurred.\n${responseObj.message}.`,
       status: 'error'
     })
-    await statusStore.loadStatuses()
+    await boardStore.loadStatuses()
   } else {
     toastStore.createToast({
       title: 'Success',
       description: 'The status has been deleted',
       status: 'success'
     })
-    await statusStore.loadStatuses()
+    await boardStore.loadStatuses()
   }
   statusDeleteModalOpenState.value = false
 }
@@ -177,7 +175,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
             <template #menu>
               <button @click="handleRefreshBtnClick" type="button"
                 class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                <div :class="{ 'animate-spin': isLoading }">
+                <div :class="{ 'animate-spin': boardStore.isLoading.status }">
                   <IconSVG iconName="arrow-clockwise" :scale="1.25" />
                 </div>Refresh Statuses
               </button>
@@ -188,7 +186,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
             </template>
           </BaseMenu>
           <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
-            <div :class="{ 'animate-spin': isLoading }">
+            <div :class="{ 'animate-spin': boardStore.isLoading.status }">
               <IconSVG iconName="arrow-clockwise" :scale="1.25" />
             </div>Refresh Statuses
           </button>
@@ -211,23 +209,23 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-if="isLoading && statusStore.statuses.length === 0">
+          <tr v-if="boardStore.isLoading.status && boardStore.statuses.length === 0">
             <td colspan="5" class="text-center">Loading statuses...</td>
           </tr>
-          <tr v-else-if="statusStore.statuses === null">
+          <tr v-else-if="boardStore.statuses === null">
             <td colspan="5" class="text-center">Error while loading statuses from server. Please try again later.</td>
           </tr>
-          <tr v-else-if="statusStore.statuses.length === 0">
+          <tr v-else-if="boardStore.statuses.length === 0">
             <td colspan="5" class="text-center">No status</td>
           </tr>
-          <tr v-else v-for="(status, index) in statusStore.statuses" :key="status.id" class="itbkk-item">
+          <tr v-else v-for="(status, index) in boardStore.statuses" :key="status.id" class="itbkk-item">
             <td class="min-w-16 max-w-16">
               <div class="grid place-items-center">
                 <div>{{ index + 1 }}</div>
               </div>
             </td>
             <td class="overflow-hidden min-w-52 max-w-52">
-              <StatusBadge @click="handleStatusClick(status)" :statusData="status" textWrapMode="wrap"
+              <StatusBadge :statusData="status" textWrapMode="wrap"
                 class="itbkk-status-name cursor-default" width="100%" />
             </td>
             <td :class="{ 'italic text-[grey]': !status.description }"
@@ -237,14 +235,14 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
             <td class="min-w-16 max-w-16 p-0">
               <div class="grid place-items-center">
                 <div
-                  :class="{ 'text-error': status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status }"
+                  :class="{ 'text-error': status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isLimitTasks && !status.is_fixed_status }"
                   class="flex items-center gap-1">
                   <IconSVG
-                    v-show="status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status"
+                    v-show="status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isLimitTasks && !status.is_fixed_status"
                     iconName="exclamation-diamond"
                     title="Task limit exceeded! Please transfer some tasks to other statuses or increase the limit." />
-                  {{ status.count }}{{ boardStore.board.isLimitTasks && !status.is_fixed_status ? '/' +
-                    boardStore.board.taskLimitPerStatus : ''
+                  {{ status.count }}{{ boardStore.currentBoard?.isLimitTasks && !status.is_fixed_status ? '/' +
+                    boardStore.currentBoard?.taskLimitPerStatus : ''
                   }}
                 </div>
               </div>

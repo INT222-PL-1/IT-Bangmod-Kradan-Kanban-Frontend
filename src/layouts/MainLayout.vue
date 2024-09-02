@@ -21,9 +21,14 @@ import ResponsiveLogo from '@/components/ResponsiveLogo.vue'
     class="sticky top-20 z-20 px-4 h-12 flex justify-between items-center box-border border-b-2 border-base-300 bg-base-200 drop-shadow-md">
     <div class="flex gap-4">
       <div class="flex">
-        <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100 "
+        <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100 "
           class="btn btn-ghost btn-sm">
           <IconSVG iconName="house" :scale="1.25" />Home
+        </RouterLink>
+        <div class="divider divider-horizontal m-0"></div>
+        <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100"
+          class="itbkk-manage-status btn btn-ghost btn-sm">
+          <IconSVG iconName="kanban" :scale="1.25" />Task Board
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
         <RouterLink :to="{ name: 'status-manage' }" exact-active-class="bg-neutral opacity-100"
