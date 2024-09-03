@@ -3,9 +3,15 @@ import { computed, ref } from 'vue';
 import BaseModal from './BaseModal.vue';
 import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
+// import { useBoardStore } from '@/stores/board';
+import { createBoard } from '@/libs/boardManagement';
+import { useToastStore } from '@/stores/toast';
 
 const userStore = useUserStore()
 const router = useRouter()
+// const boardStore = useBoardStore()
+const toastStore = useToastStore()
+
 const boardModalData = ref({
   name: `${userStore.user.name} personal board`
 })
@@ -14,9 +20,21 @@ const disabledSaveButton = computed(() => {
     boardModalData.value.name.length > 120
 })
 
-const handleClickConfirm = () => {
-  console.log('Save board', boardModalData.value)
-  router.push({ name: 'all-board' })
+const handleClickConfirm = async () => {
+  // console.log('Save board', boardModalData.value)
+  const res = await createBoard(boardModalData.value)
+    if (res.status === 'error') {
+      toastStore.createToast({
+        title: 'Error',
+        description: `There is a problem. Please try again later.`,
+        status: 'error'
+      })
+    } else {
+      const createdBoard = res.data
+      router.push({ name: 'all-task', params: { boardId: createdBoard.id } })
+    }
+  // await boardStore.loadAllBoards()
+  // router.push({ name: 'all-board' })
 }
 
 const handleClickCancel = () => {

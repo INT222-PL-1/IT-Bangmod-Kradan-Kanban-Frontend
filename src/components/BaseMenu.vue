@@ -27,7 +27,7 @@ defineProps({
       :class="{ 'btn btn-sm btn-ghost btn-square': mode === 'icon' }">
       <slot :name="mode === 'button' ? mode : 'icon'"></slot>
     </div>
-    <div tabindex="0" class="dropdown-content menu p-2 shadow bg-base-300 rounded-box w-52 gap-1 flex flex-col"
+    <div tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 border-2 border-base-200 rounded-box w-52 gap-1 flex flex-col"
       :style="{ 'z-index': zLayer, height: menuHeight }">
       <slot name="menu"></slot>
     </div>

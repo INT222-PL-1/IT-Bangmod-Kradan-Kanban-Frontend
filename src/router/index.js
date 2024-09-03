@@ -26,6 +26,7 @@ const router = createRouter({
     },
     {
       path: '/board/:boardId',
+      redirect: { name: 'all-task' },
       component: MainLayout,
       children: [
         {

@@ -50,7 +50,6 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   async function loadBoard(boardId = route.params.boardId) {
-    console.log(route.params.boardId)
     isLoading.value.board = true
     const res = await getBoardById(boardId)
     if (res.status === 'success') {

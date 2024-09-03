@@ -22,7 +22,7 @@ const statusTransferModalOpenState = ref(false)
 const statusIdToTransfer = ref(1)
 
 async function refreshBoardStatuses() {
-  await boardStore.loadStatuses(route.params.boardId)
+  await boardStore.loadBoard()
 }
 
 onMounted(async () => {

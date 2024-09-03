@@ -43,3 +43,19 @@ export async function patchBoard(boardId, patchData) {
     return null
   }
 }
+
+export function createBoard(boardData) {
+  const url = `${BASE_URL}`
+
+  try {
+    const res = zyos.fetch(url, {
+      method: 'POST',
+      body: boardData,
+      useToken: true
+    })
+    return res
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}

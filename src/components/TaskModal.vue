@@ -213,10 +213,6 @@ const handleClickConfirm = async () => {
                     (Status limit {{ boardStore.currentBoard.isLimitTasks ? 'enabled' : 'disabled' }})
                   </span>
                 </span>
-                <span v-if="['add', 'edit'].includes(taskModalMode)" v-show="taskModalData.assignees.length > 30"
-                  class="text-error text-xs text-nowrap">
-                  Assignees can not be more than 30 characters
-                </span>
               </div>
               <div v-if="taskModalMode === 'view'" class="w-full max-w-[16rem]">
                 <StatusBadge :statusData="taskModalData?.status" textWrapMode="wrap" width="100%"
