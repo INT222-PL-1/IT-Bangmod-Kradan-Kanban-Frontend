@@ -6,15 +6,18 @@ import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import UserMenuButton from '@/components/UserMenuButton.vue'
 import { useBoardStore } from '@/stores/board'
 import { useUserStore } from '@/stores/user'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 
+const isLoading = ref(true)
 const router = useRouter()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
 
-onMounted(() => {
-  boardStore.loadAllBoards()
+onMounted(async () => {
+  isLoading.value = true
+  await boardStore.loadAllBoards()
+  isLoading.value = false
 })
 
 const handleAddBoardClick = () => {
@@ -56,12 +59,17 @@ const handleBoardClick = async (boardId) => {
     </button>
   </div>
   <div class="h-[calc(100vh-15rem)] w-[100vw] overflow-auto board-scrollbar pt-5 pb-32 flex flex-col items-center">
-    <div v-if="boardStore.boards.length === 0" class="flex flex-col items-center justify-center h-full">
-      <IconSVG iconName="inbox-empty" :scale="12" size="12rem" class="text-base-300" />
-      <div>You have no board yet.</div>
-      <div>Join other boards or <span @click="handleAddBoardClick" class="text-primary underline underline-offset-2 cursor-pointer">create a new one.</span></div>
+    <div v-if="!isLoading">
+      <div v-if="boardStore.boards.length === 0" class="flex flex-col items-center justify-center h-full">
+        <IconSVG iconName="inbox-empty" :scale="12" size="12rem" class="text-base-300" />
+        <div>You have no board yet.</div>
+        <div>Join other boards or <span @click="handleAddBoardClick" class="text-primary underline underline-offset-2 cursor-pointer">create a new one.</span></div>
+      </div>
+      <BoardListItem v-else v-for="board in boardStore.boards" :key="board" :board="board" @boardClick="handleBoardClick" />
     </div>
-    <BoardListItem v-else v-for="board in boardStore.boards" :key="board" :board="board" @boardClick="handleBoardClick" />
+    <div v-else class="flex items-center justify-center">
+      <div class="loading loading-lg loading-dots" />
+    </div>
   </div>
 </template>
 
