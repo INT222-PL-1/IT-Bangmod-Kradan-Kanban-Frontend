@@ -13,7 +13,7 @@ export async function getStatuses(boardId) {
   const url = `${BASE_URL}/${boardId}/statuses`
 
   try {
-    const res = await zyos.fetch(url, { useToken: true })
+    const res = await zyos.fetch(url)
     return res
   } catch (error) {
     console.error(error)
@@ -37,8 +37,7 @@ export async function getStatusById(statusId, boardId) {
           if (data[key] === null) data[key] = ''
         }
         return data
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -57,8 +56,7 @@ export async function createStatus({ name, description, color }, boardId) {
         name,
         description: description === '' ? null : description,
         color: color === '' ? '#666666' : color
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -86,8 +84,7 @@ export async function updateStatus({
         color: color === '' ? '#999999' : color,
         is_limited_status,
         maximum_limit
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -101,8 +98,7 @@ export async function deleteStatus(statusId, boardId) {
 
   try {
     const res = await zyos.fetch(url, {
-      method: 'DELETE',
-      useToken: true
+      method: 'DELETE'
     })
     return res
   } catch (error) {
@@ -116,8 +112,7 @@ export async function deleteStatusAndTransferTasks(fromStatusId, toStatusId, boa
 
   try {
     const res = await zyos.fetch(url, {
-      method: 'DELETE',
-      useToken: true
+      method: 'DELETE'
     })
     return res
   } catch (error) {

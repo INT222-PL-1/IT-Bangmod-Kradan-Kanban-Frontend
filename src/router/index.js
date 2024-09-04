@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import MainLayout from '@/layouts/MainLayout.vue'
+import TaskBoardLayout from '@/layouts/TaskBoardLayout.vue'
 import { useUserStore } from '@/stores/user'
 import zyos from 'zyos'
 import BoardView from '@/views/BoardView.vue'
@@ -27,7 +27,7 @@ const router = createRouter({
     {
       path: '/board/:boardId',
       redirect: { name: 'all-task' },
-      component: MainLayout,
+      component: TaskBoardLayout,
       children: [
         {
           path: 'task',
@@ -87,7 +87,7 @@ router.beforeEach(async (to, from, next) => {
   if (['login', 'not-found'].includes(to.name)) next()
   else if (localStorage.getItem('itbkk-token')) {
     try {
-      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/validate-token`, { useToken: true })
+      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/validate-token`)
       if (res.status !== 'success') {
         localStorage.removeItem('itbkk-token')
         throw new Error('Invalid token')

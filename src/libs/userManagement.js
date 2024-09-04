@@ -11,7 +11,8 @@ export async function login(username, password) {
             body: {
                 userName: username,
                 password
-            }
+            },
+            useToken: false
         })
         return res
     } catch (error) {

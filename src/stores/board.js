@@ -3,10 +3,14 @@ import { defineStore } from 'pinia'
 import { getBoardById, getBoards } from '@/libs/boardManagement'
 import { getStatuses } from '@/libs/statusManagement'
 import { getTasks } from '@/libs/taskManagement'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useToastStore } from './toast'
 
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
+  const router = useRouter()
+  const toastStore = useToastStore
+  ()
   const isLoading = ref({
     board: false,
     task: false,
@@ -56,6 +60,15 @@ export const useBoardStore = defineStore('board', () => {
       currentBoard.value = res.data
       await loadTasks(boardId)
       await loadStatuses(boardId)
+    } else if (res.status === 'error' && res.statusCode === 404) {
+      router.push({ name: 'not-found' })
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: 'Failed to load board. Please try again later.',
+        status: 'error'
+      })
+      router.push({ name: 'all-board' })
     }
     isLoading.value.board = false
   }
@@ -80,7 +93,9 @@ export const useBoardStore = defineStore('board', () => {
 
   // watch(() => options.value.boardId, fetchBoard, { immediate: true })
 
-  watch(options, () => loadTasks, { deep: true })
+  watch(options, async () => {
+    await loadTasks()
+  }, { deep: true })
 
   return {
     isLoading,

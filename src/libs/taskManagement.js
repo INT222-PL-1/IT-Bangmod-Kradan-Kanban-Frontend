@@ -20,7 +20,7 @@ export async function getTasks(options, boardId) {
   }
 
   try {
-    const res = await zyos.fetch(`${url}?${params}`, { useToken: true })
+    const res = await zyos.fetch(`${url}?${params}`)
     return res
   } catch (error) {
     console.error(error)
@@ -38,8 +38,7 @@ export async function getTaskById(taskId, boardId) {
           if (data[key] === null) data[key] = ''
         }
         return data
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -60,8 +59,7 @@ export async function createTask({ title, description, assignees, status, boardI
         assignees: assignees === '' ? null : assignees,
         statusId: status.id,
         boardId
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -82,8 +80,7 @@ export async function updateTask({ id: taskId, title, description, assignees, st
         assignees: assignees === '' ? null : assignees,
         statusId: status.id,
         boardId
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -97,8 +94,7 @@ export async function deleteTask(taskId, boardId) {
 
   try {
     const res = await zyos.fetch(url, {
-      method: 'DELETE',
-      useToken: true
+      method: 'DELETE'
     })
     return res
   } catch (error) {

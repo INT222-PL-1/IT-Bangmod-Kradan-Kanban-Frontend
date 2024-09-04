@@ -15,9 +15,12 @@ defineProps({
 <template>
   <div class="group border-2 border-base-300 bg-base-200 rounded-md m-4 flex justify-between min-h-[7rem] max-w-[50rem] w-[90vw]">
     <div class="flex w-full">
-      <div class="h-full w-2 group-hover:w-4 transition-[width] bg-primary rounded-l-[0.25rem]" />
+      <div class="h-full w-2 transition-[width] bg-primary rounded-l-[0.25rem]" />
       <div class="flex justify-between w-full px-6 py-4">
-        <div @click="$emit('boardClick', board.id)" class="font-semibold hover:underline underline-offset-4 cursor-pointer text-xl">{{ board.name }}</div>
+        <div class="flex gap-2">
+          <IconSVG iconName="table" scale="1.25" size="2rem" />
+          <div @click="$emit('boardClick', board.id)" class="font-semibold underline hover:text-primary underline-offset-4 cursor-pointer text-xl">{{ board.name }}</div>
+        </div>
         <BaseMenu side="left" mode="icon">
           <template #icon>
             <IconSVG iconName="three-dots" :scale="1.5" size="1.5rem" />

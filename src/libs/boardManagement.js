@@ -8,7 +8,7 @@ export async function getBoardById(boardId) {
   const url = `${BASE_URL}/${boardId}`
 
   try {
-    const res = await zyos.fetch(url, { useToken: true })
+    const res = await zyos.fetch(url)
     return res
   } catch (error) {
     console.error(error)
@@ -20,7 +20,7 @@ export async function getBoards() {
   const url = `${BASE_URL}`
 
   try {
-    const res = await zyos.fetch(url, { useToken: true })
+    const res = await zyos.fetch(url)
     return res
   } catch (error) {
     console.error(error)
@@ -34,8 +34,7 @@ export async function patchBoard(boardId, patchData) {
   try {
     const res = await zyos.fetch(url, {
       method: 'PATCH',
-      body: patchData,
-      useToken: true
+      body: patchData
     })
     return res
   } catch (error) {
@@ -50,8 +49,7 @@ export function createBoard(boardData) {
   try {
     const res = zyos.fetch(url, {
       method: 'POST',
-      body: boardData,
-      useToken: true
+      body: boardData
     })
     return res
   } catch (error) {

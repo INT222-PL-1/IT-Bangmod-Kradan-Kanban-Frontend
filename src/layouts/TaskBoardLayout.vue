@@ -5,20 +5,33 @@ import BackToTopButton from '@/components/BackToTopButton.vue'
 import IconSVG from '@/components/IconSVG.vue'
 import UserMenuButton from '@/components/UserMenuButton.vue'
 import ResponsiveLogo from '@/components/ResponsiveLogo.vue'
+import { useBoardStore } from '@/stores/board'
 
+const boardStore = useBoardStore()
 </script>
 
 <template>
   <BackToTopButton />
-  <header class="sticky top-0 z-30 flex justify-between items-center bg-base-200 px-6 h-20">
-    <ResponsiveLogo />
-    <div class="flex gap-2">
-      <UserMenuButton />
-      <ThemeSwitch />
+  <header class="sticky top-0 z-30">
+    <div class="flex justify-between items-center bg-base-200 px-6 h-[5rem]">
+      <div class="breadcrumbs">
+        <ul>
+          <li>
+            <ResponsiveLogo type="compact" />
+          </li>
+          <li>
+            <div class="text-2xl font-bold">{{ boardStore.currentBoard?.name }}</div>
+          </li>
+        </ul>
+      </div>
+      <div class="flex gap-2">
+        <UserMenuButton />
+        <ThemeSwitch />
+      </div>
     </div>
   </header>
   <nav
-    class="sticky top-20 z-20 px-4 h-12 flex justify-between items-center box-border border-b-2 border-base-300 bg-base-200 shadow-md">
+    class="sticky top-[5rem] z-20 px-4 h-[3rem] flex justify-between items-center box-border border-b-2 border-base-300 bg-base-200 shadow-md">
     <div class="flex gap-4">
       <div class="flex">
         <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100 "
