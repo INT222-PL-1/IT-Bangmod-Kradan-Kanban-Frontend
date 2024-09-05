@@ -3,6 +3,7 @@ import TaskBoardLayout from '@/layouts/TaskBoardLayout.vue'
 import { useUserStore } from '@/stores/user'
 import zyos from 'zyos'
 import BoardView from '@/views/BoardView.vue'
+import { useBoardStore } from '@/stores/board'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,6 +17,18 @@ const router = createRouter({
       path: '/board',
       name: 'all-board',
       component: BoardView,
+      beforeEnter: async (to, from, next) => {
+        const boardStore = useBoardStore()
+        await boardStore.loadAllBoards()
+        if (from.name === 'all-task') {
+          next()
+          return
+        }
+        if (boardStore.boards.length === 1) {
+          next({ name: 'all-task', params: { boardId: boardStore.boards[0].id } })
+        }
+        else next()
+      },
       children: [
         {
           path: 'add',

@@ -6,19 +6,20 @@ import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import UserMenuButton from '@/components/UserMenuButton.vue'
 import { useBoardStore } from '@/stores/board'
 import { useUserStore } from '@/stores/user'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 
-const isLoading = ref(true)
+// const isLoading = ref(true)
+const isLoading = ref(false)
 const router = useRouter()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
 
-onMounted(async () => {
-  isLoading.value = true
-  await boardStore.loadAllBoards()
-  isLoading.value = false
-})
+// onMounted(async () => {
+//   isLoading.value = true
+//   await boardStore.loadAllBoards()
+//   isLoading.value = false
+// })
 
 const handleAddBoardClick = () => {
   router.push({ name: 'board-add' })
@@ -32,7 +33,6 @@ const handleBoardClick = async (boardId) => {
 </script>
 
 <template>
-  <!-- <BoardAddModal @clickClose="handleAddBoardCancel" :show="boardAddModalOpenState" /> -->
   <RouterView v-slot="{ Component }">
     <Transition>
       <Component :is="Component" />
@@ -40,7 +40,7 @@ const handleBoardClick = async (boardId) => {
   </RouterView>
 
   <div class="h-[5rem] flex justify-between items-center px-6 bg-base-200 border-2 border-base-300 shadow-md">
-    <ResponsiveLogo />
+    <ResponsiveLogo type="compact" />
     <div class="flex items-center">
       <UserMenuButton />
       <ThemeSwitch />
