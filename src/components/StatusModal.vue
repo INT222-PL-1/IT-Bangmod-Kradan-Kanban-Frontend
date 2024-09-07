@@ -118,8 +118,8 @@ const handleClickConfirm = async () => {
 <template>
   <BaseModal :show="statusModalData !== null" @clickBG="handleClickClose">
     <div
-      class="itbkk-modal-status bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
-      <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">
+      class="itbkk-modal-status bg-base-300 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
+      <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">
         <span v-if="statusModalMode === 'add'">Add Status</span>
         <span v-else-if="statusModalMode === 'edit'">Edit Status</span>
       </div>
@@ -203,7 +203,7 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+      <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
         <div class="flex gap-2">
           <button @click="handleClickConfirm"
             :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"

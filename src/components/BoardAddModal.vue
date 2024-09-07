@@ -46,7 +46,7 @@ const handleClickCancel = () => {
 <template>
   <BaseModal
     :show="true" @clickBG="handleClickCancel" :mobileCenter="true">
-    <div class="absolute bg-base-100 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+    <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
       <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">New Board
       </div>
       <div class="flex flex-col gap-2 p-4 break-words">
@@ -70,7 +70,7 @@ const handleClickCancel = () => {
           </div>
         </div>
       </div>
-      <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+      <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
         <div class="flex gap-2">
           <button @click="handleClickConfirm" :class="{ disabled: disabledSaveButton }" class="itbkk-button-ok btn btn-sm btn-success" :disabled="disabledSaveButton">
             Save

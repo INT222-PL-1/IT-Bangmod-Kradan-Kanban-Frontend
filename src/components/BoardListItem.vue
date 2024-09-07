@@ -17,16 +17,18 @@ const boardUrl = window.location.href + `/${props.board.id}`
 </script>
 
 <template>
-  <div class="group border-2 border-base-300 bg-base-200 rounded-md m-4 flex justify-between min-h-[7rem] max-w-[50rem] w-[90vw]">
+  <div class="group bg-base-300 shadow-md rounded-md m-4 flex justify-between min-h-[7rem] max-w-[50rem] w-[90vw]">
     <div class="flex w-full">
       <div class="h-full w-2 transition-[width] bg-primary rounded-l-[0.25rem]" />
       <div class="flex justify-between w-full px-6 py-4">
-        <div>
+        <div class="flex flex-col justify-between">
           <div class="flex gap-2">
             <IconSVG iconName="table" scale="1.25" size="2rem" />
             <div @click="$emit('boardClick', board.id)" class="font-semibold underline hover:text-primary underline-offset-4 cursor-pointer text-xl">{{ board.name }}</div>
           </div>
-          <CopyButton :text="boardUrl" />
+          <div class="flex gap-2 items-center">
+            <CopyButton :text="boardUrl" label="Copy Link" />
+          </div>
         </div>
         <BaseMenu side="left" mode="icon">
           <template #icon>

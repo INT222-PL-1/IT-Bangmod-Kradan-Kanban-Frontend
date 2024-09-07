@@ -63,7 +63,7 @@ const handleClearFilterButtonClick = () => {
     </div>
 
     <div tabindex="0"
-      class="dropdown-content menu mt-1 shadow bg-base-200 rounded-box w-[19rem] gap-1 h-fit border border-base-300 z-10">
+      class="dropdown-content menu mt-1 shadow bg-base-300 rounded-box w-[19rem] gap-1 h-fit border border-base-100 z-10">
       <div class="flex items-center gap-2">
         <IconSVG iconName="search" size="2rem" />
         <input v-model="searchTerm" type="text" placeholder="Search status name"
@@ -75,7 +75,7 @@ const handleClearFilterButtonClick = () => {
         class="grid grid-flow-row grid-cols-2 content-start gap-2 h-[4.5rem] sm:h-28 overflow-y-auto overflow-x-hidden custom-scroll">
         <button v-for="status in filteredStatusList" :key="status.id" @click="handleStatusClick(status.name)"
           :class="{ 'opacity-25': !boardStore.options.filterStatuses.includes(status.name) }"
-          class="active:scale-90 transition p-0 bg-base-100 hover:contrast-75 w-fit rounded-lg">
+          class="active:scale-90 transition p-0 hover:contrast-75 w-fit rounded-lg">
           <StatusBadge class="itbkk-status-choice cursor-pointer" :statusData="status" textWrapMode="truncate"
             showCount />
         </button>

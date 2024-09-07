@@ -87,13 +87,13 @@ watch(() => boardStore.currentBoard, (newBoard) => {
 <template>
   <Transition>
     <BaseModal @clickBG="$emit('clickClose')" :show="show" :mobileCenter="true">
-      <div class="absolute bg-base-100 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Board Settings</div>
+      <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Board Settings</div>
         <div class="flex flex-col gap-2 p-4 break-words">
           <div class="flex flex-col gap-2">
             <div class="flex-col">
               <div class="font-semibold text-lg underline">Limited Status</div>
-              <div class="text-secondary text-sm">
+              <div class="text-sm">
                 Users can limit the number of task in a status by setting the Maximum
                 tasks in each status (except "No Status" and "Done" statuses).
               </div>
@@ -110,7 +110,7 @@ watch(() => boardStore.currentBoard, (newBoard) => {
             </div>
           </div>
         </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
             <button @click="handleSaveSettingsStatus" class="btn btn-sm btn-success"
               :class="{ 'itbkk-button-confirm': confirmLimitOpenState === false }" :disabled="disabledSaveSettingsBtn">
@@ -125,8 +125,8 @@ watch(() => boardStore.currentBoard, (newBoard) => {
       </div>
       <Transition>
         <BaseModal :show="confirmLimitOpenState" @clickBG="handleCancelConfirmLimit" :mobileCenter="true">
-          <div class="absolute bg-base-100 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-            <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Confirm {{
+          <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+            <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Confirm {{
               newSettings.isLimitTasks ? 'Enable' : 'Disable' }} Limit</div>
             <div v-show="newSettings.isLimitTasks" class="flex flex-col gap-2 p-4 break-words">
               The Kanban board will limit the number of tasks in each status to {{ newSettings.taskLimitPerStatus }}.
@@ -134,7 +134,7 @@ watch(() => boardStore.currentBoard, (newBoard) => {
             <div v-show="!newSettings.isLimitTasks" class="flex flex-col gap-2 p-4 break-words">
               The Kanban board will disable the task limit in each status.
             </div>
-            <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+            <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
               <div class="flex gap-2">
                 <button @click="handleConfirmLimit" class="itbkk-button-confirm btn btn-sm btn-success">
                   Confirm
@@ -149,8 +149,8 @@ watch(() => boardStore.currentBoard, (newBoard) => {
       </Transition>
       <Transition>
         <BaseModal :show="exceedLimitOpenState" @clickBG="handleCloseExceedLimitModal" :mobileCenter="true">
-          <div class="absolute bg-base-100 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-            <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Status Exceed Limit
+          <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+            <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Status Exceed Limit
             </div>
             <div class="flex flex-col gap-2 p-4 break-words">
               <div>
@@ -167,7 +167,7 @@ watch(() => boardStore.currentBoard, (newBoard) => {
                 </div>
               </div>
             </div>
-            <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+            <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
               <div class="flex gap-2">
                 <button @click="handleCloseExceedLimitModal" class="itbkk-button-cancel btn btn-sm btn-neutral">
                   Cancel

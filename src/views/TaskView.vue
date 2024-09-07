@@ -91,13 +91,13 @@ defineExpose({
 
   <Transition>
     <BaseModal @clickBG="taskDeleteModalOpenState = false" :show="taskDeleteModalOpenState" :mobileCenter="true">
-      <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Delete Task</div>
+      <div class="bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Delete Task</div>
         <div class="itbkk-message p-4 break-words">
           Do you want to delete the task number {{ taskDeleteModalData.id }} -
           "<span class="opacity-75 italic">{{ taskDeleteModalData.title }}</span>"?
         </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-100">
           <div class="flex gap-2">
             <button @click="taskDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
               Cancel
@@ -121,7 +121,7 @@ defineExpose({
   <div class="max-w-full pt-10 pb-20">
     <div class="bg-base-300 rounded-lg shadow-md">
       <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-3 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
-        <div class="flex justify-between">
+        <div class="flex justify-between py-2">
           <StatusFilterBar />
           <div class="flex gap-2">
             <BaseMenu side="left" class="sm:hidden">
@@ -161,7 +161,7 @@ defineExpose({
       </div>
       <div class="table-overflow-x-scroll p-4">
         <table class="table table-zebra">
-          <thead class="">
+          <thead>
             <tr class="select-none">
               <th class="min-w-16 max-w-16"></th>
               <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">
@@ -189,13 +189,13 @@ defineExpose({
           </thead>
           <tbody>
             <tr v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
-              <td colspan="4" class="text-center">Loading tasks...</td>
+              <td colspan="4" class="text-center h-32">Loading tasks...</td>
             </tr>
             <tr v-else-if="boardStore.tasks === null">
-              <td colspan="4" class="text-center">Error while loading tasks from server. Please try again later.</td>
+              <td colspan="4" class="text-center h-32">Error while loading tasks from server. Please try again later.</td>
             </tr>
             <tr v-else-if="boardStore.tasks.length === 0">
-              <td colspan="4" class="text-center">No task</td>
+              <td colspan="4" class="text-center h-32">No task</td>
             </tr>
             <tr v-else v-for="(task, index) in boardStore.tasks" :key="task.id" class="itbkk-item">
               <td class="min-w-16 max-w-16">
@@ -241,7 +241,7 @@ defineExpose({
             </tr>
           </tbody>
         </table>
-        <div class="h-20"></div>
+        <div class="h-16"></div>
       </div>
     </div>
   </div>
