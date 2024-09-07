@@ -8,12 +8,13 @@ import ResponsiveLogo from '@/components/ResponsiveLogo.vue'
 import { useBoardStore } from '@/stores/board'
 
 const boardStore = useBoardStore()
+
 </script>
 
 <template>
   <BackToTopButton />
   <header class="sticky top-0 z-30">
-    <div class="flex justify-between items-center bg-base-200 px-6 h-[5rem]">
+    <div class="flex justify-between items-center bg-base-300 px-6 h-[5rem]">
       <div class="breadcrumbs">
         <ul>
           <li>
@@ -25,13 +26,13 @@ const boardStore = useBoardStore()
         </ul>
       </div>
       <div class="flex gap-2">
-        <UserMenuButton />
         <ThemeSwitch />
+        <UserMenuButton />
       </div>
     </div>
   </header>
   <nav
-    class="sticky top-[5rem] z-20 px-4 h-[3rem] flex justify-between items-center box-border border-b-2 border-base-300 bg-base-200 shadow-md">
+    class="sticky top-[5rem] z-20 px-4 h-[3rem] flex justify-between items-center bg-base-300 shadow-md">
     <div class="flex gap-4">
       <div class="flex">
         <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100 "
@@ -55,7 +56,7 @@ const boardStore = useBoardStore()
   <section class="flex flex-col sm:items-center max-w-full min-h-[calc(100vh-8rem)] h-auto">
     <RouterView />
   </section>
-  <footer class="footer footer-center p-4 bg-base-200 text-base-content">
+  <footer class="footer footer-center p-4 bg-base-300 text-base-content">
     <aside>
       <p>Copyright © 2024 - All right reserved by Dawnbreakers Team</p>
     </aside>

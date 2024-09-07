@@ -52,12 +52,12 @@ const handleSetTheme = (theme) => {
       <div class="grid place-items-center w-8 h-8">
         <Transition>
           <div v-show="(!isSystemDark && themeSetting === 'system') || themeSetting === 'light'" class="absolute">
-            <IconSVG iconName="sun-fill" :scale="1.5" size="2rem" />
+            <IconSVG iconName="sun-fill" :scale="1.25" size="2rem" />
           </div>
         </Transition>
         <Transition>
           <div v-show="(isSystemDark && themeSetting === 'system') || themeSetting === 'dark'" class="absolute">
-            <IconSVG iconName="moon-fill" :scale="1.5" size="2rem" />
+            <IconSVG iconName="moon-fill" :scale="1.25" size="2rem" />
           </div>
         </Transition>
       </div>
