@@ -23,8 +23,8 @@ const props = defineProps({
 
 const isCopied = ref(false)
 
-const handleCopyBoard = () => {
-  navigator.clipboard.writeText(props.text)
+const handleCopyBoard = async () => {
+  await navigator.clipboard.writeText(props.text)
   isCopied.value = true
   setTimeout(() => {
     isCopied.value = false
