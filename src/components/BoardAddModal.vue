@@ -73,7 +73,7 @@ const handleClickCancel = () => {
       <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
         <div class="flex gap-2">
           <button @click="handleClickConfirm" :class="{ disabled: disabledSaveButton }" class="itbkk-button-ok btn btn-sm btn-success" :disabled="disabledSaveButton">
-            Save
+            Create
           </button>
           <button @click="handleClickCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
             Cancel

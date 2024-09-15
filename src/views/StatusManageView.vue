@@ -104,12 +104,12 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
 <template>
   <Transition>
     <BaseModal @clickBG="statusDeleteModalOpenState = false" :show="statusDeleteModalOpenState" :mobileCenter="true">
-      <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Delete a Status</div>
+      <div class="bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Delete a Status</div>
         <div class="itbkk-message p-4 break-words">
           Do you want to delete the <span class="opacity-75 italic">{{ statusModalData.name }}</span> status?
         </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
             <button @click="statusDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
               Cancel

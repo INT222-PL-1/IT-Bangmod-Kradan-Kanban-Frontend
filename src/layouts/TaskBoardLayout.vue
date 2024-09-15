@@ -20,8 +20,8 @@ const boardStore = useBoardStore()
           <li>
             <ResponsiveLogo type="compact" />
           </li>
-          <li>
-            <div class="text-2xl font-bold">{{ boardStore.currentBoard?.name }}</div>
+          <li class="max-w-[60%] sm:max-w-[30%] md:max-w-[50%]">
+            <div class="text-2xl font-bold truncate" :title="boardStore.currentBoard?.name">{{ boardStore.currentBoard?.name }}</div>
           </li>
         </ul>
       </div>

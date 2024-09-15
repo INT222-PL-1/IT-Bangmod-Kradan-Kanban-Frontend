@@ -97,7 +97,7 @@ defineExpose({
           Do you want to delete the task number {{ taskDeleteModalData.id }} -
           "<span class="opacity-75 italic">{{ taskDeleteModalData.title }}</span>"?
         </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-100">
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
             <button @click="taskDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
               Cancel
