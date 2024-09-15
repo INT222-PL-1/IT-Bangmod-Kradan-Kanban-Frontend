@@ -92,3 +92,7 @@ export function superArraySorter(array, sortBy, sortDirection) {
 export function parseJwtPayload(token) {
   return JSON.parse(atob(token.split('.')[1]));
 }
+
+export function errorArrayToString(errors) {
+  return errors.map((error) => error.field + ' ' + error.message).join('\n')
+}

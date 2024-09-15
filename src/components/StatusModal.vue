@@ -6,7 +6,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import ColorPalette from './ColorPalette.vue'
 import StatusBadge from './StatusBadge.vue';
-import { colorValidator } from '@/libs/utils';
+import { colorValidator, errorArrayToString } from '@/libs/utils';
 import IconSVG from './IconSVG.vue';
 import { useBoardStore } from '@/stores/board';
 
@@ -77,9 +77,14 @@ const handleClickConfirm = async () => {
   if (statusModalMode.value === 'add') {
     const responseObj = await createStatus(statusModalData.value, boardId)
     if (responseObj.status === 'error') {
+      // toastStore.createToast({
+      //   title: 'Error',
+      //   description: `An error has occurred.\n${responseObj.message}`,
+      //   status: 'error'
+      // })
       toastStore.createToast({
-        title: 'Error',
-        description: `An error has occurred.\n${responseObj.message}`,
+        title: `Error while creating status`,
+        description: `An error has occurred.\nStatus ${errorArrayToString(responseObj.data.errors)}`,
         status: 'error'
       })
     } else {
@@ -96,8 +101,8 @@ const handleClickConfirm = async () => {
     const responseObj = await updateStatus(statusModalData.value, boardId)
     if (responseObj.status === 'error') {
       toastStore.createToast({
-        title: 'Error',
-        description: `An error has occurred.\n${responseObj.message}`,
+        title: 'Error while updating status',
+        description: `An error has occurred.\nStatus ${errorArrayToString(responseObj.data.errors)}`,
         status: 'error'
       })
     } else {
