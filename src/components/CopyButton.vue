@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import IconSVG from './IconSVG.vue';
+import { copyToClipboard } from '@/libs/utils';
 
 const props = defineProps({
   text: {
@@ -24,7 +25,7 @@ const props = defineProps({
 const isCopied = ref(false)
 
 const handleCopyBoard = async () => {
-  await navigator.clipboard.writeText(props.text)
+  await copyToClipboard(props.text)
   isCopied.value = true
   setTimeout(() => {
     isCopied.value = false
