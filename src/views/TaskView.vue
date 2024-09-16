@@ -124,7 +124,7 @@ defineExpose({
         <div class="flex justify-between py-2">
           <StatusFilterBar />
           <div class="flex gap-2">
-            <BaseMenu side="left" class="sm:hidden">
+            <BaseMenu side="left" class="md:hidden">
               <template #icon>
                 <IconSVG iconName="three-dots" scale="1.25" />
               </template>
@@ -144,16 +144,16 @@ defineExpose({
                 </button>
               </template>
             </BaseMenu>
-            <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden sm:flex">
+            <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden md:flex">
               <IconSVG iconName="gear" :scale="1.25" />Board Settings
             </button>
-            <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
+            <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden md:flex">
               <div :class="{ 'animate-spin': boardStore.isLoading.task }">
                 <IconSVG iconName="arrow-clockwise" :scale="1.25" />
               </div>Refresh Tasks
             </button>
             <button @click="handleAddBtnClick" type="button"
-              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
+              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
               <IconSVG iconName="plus" :scale="1.25" />Add Task
             </button>
           </div>

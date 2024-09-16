@@ -21,10 +21,10 @@ const boardUrl = window.location.href + `/${props.board.id}`
     <div class="flex w-full">
       <div class="h-full w-2 transition-[width] bg-primary rounded-l-[0.25rem]" />
       <div class="flex justify-between w-full px-6 py-4">
-        <div class="flex flex-col justify-between max-w-[70%]">
+        <div class="flex flex-col justify-between">
           <div class="flex gap-2">
             <IconSVG iconName="table" scale="1.25" size="2rem" />
-            <div @click="$emit('boardClick', board.id)" class="font-semibold underline hover:text-primary underline-offset-4 cursor-pointer text-xl truncate" :title="board.name">{{ board.name }}</div>
+            <div @click="$emit('boardClick', board.id)" class="font-semibold underline hover:text-primary underline-offset-4 cursor-pointer text-xl truncate max-w-[25rem]" :title="board.name">{{ board.name }}</div>
           </div>
           <div class="flex gap-2 items-center">
             <CopyButton :text="boardUrl" label="Copy Link" />

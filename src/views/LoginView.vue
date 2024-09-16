@@ -53,67 +53,42 @@ const handleLoginSubmit = async () => {
     <div class="fixed top-4 right-4 z-40">
         <ThemeSwitch />
     </div>
-    <main class="fixed h-screen w-screen overflow-hidden">
-        <div :class="{ '-translate-x-[100vw]': isLoggingIn }"
-            class="w-[200vw] h-screen flex transition-transform duration-1000">
-            <div class="w-screen h-screen grid place-items-center">
-                <div
-                    class="flex flex-col w-screen h-screen md:w-auto md:h-auto bg-base-200 rounded-xl px-14 py-14 animate-slide-in">
-                    <IconSVG iconName="itbkk-logo" :scale="4" size="4rem" />
-                    <span class="text-[2rem] mt-[1rem] mb-[0.5rem]">Login</span>
-                    <span class="opacity-80">Welcome to IT-Bangmod Kradan Kanban.</span>
-                    <span class="opacity-80">A productive and easy-to-manage task board.</span>
-                    <form @submit.prevent="handleLoginSubmit" class="flex flex-col mt-[0.5rem]">
-                        <span v-if="isLoginFailed" class="text-error">Invalid username or password.</span>
-                        <input v-model="username" type="text" placeholder="Username" :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
-                            class="itbkk-username input input-bordered border-2 bg-base-100 my-[1rem]" />
-                        <div>
-                            <input v-model="password" :type="isPasswordShow ? 'text' : 'password'"
-                                placeholder="Password" :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
-                                class="itbkk-password input input-bordered border-2 w-full bg-base-100" />
-                            <button type="button" @click="handleTogglePasswordShow"
-                                class="absolute -translate-x-full opacity-75">
-                                <div v-show="!isPasswordShow">
-                                    <IconSVG iconName="eye" size="3rem" :scale="1.5" />
-                                </div>
-                                <div v-show="isPasswordShow">
-                                    <IconSVG iconName="eye-slash" size="3rem" :scale="1.5" />
-                                </div>
-                            </button>
+    <main class="w-screen h-screen grid place-items-center">
+        <div
+            class="flex flex-col w-screen h-screen md:w-auto md:h-auto bg-base-200 rounded-xl px-14 py-14 animate-slide-in">
+            <IconSVG iconName="itbkk-logo" :scale="4" size="4rem" />
+            <span class="text-[2rem] mt-[1rem] mb-[0.5rem]">Login</span>
+            <span class="opacity-80">Welcome to IT-Bangmod Kradan Kanban.</span>
+            <span class="opacity-80">A productive and easy-to-manage task board.</span>
+            <form @submit.prevent="handleLoginSubmit" class="flex flex-col mt-[0.5rem]">
+                <span v-if="isLoginFailed" class="text-error">Invalid username or password.</span>
+                <input v-model="username" type="text" placeholder="Username" :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
+                    class="itbkk-username input input-bordered border-2 bg-base-100 my-[1rem]"
+                    :disabled="isLoggingIn"
+                    />
+                <div>
+                    <input v-model="password" :type="isPasswordShow ? 'text' : 'password'"
+                        placeholder="Password" :class="{ 'animate-shake-x-in border-error': isLoginFailed }"
+                        class="itbkk-password input input-bordered border-2 w-full bg-base-100"
+                        :disabled="isLoggingIn"
+                        />
+                    <button type="button" @click="handleTogglePasswordShow"
+                        class="absolute -translate-x-full opacity-75">
+                        <div v-show="!isPasswordShow">
+                            <IconSVG iconName="eye" size="3rem" :scale="1.5" />
                         </div>
-                        <button type="submit" :disabled="username.length === 0 || password.length === 0"
-                            :class="{ 'disabled': username.length === 0 || password.length === 0 }"
-                            class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
-                    </form>
+                        <div v-show="isPasswordShow">
+                            <IconSVG iconName="eye-slash" size="3rem" :scale="1.5" />
+                        </div>
+                    </button>
                 </div>
-            </div>
-            <div class="w-screen h-screen grid place-items-center">
-                <div :class="{ 'opacity-100': isLoggingIn }"
-                    class="opacity-0 transition-opacity delay-1000 duration-1000">
-                    <div class="text-4xl font-semibold">We are logging you in</div>
-                </div>
-                <div :class="{ 'opacity-100': isLoggingIn }"
-                    class="loading loading-lg loading-spinner transition opacity-0 delay-[2s] absolute translate-y-[200%]">
-                </div>
-            </div>
+                <button type="submit" :disabled="username.length === 0 || password.length === 0"
+                    :class="{ 'disabled': username.length === 0 || password.length === 0 }"
+                    class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
+            </form>
         </div>
-    </main>
+    </main> 
 </template>
 
 <style scoped>
-@media (width >=768px) {
-    .animate-slide-in {
-        animation: slide-in 1s ease;
-    }
-}
-
-@keyframes slide-in {
-    0% {
-        transform: translateX(100vw) scale(0.5);
-    }
-
-    100% {
-        transform: translateX(0vw) scale(1);
-    }
-}
 </style>

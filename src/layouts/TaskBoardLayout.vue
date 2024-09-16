@@ -15,15 +15,12 @@ const boardStore = useBoardStore()
   <BackToTopButton />
   <header class="sticky top-0 z-30">
     <div class="flex justify-between items-center bg-base-300 px-6 h-[5rem]">
-      <div class="breadcrumbs">
-        <ul>
-          <li>
-            <ResponsiveLogo type="compact" />
-          </li>
-          <li class="max-w-[60%] sm:max-w-[30%] md:max-w-[50%]">
-            <div class="text-2xl font-bold truncate" :title="boardStore.currentBoard?.name">{{ boardStore.currentBoard?.name }}</div>
-          </li>
-        </ul>
+      <div class="flex items-center gap-2">
+        <ResponsiveLogo type="compact" />
+        <div class="text-secondary">
+          <IconSVG iconName="chevron-right" :scale="1" />
+        </div>
+        <div class="text-xl truncate max-w-[45vw]" :title="boardStore.currentBoard?.name">{{ boardStore.currentBoard?.name }}</div>
       </div>
       <div class="flex gap-2">
         <ThemeSwitch />

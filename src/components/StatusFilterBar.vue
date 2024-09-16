@@ -43,7 +43,7 @@ const handleClearFilterButtonClick = () => {
         </button>
       </div>
       <div tabindex="0" role="button"
-        class="flex gap-1 items-center py-1 px-2 w-36 sm:w-72 md:w-96 h-full cursor-pointer border-x-2 border-base-100 bg-base-200">
+        class="flex gap-1 items-center py-1 px-2 w-36 sm:w-64 lg:w-96 h-full cursor-pointer border-x-2 border-base-100 bg-base-200">
         <div v-show="boardStore.options.filterStatuses.length === 0" class="text-sm font-semibold opacity-50">
           Filter By Status(es)
         </div>
