@@ -46,7 +46,7 @@ const handleClickCancel = () => {
 <template>
   <BaseModal
     :show="true" @clickBG="handleClickCancel" :mobileCenter="true">
-    <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+    <div class="itbkk-modal-new absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
       <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">New Board
       </div>
       <div class="flex flex-col gap-2 p-4 break-words">

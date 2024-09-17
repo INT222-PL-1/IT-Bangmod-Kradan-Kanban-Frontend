@@ -104,4 +104,4 @@ export async function copyToClipboard(text) {
   } catch (err) {
     console.error('Failed to copy!', err);
   }
-};
+}

@@ -38,7 +38,7 @@ const boardStore = useBoardStore()
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
         <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100"
-          class="itbkk-manage-status btn btn-ghost btn-sm">
+          class="btn btn-ghost btn-sm">
           <IconSVG iconName="kanban" :scale="1.25" />Task Board
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
