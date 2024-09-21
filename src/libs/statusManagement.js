@@ -70,8 +70,6 @@ export async function updateStatus({
   name,
   description,
   color,
-  is_limited_status,
-  maximum_limit
 }, boardId) {
   const url = `${BASE_URL}/${boardId}/statuses/${statusId}`
 
@@ -82,8 +80,6 @@ export async function updateStatus({
         name,
         description: description === '' ? null : description,
         color: color === '' ? '#999999' : color,
-        is_limited_status,
-        maximum_limit
       }
     })
     return res

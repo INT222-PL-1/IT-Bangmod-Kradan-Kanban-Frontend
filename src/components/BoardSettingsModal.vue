@@ -18,11 +18,11 @@ defineProps({
 const boardStore = useBoardStore()
 const toastStore = useToastStore()
 const newSettings = ref({
-  isLimitTasks: false,
+  isTaskLimitEnabled: false,
   taskLimitPerStatus: 10
 })
 const disabledSaveSettingsBtn = computed(() => {
-  return newSettings.value.isLimitTasks === boardStore.currentBoard.isLimitTasks &&
+  return newSettings.value.isTaskLimitEnabled === boardStore.currentBoard.isTaskLimitEnabled &&
     newSettings.value.taskLimitPerStatus === boardStore.currentBoard.taskLimitPerStatus
 })
 const confirmLimitOpenState = ref(false)
@@ -48,7 +48,7 @@ const handleSaveSettingsStatus = async ({ message }) => {
 
   const patchedBoard = responseObj.data
 
-  if (patchedBoard.isLimitTasks && patchedBoard.exceedLimitStatus.length > 0) {
+  if (patchedBoard.isTaskLimitEnabled && patchedBoard.exceedLimitStatus.length > 0) {
     exceedLimitStatus.value.push(...patchedBoard.exceedLimitStatus)
     exceedLimitOpenState.value = true
   }
@@ -56,13 +56,13 @@ const handleSaveSettingsStatus = async ({ message }) => {
 
 const handleConfirmLimit = async () => {
   await handleSaveSettingsStatus({
-    message: newSettings.value.isLimitTasks ? `The Kanban board now limits ${newSettings.value.taskLimitPerStatus} tasks in each status.` : 'The Kanban board has disabled the task limit in each status.'
+    message: newSettings.value.isTaskLimitEnabled ? `The Kanban board now limits ${newSettings.value.taskLimitPerStatus} tasks in each status.` : 'The Kanban board has disabled the task limit in each status.'
   })
   confirmLimitOpenState.value = false
 }
 
 const handleCancelConfirmLimit = () => {
-  newSettings.value.isLimitTasks = boardStore.currentBoard.isLimitTasks
+  newSettings.value.isTaskLimitEnabled = boardStore.currentBoard.isTaskLimitEnabled
   confirmLimitOpenState.value = false
   emits('clickClose')
 }
@@ -72,8 +72,8 @@ const handleCloseExceedLimitModal = () => {
   exceedLimitOpenState.value = false
 }
 
-watch(() => newSettings.value?.isLimitTasks, (newVal) => {
-  if (newVal !== boardStore.currentBoard?.isLimitTasks) {
+watch(() => newSettings.value?.isTaskLimitEnabled, (newVal) => {
+  if (newVal !== boardStore.currentBoard?.isTaskLimitEnabled) {
     confirmLimitOpenState.value = true
   }
 })
@@ -100,13 +100,13 @@ watch(() => boardStore.currentBoard, (newBoard) => {
             </div>
             <div class="flex items-center justify-between">
               <div>Limit the number of tasks in this status</div>
-              <input v-model="newSettings.isLimitTasks" class="itbkk-limit-task toggle" type="checkbox">
+              <input v-model="newSettings.isTaskLimitEnabled" class="itbkk-limit-task toggle" type="checkbox">
             </div>
-            <div :class="{ 'opacity-50 cursor-not-allowed': newSettings.isLimitTasks === false }"
+            <div :class="{ 'opacity-50 cursor-not-allowed': newSettings.isTaskLimitEnabled === false }"
               class="flex items-center justify-between">
               <div>Set number of tasks limit</div>
               <input v-model="newSettings.taskLimitPerStatus" class="input input-bordered input-sm w-16" type="number"
-                min="0" max="9999" :disabled="newSettings.isLimitTasks === false" />
+                min="0" max="9999" :disabled="newSettings.isTaskLimitEnabled === false" />
             </div>
           </div>
         </div>
@@ -127,11 +127,11 @@ watch(() => boardStore.currentBoard, (newBoard) => {
         <BaseModal :show="confirmLimitOpenState" @clickBG="handleCancelConfirmLimit" :mobileCenter="true">
           <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
             <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Confirm {{
-              newSettings.isLimitTasks ? 'Enable' : 'Disable' }} Limit</div>
-            <div v-show="newSettings.isLimitTasks" class="flex flex-col gap-2 p-4 break-words">
+              newSettings.isTaskLimitEnabled ? 'Enable' : 'Disable' }} Limit</div>
+            <div v-show="newSettings.isTaskLimitEnabled" class="flex flex-col gap-2 p-4 break-words">
               The Kanban board will limit the number of tasks in each status to {{ newSettings.taskLimitPerStatus }}.
             </div>
-            <div v-show="!newSettings.isLimitTasks" class="flex flex-col gap-2 p-4 break-words">
+            <div v-show="!newSettings.isTaskLimitEnabled" class="flex flex-col gap-2 p-4 break-words">
               The Kanban board will disable the task limit in each status.
             </div>
             <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">

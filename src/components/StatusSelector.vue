@@ -60,7 +60,7 @@ const filteredStatusList = computed(() => {
           <button v-for="status in filteredStatusList" :key="status.id"
             class="active:scale-90 transition p-0 hover:contrast-75 w-fit rounded-lg">
             <StatusBadge class="cursor-pointer" @click="model = status.id" :statusData="status" textWrapMode="truncate"
-              showCount :showLimit="boardStore.currentBoard?.isLimitTasks" />
+              showCount :showLimit="boardStore.currentBoard?.isTaskLimitEnabled" />
           </button>
         </div>
       </div>

@@ -61,6 +61,7 @@ export const useBoardStore = defineStore('board', () => {
       await loadTasks(boardId)
       await loadStatuses(boardId)
     } else if (res.status === 'error' && res.statusCode === 404) {
+      await loadStatuses(boardId)
       router.push({ name: 'not-found' })
     } else {
       toastStore.createToast({

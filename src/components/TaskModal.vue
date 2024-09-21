@@ -209,8 +209,8 @@ const handleClickConfirm = async () => {
                 <span class="text-lg font-semibold">
                   <span>Status </span>
                   <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm"
-                    :class="boardStore.currentBoard.isLimitTasks ? 'text-warning' : 'opacity-50'">
-                    (Status limit {{ boardStore.currentBoard.isLimitTasks ? 'enabled' : 'disabled' }})
+                    :class="boardStore.currentBoard?.isTaskLimitEnabled ? 'text-warning' : 'opacity-50'">
+                    (Status limit {{ boardStore.currentBoard?.isTaskLimitEnabled ? 'enabled' : 'disabled' }})
                   </span>
                 </span>
               </div>

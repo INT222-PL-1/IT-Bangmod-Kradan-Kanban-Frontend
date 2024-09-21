@@ -20,7 +20,7 @@ const props = defineProps({
 const boardStore = useBoardStore()
 
 const count = computed(() => {
-  return props.showCount ? ` (${props.statusData.count}${props.showLimit && boardStore.currentBoard.isLimitTasks && !props.statusData.is_fixed_status ? `/${boardStore.currentBoard.taskLimitPerStatus}` : ''})` : ''
+  return props.showCount ? ` (${props.statusData.count}${props.showLimit && boardStore.currentBoard.isTaskLimitEnabled && !props.statusData.isPredefined ? `/${boardStore.currentBoard.taskLimitPerStatus}` : ''})` : ''
 })
 
 </script>

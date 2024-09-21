@@ -236,20 +236,20 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
               <td class="min-w-16 max-w-16 p-0">
                 <div class="grid place-items-center">
                   <div
-                    :class="{ 'text-error': status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isLimitTasks && !status.is_fixed_status }"
+                    :class="{ 'text-error': status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isTaskLimitEnabled && !status.isPredefined }"
                     class="flex items-center gap-1">
                     <IconSVG
-                      v-show="status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isLimitTasks && !status.is_fixed_status"
+                      v-show="status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isTaskLimitEnabled && !status.isPredefined"
                       iconName="exclamation-diamond"
                       title="Task limit exceeded! Please transfer some tasks to other statuses or increase the limit." />
-                    {{ status.count }}{{ boardStore.currentBoard?.isLimitTasks && !status.is_fixed_status ? '/' +
+                    {{ status.count }}{{ boardStore.currentBoard?.isTaskLimitEnabled && !status.isPredefined ? '/' +
                       boardStore.currentBoard?.taskLimitPerStatus : ''
                     }}
                   </div>
                 </div>
               </td>
               <td class="min-w-44 max-w-44">
-                <div v-if="status.is_fixed_status === false" class="flex justify-center items-center gap-1 w-full">
+                <div v-if="status.isPredefined === false" class="flex justify-center items-center gap-1 w-full">
                   <ButtonWithIcon @click="handleEditBtnClick(status.id)"
                     className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap" iconName="pencil-square">
                     Edit

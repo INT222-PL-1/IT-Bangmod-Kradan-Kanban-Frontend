@@ -65,6 +65,10 @@ const router = createRouter({
           ]
         },
         {
+          path: 'status',
+          redirect: { name: 'status-manage' }
+        },
+        {
           path: 'status/manage',
           name: 'status-manage',
           component: () => import('@/views/StatusManageView.vue'),
@@ -97,15 +101,19 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore()
   if (['login', 'not-found'].includes(to.name)) next()
   else if (localStorage.getItem('itbkk-token')) {
+    if (userStore.user) {
+      next()
+      return
+    }
     try {
       const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/validate-token`)
       if (res.status !== 'success') {
         localStorage.removeItem('itbkk-token')
         throw new Error('Invalid token')
       }
-      const userStore = useUserStore()
       userStore.loadUserData()
       next()
     } catch (error) {
