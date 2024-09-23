@@ -1,9 +1,9 @@
 <script setup>
-import { useStatusStore } from '@/stores/status';
-import StatusBadge from './StatusBadge.vue';
+import StatusBadge from './StatusBadge.vue'
 import { computed, onMounted, ref } from 'vue'
 import IconSVG from './IconSVG.vue'
-import { useBoardStore } from '@/stores/board';
+import { useBoardStore } from '@/stores/board'
+import { useRoute } from 'vue-router'
 
 const props = defineProps({
   excludeStatusId: {
@@ -12,17 +12,17 @@ const props = defineProps({
   },
 })
 
+const route = useRoute()
 const model = defineModel()
 const searchTerm = ref('')
-const statusStore = useStatusStore()
 const boardStore = useBoardStore()
 
 onMounted(async () => {
-  await statusStore.loadStatuses()
+  await boardStore.loadStatuses(route.params.boardId)
 })
 
 const statusList = computed(() => {
-  const copiedStatuses = [...statusStore.statuses]
+  const copiedStatuses = [...boardStore.statuses]
   if (props.excludeStatusId !== -1) {
     copiedStatuses.splice(copiedStatuses.findIndex(status => status.id === props.excludeStatusId), 1)
   }
@@ -47,7 +47,7 @@ const filteredStatusList = computed(() => {
         </div>
       </div>
       <div tabindex="0"
-        class="dropdown-content menu mt-1 shadow bg-base-200 rounded-box w-[19rem] gap-1 h-fit border border-base-300">
+        class="dropdown-content menu mt-1 shadow bg-base-300 rounded-box w-[19rem] gap-1 h-fit border border-base-100">
         <div class="flex items-center gap-2">
           <IconSVG iconName="search" size="2rem" />
           <input v-model="searchTerm" type="text" placeholder="Search status name"
@@ -58,9 +58,9 @@ const filteredStatusList = computed(() => {
         <div v-show="filteredStatusList.length > 0"
           class="grid grid-flow-row grid-cols-2 content-start gap-2 h-[4.5rem] sm:h-28 overflow-y-auto overflow-x-hidden custom-scroll">
           <button v-for="status in filteredStatusList" :key="status.id"
-            class="active:scale-90 transition p-0 hover:contrast-75 w-fit rounded-lg bg-base-100">
+            class="active:scale-90 transition p-0 hover:contrast-75 w-fit rounded-lg">
             <StatusBadge class="cursor-pointer" @click="model = status.id" :statusData="status" textWrapMode="truncate"
-              showCount :showLimit="boardStore.board.isLimitTasks" />
+              showCount :showLimit="boardStore.currentBoard?.isTaskLimitEnabled" />
           </button>
         </div>
       </div>

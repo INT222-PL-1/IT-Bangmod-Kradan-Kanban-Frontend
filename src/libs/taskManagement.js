@@ -1,9 +1,17 @@
 import zyos from 'zyos'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
+const VERSION = 'v3'
+const BASE_URL = `${SERVER_URL}/${VERSION}/boards`
 
-export async function getTasks(options = {}) {
-  const url = `${SERVER_URL}/v2/tasks`
+/**
+ * Get all tasks in a board
+ * @param {object} options - query parameters
+ * @param {string} boardId - board id
+ * @returns 
+ */
+export async function getTasks(options, boardId) {
+  const url = `${BASE_URL}/${boardId}/tasks`
   const params = new URLSearchParams()
 
   for (const [key, value] of Object.entries(options)) {
@@ -12,7 +20,7 @@ export async function getTasks(options = {}) {
   }
 
   try {
-    const res = await zyos.fetch(`${url}?${params}`, { useToken: true })
+    const res = await zyos.fetch(`${url}?${params}`)
     return res
   } catch (error) {
     console.error(error)
@@ -20,8 +28,8 @@ export async function getTasks(options = {}) {
   }
 }
 
-export async function getTaskById(taskId) {
-  const url = `${SERVER_URL}/v2/tasks/${taskId}`
+export async function getTaskById(taskId, boardId) {
+  const url = `${BASE_URL}/${boardId}/tasks/${taskId}`
 
   try {
     const res = await zyos.fetch(url, {
@@ -30,8 +38,7 @@ export async function getTaskById(taskId) {
           if (data[key] === null) data[key] = ''
         }
         return data
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -41,7 +48,7 @@ export async function getTaskById(taskId) {
 }
 
 export async function createTask({ title, description, assignees, status, boardId }) {
-  const url = `${SERVER_URL}/v2/tasks`
+  const url = `${BASE_URL}/${boardId}/tasks`
 
   try {
     const res = await zyos.fetch(url, {
@@ -52,8 +59,7 @@ export async function createTask({ title, description, assignees, status, boardI
         assignees: assignees === '' ? null : assignees,
         statusId: status.id,
         boardId
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -63,7 +69,7 @@ export async function createTask({ title, description, assignees, status, boardI
 }
 
 export async function updateTask({ id: taskId, title, description, assignees, status, boardId }) {
-  const url = `${SERVER_URL}/v2/tasks/${taskId}`
+  const url = `${BASE_URL}/${boardId}/tasks/${taskId}`
 
   try {
     const res = await zyos.fetch(url, {
@@ -74,8 +80,7 @@ export async function updateTask({ id: taskId, title, description, assignees, st
         assignees: assignees === '' ? null : assignees,
         statusId: status.id,
         boardId
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -84,13 +89,12 @@ export async function updateTask({ id: taskId, title, description, assignees, st
   }
 }
 
-export async function deleteTask(taskId) {
-  const url = `${SERVER_URL}/v2/tasks/${taskId}`
+export async function deleteTask(taskId, boardId) {
+  const url = `${BASE_URL}/${boardId}/tasks/${taskId}`
 
   try {
     const res = await zyos.fetch(url, {
-      method: 'DELETE',
-      useToken: true
+      method: 'DELETE'
     })
     return res
   } catch (error) {

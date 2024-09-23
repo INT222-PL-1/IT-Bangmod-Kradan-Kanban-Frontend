@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import TaskView from '@/views/TaskView.vue'
-import MainLayout from '@/layouts/MainLayout.vue'
+import TaskBoardLayout from '@/layouts/TaskBoardLayout.vue'
 import { useUserStore } from '@/stores/user'
 import zyos from 'zyos'
+import BoardView from '@/views/BoardView.vue'
+import { useBoardStore } from '@/stores/board'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,16 +11,41 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      redirect: { name: 'all-task' }
+      redirect: { name: 'all-board' }
     },
     {
-      path: '/',
-      component: MainLayout,
+      path: '/board',
+      name: 'all-board',
+      component: BoardView,
+      beforeEnter: async (to, from, next) => {
+        const boardStore = useBoardStore()
+        await boardStore.loadAllBoards()
+        if (from.name === 'all-task') {
+          next()
+          return
+        }
+        if (boardStore.boards.length === 1) {
+          next({ name: 'all-task', params: { boardId: boardStore.boards[0].id } })
+        }
+        else next()
+      },
+      children: [
+        {
+          path: 'add',
+          name: 'board-add',
+          component: () => import('@/components/BoardAddModal.vue')
+        }
+      ]
+    },
+    {
+      path: '/board/:boardId',
+      redirect: { name: 'all-task' },
+      component: TaskBoardLayout,
       children: [
         {
           path: 'task',
           name: 'all-task',
-          component: TaskView,
+          component: () => import('@/views/TaskView.vue'),
           children: [
             {
               path: ':taskId',
@@ -39,17 +65,21 @@ const router = createRouter({
           ]
         },
         {
+          path: 'status',
+          redirect: { name: 'status-manage' }
+        },
+        {
           path: 'status/manage',
           name: 'status-manage',
           component: () => import('@/views/StatusManageView.vue'),
           children: [
             {
-              path: '/status/add',
+              path: '/board/:boardId/status/add',
               name: 'status-add',
               component: () => import('@/components/StatusModal.vue')
             },
             {
-              path: '/status/:statusId/edit',
+              path: '/board/:boardId/status/:statusId/edit',
               name: 'status-edit',
               component: () => import('@/components/StatusModal.vue')
             }
@@ -71,15 +101,19 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore()
   if (['login', 'not-found'].includes(to.name)) next()
   else if (localStorage.getItem('itbkk-token')) {
+    if (userStore.user) {
+      next()
+      return
+    }
     try {
-      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/validate-token`, { useToken: true })
+      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/validate-token`)
       if (res.status !== 'success') {
         localStorage.removeItem('itbkk-token')
         throw new Error('Invalid token')
       }
-      const userStore = useUserStore()
       userStore.loadUserData()
       next()
     } catch (error) {

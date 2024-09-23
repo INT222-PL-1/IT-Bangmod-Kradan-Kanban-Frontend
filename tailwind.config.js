@@ -4,7 +4,14 @@ import daisyui from 'daisyui'
 export default {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
-    extend: {}
+    extend: {
+      colors: {
+        'or2-base-100': '#f4f4f4',
+        'or2-base-200': '#ececec',
+        'or2-base-300': '#fafafa',
+        'or2-base-content': '#374151',
+      }
+    }
   },
   daisyui: {
     themes: [
@@ -14,7 +21,9 @@ export default {
           secondary: '#4b5563',
           accent: '#00cdb7',
           neutral: '#fafafa',
-          'base-100': '#ffffff',
+          "base-100": "#ececec",
+          "base-200": "#f4f4f4",
+          'base-300': '#ffffff',
           'base-content': '#374151',
           info: '#00b5ff',
           success: '#00a96e',
@@ -27,8 +36,10 @@ export default {
           primary: '#f04c1c',
           secondary: '#4b5563',
           accent: '#00cdb7',
-          neutral: '#252b33',
-          'base-100': '#1d232a',
+          neutral: '#313842',
+          'base-100': '#181E24',
+          'base-200': '#1D232A',
+          'base-300': '#232A32',
           info: '#00b5ff',
           success: '#00a96e',
           warning: '#ffbe00',

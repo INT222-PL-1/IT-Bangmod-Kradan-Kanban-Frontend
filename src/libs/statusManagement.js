@@ -1,18 +1,19 @@
 import zyos from 'zyos'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
+const VERSION = 'v3'
+const BASE_URL = `${SERVER_URL}/${VERSION}/boards`
 
 /**
- * Get all statuses
- * @param {Object} options
- * @param {Number} options.count
+ * Get all statuses in a board
+ * @param {string} boardId
  * @returns
  */
-export async function getStatuses() {
-  const url = `${SERVER_URL}/v2/statuses`
+export async function getStatuses(boardId) {
+  const url = `${BASE_URL}/${boardId}/statuses`
 
   try {
-    const res = await zyos.fetch(url, { useToken: true })
+    const res = await zyos.fetch(url)
     return res
   } catch (error) {
     console.error(error)
@@ -23,10 +24,11 @@ export async function getStatuses() {
 /**
  * Get status by id
  * @param {Number} statusId
+ * @param {Number} boardId
  * @returns
  */
-export async function getStatusById(statusId) {
-  const url = `${SERVER_URL}/v2/statuses/${statusId}`
+export async function getStatusById(statusId, boardId) {
+  const url = `${BASE_URL}/${boardId}/statuses/${statusId}`
 
   try {
     const res = await zyos.fetch(url, {
@@ -35,8 +37,7 @@ export async function getStatusById(statusId) {
           if (data[key] === null) data[key] = ''
         }
         return data
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -45,8 +46,8 @@ export async function getStatusById(statusId) {
   }
 }
 
-export async function createStatus({ name, description, color }) {
-  const url = `${SERVER_URL}/v2/statuses`
+export async function createStatus({ name, description, color }, boardId) {
+  const url = `${BASE_URL}/${boardId}/statuses`
 
   try {
     const res = await zyos.fetch(url, {
@@ -55,8 +56,7 @@ export async function createStatus({ name, description, color }) {
         name,
         description: description === '' ? null : description,
         color: color === '' ? '#666666' : color
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -70,10 +70,8 @@ export async function updateStatus({
   name,
   description,
   color,
-  is_limited_status,
-  maximum_limit
-}) {
-  const url = `${SERVER_URL}/v2/statuses/${statusId}`
+}, boardId) {
+  const url = `${BASE_URL}/${boardId}/statuses/${statusId}`
 
   try {
     const res = await zyos.fetch(url, {
@@ -82,10 +80,7 @@ export async function updateStatus({
         name,
         description: description === '' ? null : description,
         color: color === '' ? '#999999' : color,
-        is_limited_status,
-        maximum_limit
-      },
-      useToken: true
+      }
     })
     return res
   } catch (error) {
@@ -94,13 +89,12 @@ export async function updateStatus({
   }
 }
 
-export async function deleteStatus(statusId) {
-  const url = `${SERVER_URL}/v2/statuses/${statusId}`
+export async function deleteStatus(statusId, boardId) {
+  const url = `${BASE_URL}/${boardId}/statuses/${statusId}`
 
   try {
     const res = await zyos.fetch(url, {
-      method: 'DELETE',
-      useToken: true
+      method: 'DELETE'
     })
     return res
   } catch (error) {
@@ -109,13 +103,12 @@ export async function deleteStatus(statusId) {
   }
 }
 
-export async function deleteStatusAndTransferTasks(fromStatusId, toStatusId) {
-  const url = `${SERVER_URL}/v2/statuses/${fromStatusId}/${toStatusId}`
+export async function deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId) {
+  const url = `${BASE_URL}/${boardId}/statuses/${fromStatusId}/${toStatusId}`
 
   try {
     const res = await zyos.fetch(url, {
-      method: 'DELETE',
-      useToken: true
+      method: 'DELETE'
     })
     return res
   } catch (error) {

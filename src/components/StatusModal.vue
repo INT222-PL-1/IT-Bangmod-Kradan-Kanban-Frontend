@@ -1,19 +1,19 @@
 <script setup>
 import BaseModal from '@/components/BaseModal.vue'
 import { createStatus, getStatusById, updateStatus } from '@/libs/statusManagement';
-import { useStatusStore } from '@/stores/status';
 import { useToastStore } from '@/stores/toast';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import ColorPalette from './ColorPalette.vue'
 import StatusBadge from './StatusBadge.vue';
-import { colorValidator } from '@/libs/utils';
+import { colorValidator, errorArrayToString } from '@/libs/utils';
 import IconSVG from './IconSVG.vue';
+import { useBoardStore } from '@/stores/board';
 
 const route = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
-const statusStore = useStatusStore()
+const boardStore = useBoardStore()
 
 const statusModalMode = ref('')
 const statusModalData = ref(null)
@@ -33,9 +33,9 @@ const disabledSaveButton = computed(() => {
     )
 })
 
-async function fetchStatusData() {
-  const statusId = route.params.statusId
-  const responseObj = await getStatusById(statusId, { count: true })
+async function loadSelectedStatusData() {
+  const { statusId, boardId } = route.params
+  const responseObj = await getStatusById(statusId, boardId)
   if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
@@ -62,9 +62,9 @@ onMounted(async () => {
     }
     return
   } else if (statusModalMode.value === 'edit') {
-    await fetchStatusData()
+    await loadSelectedStatusData()
   } else {
-    await fetchStatusData()
+    await loadSelectedStatusData()
   }
 })
 
@@ -73,12 +73,18 @@ const handleClickClose = () => {
 }
 
 const handleClickConfirm = async () => {
+  const { boardId } = route.params
   if (statusModalMode.value === 'add') {
-    const responseObj = await createStatus(statusModalData.value)
+    const responseObj = await createStatus(statusModalData.value, boardId)
     if (responseObj.status === 'error') {
+      // toastStore.createToast({
+      //   title: 'Error',
+      //   description: `An error has occurred.\n${responseObj.message}`,
+      //   status: 'error'
+      // })
       toastStore.createToast({
-        title: 'Error',
-        description: `An error has occurred.\n${responseObj.message}`,
+        title: `Error while creating status`,
+        description: `An error has occurred.\nStatus ${errorArrayToString(responseObj.data.errors)}`,
         status: 'error'
       })
     } else {
@@ -89,14 +95,14 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    statusStore.loadStatuses()
+    boardStore.loadStatuses()
     router.push({ name: 'status-manage' })
   } else if (statusModalMode.value === 'edit') {
-    const responseObj = await updateStatus(statusModalData.value)
+    const responseObj = await updateStatus(statusModalData.value, boardId)
     if (responseObj.status === 'error') {
       toastStore.createToast({
-        title: 'Error',
-        description: `An error has occurred.\n${responseObj.message}`,
+        title: 'Error while updating status',
+        description: `An error has occurred.\nStatus ${errorArrayToString(responseObj.data.errors)}`,
         status: 'error'
       })
     } else {
@@ -107,7 +113,7 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
     }
-    statusStore.loadStatuses()
+    boardStore.loadStatuses()
     router.push({ name: 'status-manage' })
   }
 }
@@ -117,8 +123,8 @@ const handleClickConfirm = async () => {
 <template>
   <BaseModal :show="statusModalData !== null" @clickBG="handleClickClose">
     <div
-      class="itbkk-modal-status bg-base-100 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
-      <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">
+      class="itbkk-modal-status bg-base-300 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
+      <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">
         <span v-if="statusModalMode === 'add'">Add Status</span>
         <span v-else-if="statusModalMode === 'edit'">Edit Status</span>
       </div>
@@ -202,7 +208,7 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+      <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
         <div class="flex gap-2">
           <button @click="handleClickConfirm"
             :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"

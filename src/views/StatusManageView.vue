@@ -1,6 +1,5 @@
 <script setup>
-import { RouterView, useRouter } from 'vue-router'
-import { useStatusStore } from '@/stores/status'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import { onMounted, ref } from 'vue'
@@ -12,29 +11,26 @@ import StatusSelector from '@/components/StatusSelector.vue'
 import BaseMenu from '@/components/BaseMenu.vue'
 import { useBoardStore } from '@/stores/board'
 
-const isLoading = ref(false)
+const route = useRoute()
 const router = useRouter()
-const boardStore = useBoardStore()
-const statusStore = useStatusStore()
 const toastStore = useToastStore()
+const boardStore = useBoardStore()
 
 const statusModalData = ref(null)
 const statusDeleteModalOpenState = ref(false)
 const statusTransferModalOpenState = ref(false)
 const statusIdToTransfer = ref(1)
 
-async function fetchStatuses() {
-  isLoading.value = true
-  await statusStore.loadStatuses()
-  isLoading.value = false
+async function refreshBoardStatuses() {
+  await boardStore.loadBoard()
 }
 
 onMounted(async () => {
-  await fetchStatuses()
+  await refreshBoardStatuses()
 })
 
 const handleRefreshBtnClick = async () => {
-  await fetchStatuses()
+  await refreshBoardStatuses()
 }
 
 const handleAddBtnClick = () => {
@@ -60,7 +56,8 @@ const handleOpenDeleteModal = (statusData) => {
 }
 
 const handleTransferStatus = async (fromStatusId, toStatusId) => {
-  const responseObj = await deleteStatusAndTransferTasks(fromStatusId, toStatusId)
+  const { boardId } = route.params
+  const responseObj = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
   if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
@@ -73,27 +70,28 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
       description: 'The tasks have been transferred and the status has been deleted.',
       status: 'success'
     })
-    await statusStore.loadStatuses()
+    await boardStore.loadStatuses()
   }
   statusTransferModalOpenState.value = false
 }
 
 const handleDeleteStatus = async (statusId) => {
-  const responseObj = await deleteStatus(statusId)
+  const { boardId } = route.params
+  const responseObj = await deleteStatus(statusId, boardId)
   if (responseObj.status === 'error') {
     toastStore.createToast({
       title: 'Error',
       description: `An error has occurred.\n${responseObj.message}.`,
       status: 'error'
     })
-    await statusStore.loadStatuses()
+    await boardStore.loadStatuses()
   } else {
     toastStore.createToast({
       title: 'Success',
       description: 'The status has been deleted',
       status: 'success'
     })
-    await statusStore.loadStatuses()
+    await boardStore.loadStatuses()
   }
   statusDeleteModalOpenState.value = false
 }
@@ -106,12 +104,12 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
 <template>
   <Transition>
     <BaseModal @clickBG="statusDeleteModalOpenState = false" :show="statusDeleteModalOpenState" :mobileCenter="true">
-      <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Delete a Status</div>
+      <div class="bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Delete a Status</div>
         <div class="itbkk-message p-4 break-words">
           Do you want to delete the <span class="opacity-75 italic">{{ statusModalData.name }}</span> status?
         </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-300 bg-base-200">
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
             <button @click="statusDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
               Cancel
@@ -129,8 +127,8 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
   <Transition>
     <BaseModal @clickBG="statusTransferModalOpenState = false" :show="statusTransferModalOpenState"
       :mobileCenter="true">
-      <div class="bg-base-100 w-[30rem] max-w-[90vw] rounded-xl h-auto flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Transfer a Status</div>
+      <div class="bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto flex flex-col">
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Transfer a Status</div>
         <div class="itbkk-message p-4 break-words">
           <div>
             <div>There are <span class="font-semibold">{{ statusModalData.count }}</span> task{{
@@ -145,7 +143,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
           </div>
         </div>
         <div
-          class="flex justify-end items-center flex-none h-14 px-4 rounded-b-xl border-t-2 border-base-300 bg-base-200">
+          class="flex justify-end items-center flex-none h-14 px-4 rounded-b-xl border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
             <button @click="statusTransferModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
               Cancel
@@ -167,105 +165,107 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
   </RouterView>
 
   <div class="max-w-full pt-10 pb-20">
-    <div class="px-4 min-h-8 mb-2 sticky top-[8rem] z-10 bg-base-100 py-3 border-b-base-200 border-b-2">
-      <div class="flex justify-end">
-        <div class="flex gap-2">
-          <BaseMenu side="left" class="sm:hidden">
-            <template #icon>
-              <IconSVG iconName="three-dots" scale="1.25" />
-            </template>
-            <template #menu>
-              <button @click="handleRefreshBtnClick" type="button"
-                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                <div :class="{ 'animate-spin': isLoading }">
-                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-                </div>Refresh Statuses
-              </button>
-              <button @click="handleAddBtnClick" type="button"
-                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                <IconSVG iconName="plus" :scale="1.25" />Add Status
-              </button>
-            </template>
-          </BaseMenu>
-          <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
-            <div :class="{ 'animate-spin': isLoading }">
-              <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-            </div>Refresh Statuses
-          </button>
-          <button @click="handleAddBtnClick" type="button"
-            class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
-            <IconSVG iconName="plus" :scale="1.25" />Add Status
-          </button>
+    <div class="bg-base-300 rounded-lg shadow-md">
+      <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-3 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
+        <div class="flex justify-end py-2">
+          <div class="flex gap-2">
+            <BaseMenu side="left" class="sm:hidden">
+              <template #icon>
+                <IconSVG iconName="three-dots" scale="1.25" />
+              </template>
+              <template #menu>
+                <button @click="handleRefreshBtnClick" type="button"
+                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                  <div :class="{ 'animate-spin': boardStore.isLoading.status }">
+                    <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+                  </div>Refresh Statuses
+                </button>
+                <button @click="handleAddBtnClick" type="button"
+                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                  <IconSVG iconName="plus" :scale="1.25" />Add Status
+                </button>
+              </template>
+            </BaseMenu>
+            <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
+              <div :class="{ 'animate-spin': boardStore.isLoading.status }">
+                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+              </div>Refresh Statuses
+            </button>
+            <button @click="handleAddBtnClick" type="button"
+              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
+              <IconSVG iconName="plus" :scale="1.25" />Add Status
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="table-overflow-x-scroll px-4">
-      <table class="table border border-base-300">
-        <thead class="bg-base-200">
-          <tr class="select-none">
-            <th class="min-w-16 max-w-16"></th>
-            <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
-            <th class="min-w-96 max-w-96 sm:min-w-[35vw] sm:max-w-[35vw]">Description</th>
-            <th class="min-w-16 max-w-16">Tasks</th>
-            <th class="min-w-60 max-w-60">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="isLoading && statusStore.statuses.length === 0">
-            <td colspan="5" class="text-center">Loading statuses...</td>
-          </tr>
-          <tr v-else-if="statusStore.statuses === null">
-            <td colspan="5" class="text-center">Error while loading statuses from server. Please try again later.</td>
-          </tr>
-          <tr v-else-if="statusStore.statuses.length === 0">
-            <td colspan="5" class="text-center">No status</td>
-          </tr>
-          <tr v-else v-for="(status, index) in statusStore.statuses" :key="status.id" class="itbkk-item">
-            <td class="min-w-16 max-w-16">
-              <div class="grid place-items-center">
-                <div>{{ index + 1 }}</div>
-              </div>
-            </td>
-            <td class="overflow-hidden min-w-52 max-w-52">
-              <StatusBadge @click="handleStatusClick(status)" :statusData="status" textWrapMode="wrap"
-                class="itbkk-status-name cursor-default" width="100%" />
-            </td>
-            <td :class="{ 'italic text-[grey]': !status.description }"
-              class="itbkk-status-description min-w-96 max-w-96 break-words">
-              {{ status.description || 'No description is provided' }}
-            </td>
-            <td class="min-w-16 max-w-16 p-0">
-              <div class="grid place-items-center">
-                <div
-                  :class="{ 'text-error': status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status }"
-                  class="flex items-center gap-1">
-                  <IconSVG
-                    v-show="status.count > boardStore.board.taskLimitPerStatus && boardStore.board.isLimitTasks && !status.is_fixed_status"
-                    iconName="exclamation-diamond"
-                    title="Task limit exceeded! Please transfer some tasks to other statuses or increase the limit." />
-                  {{ status.count }}{{ boardStore.board.isLimitTasks && !status.is_fixed_status ? '/' +
-                    boardStore.board.taskLimitPerStatus : ''
-                  }}
+      <div class="table-overflow-x-scroll p-4">
+        <table class="table table-zebra">
+          <thead>
+            <tr class="select-none">
+              <th class="min-w-16 max-w-16"></th>
+              <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
+              <th class="min-w-96 max-w-96 sm:min-w-[35vw] sm:max-w-[35vw]">Description</th>
+              <th class="min-w-16 max-w-16">Tasks</th>
+              <th class="min-w-60 max-w-60">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="boardStore.isLoading.status && boardStore.statuses.length === 0">
+              <td colspan="5" class="text-center">Loading statuses...</td>
+            </tr>
+            <tr v-else-if="boardStore.statuses === null">
+              <td colspan="5" class="text-center">Error while loading statuses from server. Please try again later.</td>
+            </tr>
+            <tr v-else-if="boardStore.statuses.length === 0">
+              <td colspan="5" class="text-center">No status</td>
+            </tr>
+            <tr v-else v-for="(status, index) in boardStore.statuses" :key="status.id" class="itbkk-item">
+              <td class="min-w-16 max-w-16">
+                <div class="grid place-items-center">
+                  <div>{{ index + 1 }}</div>
                 </div>
-              </div>
-            </td>
-            <td class="min-w-44 max-w-44">
-              <div v-if="status.is_fixed_status === false" class="flex justify-center items-center gap-1 w-full">
-                <ButtonWithIcon @click="handleEditBtnClick(status.id)"
-                  className="itbkk-button-edit btn btn-sm justify-start flex flex-nowrap" iconName="pencil-square">
-                  Edit
-                </ButtonWithIcon>
-                <ButtonWithIcon @click="handleOpenDeleteModal(status)"
-                  className="itbkk-button-delete btn btn-sm justify-start text-error flex flex-nowrap"
-                  iconName="trash-fill">
-                  Delete
-                </ButtonWithIcon>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="h-20"></div>
+              </td>
+              <td class="overflow-hidden min-w-52 max-w-52">
+                <StatusBadge :statusData="status" textWrapMode="wrap"
+                  class="itbkk-status-name cursor-default" width="100%" />
+              </td>
+              <td :class="{ 'italic text-[grey]': !status.description }"
+                class="itbkk-status-description min-w-96 max-w-96 break-words">
+                {{ status.description || 'No description is provided' }}
+              </td>
+              <td class="min-w-16 max-w-16 p-0">
+                <div class="grid place-items-center">
+                  <div
+                    :class="{ 'text-error': status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isTaskLimitEnabled && !status.isPredefined }"
+                    class="flex items-center gap-1">
+                    <IconSVG
+                      v-show="status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isTaskLimitEnabled && !status.isPredefined"
+                      iconName="exclamation-diamond"
+                      title="Task limit exceeded! Please transfer some tasks to other statuses or increase the limit." />
+                    {{ status.count }}{{ boardStore.currentBoard?.isTaskLimitEnabled && !status.isPredefined ? '/' +
+                      boardStore.currentBoard?.taskLimitPerStatus : ''
+                    }}
+                  </div>
+                </div>
+              </td>
+              <td class="min-w-44 max-w-44">
+                <div v-if="status.isPredefined === false" class="flex justify-center items-center gap-1 w-full">
+                  <ButtonWithIcon @click="handleEditBtnClick(status.id)"
+                    className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap" iconName="pencil-square">
+                    Edit
+                  </ButtonWithIcon>
+                  <ButtonWithIcon @click="handleOpenDeleteModal(status)"
+                    className="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
+                    iconName="trash-fill">
+                    Delete
+                  </ButtonWithIcon>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="h-20"></div>
+      </div>
     </div>
   </div>
 </template>

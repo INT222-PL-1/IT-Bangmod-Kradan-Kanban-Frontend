@@ -92,3 +92,16 @@ export function superArraySorter(array, sortBy, sortDirection) {
 export function parseJwtPayload(token) {
   return JSON.parse(atob(token.split('.')[1]));
 }
+
+export function errorArrayToString(errors) {
+  return errors.map((error) => error.field + ' ' + error.message).join('\n')
+}
+
+export async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    console.log('success');
+  } catch (err) {
+    console.error('Failed to copy!', err);
+  }
+}
