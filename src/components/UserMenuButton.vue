@@ -32,6 +32,7 @@ const handleSignOutClick = () => {
       </BaseMenu>
 </template>
 
+
 <style scoped>
 
 </style>
