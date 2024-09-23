@@ -3,7 +3,6 @@ import { computed, ref } from 'vue';
 import BaseModal from './BaseModal.vue';
 import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
-// import { useBoardStore } from '@/stores/board';
 import { createBoard } from '@/libs/boardManagement';
 import { useToastStore } from '@/stores/toast';
 
@@ -21,7 +20,6 @@ const disabledSaveButton = computed(() => {
 })
 
 const handleClickConfirm = async () => {
-  // console.log('Save board', boardModalData.value)
   const res = await createBoard(boardModalData.value)
     if (res.status === 'error') {
       toastStore.createToast({
@@ -33,8 +31,6 @@ const handleClickConfirm = async () => {
       const createdBoard = res.data
       router.push({ name: 'all-task', params: { boardId: createdBoard.id } })
     }
-  // await boardStore.loadAllBoards()
-  // router.push({ name: 'all-board' })
 }
 
 const handleClickCancel = () => {
