@@ -82,14 +82,49 @@ const handleSettingsButtonClick = () => {
   boardSettingsModalOpenState.value = true
 }
 
-defineExpose({
-  test: 'test'
-})
+const handleToggleVisibilityButtonClick = () => {
+  boardVisibilityModalOpenState.value = true
+}
+
+const handleToggleBoardVisibility = async () => {
+  await boardStore.toggleBoardVisibility()
+  boardVisibilityModalOpenState.value = false
+  await refreshBoardTasks()
+}
 </script>
 
 <template>
 
   <BoardSettingsModal :show="boardSettingsModalOpenState" @clickClose="boardSettingsModalOpenState = false" />
+
+  <Transition>
+    <BaseModal @clickBG="boardVisibilityModalOpenState = false" :show="boardVisibilityModalOpenState" :mobileCenter="true">
+      <div class="itbkk-modal-alert bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Change board visibility</div>
+        <div class="px-4 pt-4 text-error">
+          This board is currently in <span class="font-semibold">{{ boardStore.currentBoard?.isPublic ? 'Public' : 'Private' }}</span> mode.
+        </div>
+        <div class="itbkk-message px-4 pb-4">
+          {{
+            boardStore.currentBoard?.isPublic
+              ? 'In private, only board owner can access/control board. Do you want to change the visibility to Private?'
+              : 'In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public?'
+          }}
+        </div>
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
+          <div class="flex gap-2">
+            <button @click="boardVisibilityModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+              Cancel
+            </button>
+            <button @click="handleToggleBoardVisibility"
+              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
+  </Transition>
 
   <Transition>
     <BaseModal @clickBG="taskDeleteModalOpenState = false" :show="taskDeleteModalOpenState" :mobileCenter="true">
@@ -146,7 +181,7 @@ defineExpose({
                 </button>
               </template>
             </BaseMenu>
-            <BoardVisibilityToggleButton />
+            <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" />
             <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden md:flex">
               <IconSVG iconName="gear" :scale="1.25" />Board Settings
             </button>

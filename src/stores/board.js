@@ -1,16 +1,14 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { getBoardById, getBoards } from '@/libs/boardManagement'
+import { getBoardById, getBoards, patchBoard } from '@/libs/boardManagement'
 import { getStatuses } from '@/libs/statusManagement'
 import { getTasks } from '@/libs/taskManagement'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useToastStore } from './toast'
 
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
-  const router = useRouter()
-  const toastStore = useToastStore
-  ()
+  const toastStore = useToastStore()
   const isLoading = ref({
     board: false,
     task: false,
@@ -61,17 +59,6 @@ export const useBoardStore = defineStore('board', () => {
       await loadTasks(boardId)
       await loadStatuses(boardId)
     }
-    // else if (res.status === 'error') {
-    //   router.push({ name: 'not-found' })
-    // }
-    // else {
-    //   toastStore.createToast({
-    //     title: 'Error',
-    //     description: 'Faไiled to load board. Please try again later.',
-    //     status: 'error'
-    //   })
-    //   router.push({ name: 'all-board' })
-    // }
     isLoading.value.board = false
   }
 
@@ -91,6 +78,20 @@ export const useBoardStore = defineStore('board', () => {
 
   function clearTaskFilterStatus() {
     options.value.filterStatuses.splice(0, options.value.filterStatuses.length)
+  }
+
+  async function toggleBoardVisibility() {
+    const res = await patchBoard(currentBoard.value.id, { visibility: currentBoard.value.isPublic ? 'PRIVATE' : 'PUBLIC' })
+    if (res.status === 'success') {
+      currentBoard.value.isPublic = !currentBoard.value.isPublic
+    }
+    else {
+      toastStore.createToast({
+        title: 'Error',
+        description: 'Failed to update board visibility. Please try again later.',
+        status: 'error'
+      })
+    }
   }
 
   // watch(() => options.value.boardId, fetchBoard, { immediate: true })
@@ -113,6 +114,7 @@ export const useBoardStore = defineStore('board', () => {
     sortTasks,
     addTaskFilterStatus,
     removeTaskFilterStatus,
-    clearTaskFilterStatus
+    clearTaskFilterStatus,
+    toggleBoardVisibility
   }
 })
