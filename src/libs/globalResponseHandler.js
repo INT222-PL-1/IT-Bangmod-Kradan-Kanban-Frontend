@@ -15,6 +15,12 @@ const globalResponseHandler = (response) => {
       status: 'error',
       delay: 500,
     })
+  } else if (response.statusCode === 403) {
+    console.log('Forbidden')
+    router.push({ name: 'forbidden' })
+  } else if (response.statusCode === 404) {
+    console.log('Not found')
+    router.push({ name: 'not-found' })
   }
 }
 

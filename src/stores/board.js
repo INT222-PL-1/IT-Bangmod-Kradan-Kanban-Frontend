@@ -57,20 +57,21 @@ export const useBoardStore = defineStore('board', () => {
     isLoading.value.board = true
     const res = await getBoardById(boardId)
     if (res.status === 'success') {
-      currentBoard.value = res.data
+      currentBoard.value = { ...res.data, isPublic: res.data.visibility === 'PUBLIC' }
       await loadTasks(boardId)
       await loadStatuses(boardId)
-    } else if (res.status === 'error' && res.statusCode === 404) {
-      await loadStatuses(boardId)
-      router.push({ name: 'not-found' })
-    } else {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'Failed to load board. Please try again later.',
-        status: 'error'
-      })
-      router.push({ name: 'all-board' })
     }
+    // else if (res.status === 'error') {
+    //   router.push({ name: 'not-found' })
+    // }
+    // else {
+    //   toastStore.createToast({
+    //     title: 'Error',
+    //     description: 'Faไiled to load board. Please try again later.',
+    //     status: 'error'
+    //   })
+    //   router.push({ name: 'all-board' })
+    // }
     isLoading.value.board = false
   }
 

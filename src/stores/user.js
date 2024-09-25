@@ -10,5 +10,10 @@ export const useUserStore = defineStore('user', () => {
     user.value = new User(accessToken)
   }
 
-  return { user, loadUserData }
+  function clearUserData() {
+    localStorage.removeItem('itbkk-token')
+    user.value = null
+  }
+
+  return { user, loadUserData, clearUserData }
 })

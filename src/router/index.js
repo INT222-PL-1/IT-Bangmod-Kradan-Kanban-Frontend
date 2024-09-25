@@ -93,24 +93,33 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue')
     },
     {
+      path: '/forbidden',
+      name: 'forbidden',
+      component: () => import('../views/ForbiddenView.vue')
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
-      component: () => import('../views/NotFound.vue')
+      component: () => import('../views/NotFoundView.vue')
     }
   ]
 })
 
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
-  if (['login', 'not-found'].includes(to.name)) next()
+  if (['login', 'not-found', 'forbidden'].includes(to.name)) {
+    console.log('Public route', to.name)
+    next()
+  }
   else if (localStorage.getItem('itbkk-token')) {
+    console.log('Private route', to.name)
     if (userStore.user) {
       next()
       return
     }
     try {
-      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/validate-token`)
-      if (res.status !== 'success') {
+      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/token/validate`)
+      if (res.status === 'error') {
         localStorage.removeItem('itbkk-token')
         throw new Error('Invalid token')
       }
@@ -122,7 +131,14 @@ router.beforeEach(async (to, from, next) => {
       return
     }
   }
-  else next({ name: 'login' })
+  else {
+    console.log('No token', to.name)
+    if (to.name === 'all-task') {
+      next()
+      return
+    }
+    next({ name: 'login' })
+  }
 })
 
 export default router

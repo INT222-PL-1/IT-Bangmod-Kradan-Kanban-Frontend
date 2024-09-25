@@ -29,7 +29,7 @@ export async function getBoards() {
 }
 
 export async function patchBoard(boardId, patchData) {
-  const url = `${BASE_URL}/${boardId}/maximum-task`
+  const url = `${BASE_URL}/${boardId}`
 
   try {
     const res = await zyos.fetch(url, {

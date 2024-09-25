@@ -12,6 +12,7 @@ import SortButton from '@/components/SortButton.vue'
 import { useBoardStore } from '@/stores/board'
 import BoardSettingsModal from '@/components/BoardSettingsModal.vue'
 import StatusFilterBar from '@/components/StatusFilterBar.vue'
+import BoardVisibilityToggleButton from '@/components/BoardVisibilityToggleButton.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,6 +23,7 @@ const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
 const boardSettingsModalOpenState = ref(false)
 
+const boardVisibilityModalOpenState = ref(false)
 
 async function refreshBoardTasks() {
   await boardStore.loadBoard()
@@ -144,6 +146,7 @@ defineExpose({
                 </button>
               </template>
             </BaseMenu>
+            <BoardVisibilityToggleButton />
             <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden md:flex">
               <IconSVG iconName="gear" :scale="1.25" />Board Settings
             </button>
