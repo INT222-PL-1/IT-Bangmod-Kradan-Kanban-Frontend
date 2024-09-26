@@ -13,9 +13,13 @@ import { useBoardStore } from '@/stores/board'
 import BoardSettingsModal from '@/components/BoardSettingsModal.vue'
 import StatusFilterBar from '@/components/StatusFilterBar.vue'
 import BoardVisibilityToggleButton from '@/components/BoardVisibilityToggleButton.vue'
+import BaseTooltip from '@/components/BaseTooltip.vue'
 
 const route = useRoute()
 const router = useRouter()
+
+const isLoading = ref(false)
+
 const toastStore = useToastStore()
 const boardStore = useBoardStore()
 
@@ -87,12 +91,18 @@ const handleToggleVisibilityButtonClick = () => {
 }
 
 const handleToggleBoardVisibility = async () => {
+
+  isLoading.value = true
+
   await new Promise(resolve => setTimeout(() => {
     boardVisibilityModalOpenState.value = false
     resolve()
   }, 300))
   await boardStore.toggleBoardVisibility()
   await refreshBoardTasks()
+
+  isLoading.value = false
+
 }
 </script>
 
@@ -119,7 +129,7 @@ const handleToggleBoardVisibility = async () => {
             <button @click="boardVisibilityModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
               Cancel
             </button>
-            <button @click="handleToggleBoardVisibility"
+            <button @click="handleToggleBoardVisibility" :disabled="isLoading"
               class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
               Confirm
             </button>
@@ -159,7 +169,7 @@ const handleToggleBoardVisibility = async () => {
   </RouterView>
 
   <div class="max-w-full pt-10 pb-20">
-    <div class="bg-base-300 rounded-lg shadow-md">
+    <div class="hidden sm:block bg-base-300 rounded-lg shadow-md">
       <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-3 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
         <div class="flex justify-between py-2">
           <StatusFilterBar />
@@ -185,18 +195,30 @@ const handleToggleBoardVisibility = async () => {
               </template>
             </BaseMenu>
             <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" />
-            <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden md:flex">
+            <!-- <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden md:flex">
               <IconSVG iconName="gear" :scale="1.25" />Board Settings
-            </button>
-            <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden md:flex">
+            </button> -->
+            <!-- <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden md:flex">
               <div :class="{ 'animate-spin': boardStore.isLoading.task }">
                 <IconSVG iconName="arrow-clockwise" :scale="1.25" />
               </div>Refresh Tasks
-            </button>
+            </button> -->
             <button @click="handleAddBtnClick" type="button"
-              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
-              <IconSVG iconName="plus" :scale="1.25" />Add Task
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
+            <IconSVG iconName="plus" :scale="1.25" />Add Task
+          </button>
+          <BaseTooltip text="Refresh Tasks">
+            <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm btn-square hidden md:flex">
+              <div :class="{ 'animate-spin': boardStore.isLoading.task }">
+                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+              </div>
             </button>
+          </BaseTooltip>
+          <BaseTooltip text="Board Setting">
+            <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-secondary btn-sm btn-square hidden md:flex">
+              <IconSVG iconName="gear" :scale="1.25" />
+            </button>
+          </BaseTooltip>
           </div>
         </div>
       </div>
