@@ -87,8 +87,11 @@ const handleToggleVisibilityButtonClick = () => {
 }
 
 const handleToggleBoardVisibility = async () => {
+  await new Promise(resolve => setTimeout(() => {
+    boardVisibilityModalOpenState.value = false
+    resolve()
+  }, 300))
   await boardStore.toggleBoardVisibility()
-  boardVisibilityModalOpenState.value = false
   await refreshBoardTasks()
 }
 </script>

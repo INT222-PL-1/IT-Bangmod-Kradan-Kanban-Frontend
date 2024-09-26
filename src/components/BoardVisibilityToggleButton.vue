@@ -8,7 +8,7 @@ const boardStore = useBoardStore()
 </script>
 
 <template>
-  <BaseToggleButton :currentValue="boardStore.currentBoard?.isPublic" :labelOn="BoardVisibility.public" :labelOff="BoardVisibility.private" />
+  <BaseToggleButton colorTypeOff="base" colorTypeOn="warning" :currentValue="boardStore.currentBoard?.isPublic" :labelOn="BoardVisibility.public" :labelOff="BoardVisibility.private" />
 </template>
 
 <style scoped>
