@@ -25,7 +25,7 @@ const handleSignButtonClick = () => {
     </template>
     <template #menu>
       <button @click="handleSignButtonClick" class="btn btn-ghost btn-sm flex gap-4 w-full justify-start">
-        <IconSVG iconName="box-arrow-in-right" scale="1.5" size="1.5" />
+        <IconSVG :iconName="userStore.user ? 'box-arrow-left' : 'box-arrow-in-right'" scale="1.5" size="1.5" />
         <div>Sign {{ userStore.user ? 'Out' : 'In' }}</div>
       </button>
     </template>

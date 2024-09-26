@@ -111,7 +111,7 @@ const handleToggleBoardVisibility = async () => {
   <BoardSettingsModal :show="boardSettingsModalOpenState" @clickClose="boardSettingsModalOpenState = false" />
 
   <Transition>
-    <BaseModal @clickBG="boardVisibilityModalOpenState = false" :show="boardVisibilityModalOpenState" :mobileCenter="true">
+    <BaseModal :isLoading="isLoading" @clickBG="boardVisibilityModalOpenState = false" :show="boardVisibilityModalOpenState" :mobileCenter="true">
       <div class="itbkk-modal-alert bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
         <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Change board visibility</div>
         <div class="px-4 pt-4 text-error">

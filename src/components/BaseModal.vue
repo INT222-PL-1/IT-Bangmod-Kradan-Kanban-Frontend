@@ -2,7 +2,7 @@
 
 const emits = defineEmits(['clickBG'])
 
-defineProps({
+const props = defineProps({
   show: {
     type: Boolean,
     default: false
@@ -10,10 +10,15 @@ defineProps({
   mobileCenter: {
     type: Boolean,
     default: false
+  },
+  isLoading: {
+    type: Boolean,
+    default: false
   }
 })
 
 const handleClickBG = (e) => {
+  if (props.isLoading) return
   if (e.target === e.currentTarget) emits('clickBG')
 }
 </script>
