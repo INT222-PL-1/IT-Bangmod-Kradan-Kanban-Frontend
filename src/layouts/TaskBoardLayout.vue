@@ -7,8 +7,10 @@ import UserMenuButton from '@/components/UserMenuButton.vue'
 import ResponsiveLogo from '@/components/ResponsiveLogo.vue'
 import { useBoardStore } from '@/stores/board'
 import { ref } from 'vue'
+import { useUserStore } from '@/stores/user'
 
 const boardStore = useBoardStore()
+const userStore = useUserStore()
 
 const sidebarOpenState = ref(false)
 
@@ -19,21 +21,38 @@ const sidebarOpenState = ref(false)
   <aside class="sm:hidden fixed z-50 w-screen" :class="{ 'pointer-events-none': sidebarOpenState === false }">
     <div @click="sidebarOpenState = false" class="absolute w-screen h-screen bg-[#0005] backdrop-blur-sm transition duration-1000" :class="sidebarOpenState ? 'opacity-100' : 'opacity-0'"></div>
     <div class="absolute w-[90vw] max-w-[20rem] h-screen flex flex-col bg-base-300 overflow-hidden transition duration-1000" :class="sidebarOpenState ? 'translate-x-[0%]' : 'translate-x-[-100%]'">
-      <div class="pt-8 flex justify-center items-center gap-3">
-        <IconSVG iconName="itbkk-logo" scale="3" size="3rem" />
-        <div class="text-3xl font-bold">ITBKK</div>
+      <div class="bg-base-200 p-4 flex flex-col">
+        <!-- <IconSVG iconName="itbkk-logo" scale="3" size="3rem" />
+        <div class="text-3xl font-bold">ITBKK</div> -->
+        <div class="flex">
+          <IconSVG iconName="person-circle" scale="4" size="4rem" />
+          <IconSVG iconName="itbkk-logo" scale="3" size="3rem" />
+        </div>
+        <div class="text-2xl font-bold">{{ userStore.user ? userStore.user.name : 'Guest' }}</div>
       </div>
-      <div class="divider"></div>
-      <div>
-        
+      <!-- <div class="divider"></div> -->
+      <div class="flex flex-col p-4 gap-2">
+        <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100 "
+          class="btn btn-ghost justify-start">
+          <IconSVG iconName="house" :scale="1.25" />Home
+        </RouterLink>
+        <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100"
+          class="btn btn-ghost justify-start">
+          <IconSVG iconName="kanban" :scale="1.25" />Task Board
+        </RouterLink>
+        <RouterLink :to="{ name: 'status-manage' }" exact-active-class="bg-neutral opacity-100"
+          class="btn btn-ghost justify-start">
+          <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
+        </RouterLink>
       </div>
     </div>
   </aside>
   <header class="block sm:hidden sticky top-0 z-30">
-    <div class="flex justify-between items-center bg-base-300 px-6 h-[4rem]">
+    <div class="flex gap-3 items-center bg-base-300 px-6 h-[4rem]">
       <button class="btn btn-square btn-ghost btn-sm">
         <IconSVG iconName="list" scale="2" size="2rem" @click="sidebarOpenState = true" />
       </button>
+      <div class="truncate text-lg">{{ boardStore.currentBoard?.name + 'ddddddddddddddddddddddddddddddddd' }}</div>
     </div>
   </header>
 

@@ -21,6 +21,10 @@ const filteredStatusList = computed(() => {
   return statusList.value.filter(status => status.name.toLowerCase().includes(searchTerm.value.toLowerCase())).sort((a, b) => b.id - a.id)
 })
 
+const handleFilterClick = async () => {
+  await boardStore.loadStatuses()
+}
+
 const handleStatusClick = (statusName) => {
   if (boardStore.options.filterStatuses.includes(statusName)) {
     boardStore.removeTaskFilterStatus(statusName)
@@ -34,7 +38,7 @@ const handleClearFilterButtonClick = () => {
 </script>
 
 <template>
-  <div class="dropdown">
+  <div @click="handleFilterClick" class="dropdown">
     <NotificationIndicator v-show="boardStore.options.filterStatuses.length > 0" type="warning" class="absolute top-[0.125rem] left-[0.125rem]" />
     <div class="flex items-center rounded-md overflow-hidden h-full bg-base-200">
       <div class="hover:bg-base-100 h-full">

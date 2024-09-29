@@ -19,3 +19,22 @@ export async function login(username, password) {
         console.error(error)
     }
 }
+
+export async function refreshAccessToken() {
+    const url = `${SERVER_URL}/token`
+
+    try {
+        const res = await zyos.fetch(url, {
+            method: 'POST',
+            headers: {
+                'x-refresh-token': localStorage.getItem('itbkk_refresh_token')
+            },
+            useToken: false,
+            credentials: 'include',
+        })
+        return res
+    }
+    catch (error) {
+        console.error(error)
+    }
+}

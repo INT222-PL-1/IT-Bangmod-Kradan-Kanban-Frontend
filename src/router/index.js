@@ -4,6 +4,7 @@ import { useUserStore } from '@/stores/user'
 import zyos from 'zyos'
 import BoardView from '@/views/BoardView.vue'
 import { useBoardStore } from '@/stores/board'
+import { useToastStore } from '@/stores/toast'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -107,36 +108,52 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
+  const toastStore = useToastStore()
   if (['login', 'not-found', 'forbidden'].includes(to.name)) {
     console.log('Public route', to.name)
     next()
   }
-  else if (localStorage.getItem('itbkk-token')) {
+  else if (localStorage.getItem('itbkk_access_token')) {
     console.log('Private route', to.name)
     if (userStore.user) {
+      console.log('User already loaded', to.name)
       next()
       return
     }
     try {
       const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/token/validate`)
       if (res.status === 'error') {
-        localStorage.removeItem('itbkk-token')
+        localStorage.removeItem('itbkk_access_token')
         throw new Error('Invalid token')
       }
+      console.log('User loaded', to.name)
       userStore.loadUserData()
+      console.log('User: ', userStore.user)
       next()
     } catch (error) {
       console.error(error)
+      userStore.clearUserData()
       next({ name: 'login' })
+      toastStore.createToast({
+        title: 'Error',
+        description: 'Cannot enter the page. Please login and try again.',
+        status: 'error',
+      })
       return
     }
   }
   else {
     console.log('No token', to.name)
-    if (to.name === 'all-task') {
+    if (['all-task', 'status-manage'].includes(to.name)) {
       next()
       return
     }
+    userStore.clearUserData()
+    toastStore.createToast({
+      title: 'Error',
+      description: 'Cannot enter the page. Please login and try again.',
+      status: 'error',
+    })
     next({ name: 'login' })
   }
 })

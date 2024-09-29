@@ -2,7 +2,7 @@
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { deleteStatus, deleteStatusAndTransferTasks } from '@/libs/statusManagement'
 import { useToastStore } from '@/stores/toast'
@@ -10,11 +10,16 @@ import BaseModal from '@/components/BaseModal.vue'
 import StatusSelector from '@/components/StatusSelector.vue'
 import BaseMenu from '@/components/BaseMenu.vue'
 import { useBoardStore } from '@/stores/board'
+import BaseTooltip from '@/components/BaseTooltip.vue'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
 const boardStore = useBoardStore()
+const userStore = useUserStore()
+
+const isBoardOwner = computed(() => boardStore.currentBoard?.owner.oid === userStore.user?.oid)
 
 const statusModalData = ref(null)
 const statusDeleteModalOpenState = ref(false)
@@ -169,7 +174,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
       <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-3 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
         <div class="flex justify-end py-2">
           <div class="flex gap-2">
-            <BaseMenu side="left" class="sm:hidden">
+            <BaseMenu side="left" class="md:hidden">
               <template #icon>
                 <IconSVG iconName="three-dots" scale="1.25" />
               </template>
@@ -180,21 +185,23 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
                     <IconSVG iconName="arrow-clockwise" :scale="1.25" />
                   </div>Refresh Statuses
                 </button>
-                <button @click="handleAddBtnClick" type="button"
+                <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
                   class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
                   <IconSVG iconName="plus" :scale="1.25" />Add Status
                 </button>
               </template>
             </BaseMenu>
-            <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden sm:flex">
-              <div :class="{ 'animate-spin': boardStore.isLoading.status }">
-                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-              </div>Refresh Statuses
-            </button>
-            <button @click="handleAddBtnClick" type="button"
-              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden sm:flex">
+            <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
+              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
               <IconSVG iconName="plus" :scale="1.25" />Add Status
             </button>
+            <BaseTooltip text="Refresh Statuses">
+              <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm btn-square hidden md:flex">
+                <div :class="{ 'animate-spin': boardStore.isLoading.status }">
+                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+                </div>
+              </button>
+            </BaseTooltip>
           </div>
         </div>
       </div>
@@ -206,7 +213,8 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
               <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
               <th class="min-w-96 max-w-96 sm:min-w-[35vw] sm:max-w-[35vw]">Description</th>
               <th class="min-w-16 max-w-16">Tasks</th>
-              <th class="min-w-60 max-w-60">Action</th>
+              <th v-if="isBoardOwner" class="min-w-60 max-w-60">Action</th>
+              <th v-else class="min-w-60 max-w-60"></th>
             </tr>
           </thead>
           <tbody>
@@ -248,7 +256,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
                   </div>
                 </div>
               </td>
-              <td class="min-w-44 max-w-44">
+              <td v-if="isBoardOwner">
                 <div v-if="status.isPredefined === false" class="flex justify-center items-center gap-1 w-full">
                   <ButtonWithIcon @click="handleEditBtnClick(status.id)"
                     className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap" iconName="pencil-square">
@@ -261,6 +269,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
                   </ButtonWithIcon>
                 </div>
               </td>
+              <td v-else></td>
             </tr>
           </tbody>
         </table>

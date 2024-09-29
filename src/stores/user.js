@@ -6,12 +6,13 @@ export const useUserStore = defineStore('user', () => {
   const user = ref(null)
 
   function loadUserData() {
-    const accessToken = localStorage.getItem('itbkk-token')
+    const accessToken = localStorage.getItem('itbkk_access_token')
     user.value = new User(accessToken)
   }
 
   function clearUserData() {
-    localStorage.removeItem('itbkk-token')
+    localStorage.removeItem('itbkk_access_token')
+    localStorage.removeItem('itbkk_refresh_token')
     user.value = null
   }
 

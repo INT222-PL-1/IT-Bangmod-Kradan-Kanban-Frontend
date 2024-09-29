@@ -81,11 +81,20 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   async function toggleBoardVisibility() {
-    const res = await patchBoard(currentBoard.value.id, { visibility: currentBoard.value.isPublic ? 'PRIVATE' : 'PUBLIC' })
+    const res = await patchBoard(currentBoard.value.id, {
+      visibility: currentBoard.value.isPublic ? 'PRIVATE' : 'PUBLIC'
+    }, {
+      noGlobalResponseHandler: true
+    })
     if (res.status === 'success') {
       currentBoard.value.isPublic = !currentBoard.value.isPublic
-    }
-    else {
+    } else if (res.statusCode === 403) {
+      toastStore.createToast({
+        title: 'Error',
+        description: 'You do not have permission to change board visibility mode.',
+        status: 'error'
+      })
+    } else {
       toastStore.createToast({
         title: 'Error',
         description: 'Failed to update board visibility. Please try again later.',

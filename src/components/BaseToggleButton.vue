@@ -45,6 +45,10 @@ defineProps({
       ].includes(value)
     },
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const classMap = {
@@ -93,9 +97,9 @@ const classMap = {
 </script>
 
 <template>
-  <button class="btn btn-sm" :class="classMap[currentValue ? colorTypeOn : colorTypeOff].btn">
-    <div class="w-6 h-3 border-2 rounded-full flex items-center" :class="classMap[currentValue ? colorTypeOn : colorTypeOff].borderContent">
-      <div class="w-[0.45rem] h-[0.45rem] rounded-full transition" :class="[currentValue ? 'translate-x-[calc(1.25rem-0.45rem)]' : 'translate-x-[0.05rem]', classMap[currentValue ? colorTypeOn : colorTypeOff].bgContent]"></div>
+  <button class="btn btn-sm" :class="classMap[currentValue ? colorTypeOn : colorTypeOff].btn" :disabled="disabled">
+    <div class="w-6 h-3 border-2 rounded-full flex items-center" :class="disabled ? 'border-base-content border-opacity-20' : classMap[currentValue ? colorTypeOn : colorTypeOff].borderContent">
+      <div class="w-[0.45rem] h-[0.45rem] rounded-full transition" :class="[currentValue ? 'translate-x-[calc(1.25rem-0.45rem)]' : 'translate-x-[0.05rem]', disabled ? 'bg-base-content bg-opacity-20' : classMap[currentValue ? colorTypeOn : colorTypeOff].bgContent]"></div>
     </div>
     <div>{{ currentValue ? labelOn : labelOff }}</div>
   </button>
