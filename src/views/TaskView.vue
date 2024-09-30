@@ -205,15 +205,30 @@ const handleToggleBoardVisibility = async () => {
         </div>
         
       </div>
-      <div
-        v-for="(task, index) in boardStore.tasks"
-        :key="task.id"
-      >
-        <TaskCard
-          :task="task"
-          :index="index"
-        />
-        <div class="divider"></div>
+      <div v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
+        <div colspan="4" class="flex justify-center items-center h-32">Loading tasks...</div>
+      </div>
+      <div v-else-if="boardStore.tasks === null">
+        <div colspan="4" class="flex justify-center items-center h-32">Error while loading tasks from server. Please try again later.</div>
+      </div>
+      <div v-else-if="boardStore.tasks.length === 0">
+        <div colspan="4" class="flex justify-center items-center h-32">No task</div>
+      </div>
+      <div v-else>
+        <div
+          v-for="(task, index) in boardStore.tasks"
+          :key="task.id"
+        >
+          <TaskCard
+            @titleClick="handleTaskClick(task.id)"
+            @editClick="handleEditBtnClick(task.id)"
+            @deleteClick="handleOpenDeleteModal(task)"
+            :task="task"
+            :index="index"
+            :hasWritePermission="isBoardOwner"
+          />
+          <div class="divider"></div>
+        </div>
       </div>
     </div>
     

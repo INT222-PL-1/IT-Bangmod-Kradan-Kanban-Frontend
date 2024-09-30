@@ -1,5 +1,5 @@
 <script setup>
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import BackToTopButton from '@/components/BackToTopButton.vue'
 import IconSVG from '@/components/IconSVG.vue'
@@ -9,11 +9,15 @@ import { useBoardStore } from '@/stores/board'
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 
+const router = useRouter()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
 
 const sidebarOpenState = ref(false)
-
+const handleSignButtonClick = () => {
+  if (userStore.user) userStore.clearUserData()
+  router.push({ name: 'login'})
+}
 </script>
 
 <template>
@@ -57,7 +61,7 @@ const sidebarOpenState = ref(false)
       <button class="btn btn-square btn-ghost btn-sm">
         <IconSVG iconName="list" scale="2" size="2rem" @click="sidebarOpenState = true" />
       </button>
-      <div class="truncate text-lg">{{ boardStore.currentBoard?.name + 'ddddddddddddddddddddddddddddddddd' }}</div>
+      <div class="truncate text-lg">{{ boardStore.currentBoard?.name }}</div>
     </div>
   </header>
 

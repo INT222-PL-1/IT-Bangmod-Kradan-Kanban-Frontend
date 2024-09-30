@@ -103,6 +103,15 @@ export const useBoardStore = defineStore('board', () => {
     }
   }
 
+  function clearBoardData() {
+    currentBoard.value = null
+    tasks.value.splice(0, tasks.value.length)
+    statuses.value.splice(0, statuses.value.length)
+    options.value.sortBy = null
+    options.value.sortDirection = null
+    clearTaskFilterStatus()
+  }
+
   // watch(() => options.value.boardId, fetchBoard, { immediate: true })
 
   watch(options, async () => {
@@ -124,6 +133,7 @@ export const useBoardStore = defineStore('board', () => {
     addTaskFilterStatus,
     removeTaskFilterStatus,
     clearTaskFilterStatus,
-    toggleBoardVisibility
+    toggleBoardVisibility,
+    clearBoardData
   }
 })

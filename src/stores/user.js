@@ -1,9 +1,11 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { User } from '@/libs/classes/User'
+import { useBoardStore } from './board'
 
 export const useUserStore = defineStore('user', () => {
   const user = ref(null)
+  const boardStore = useBoardStore()
 
   function loadUserData() {
     const accessToken = localStorage.getItem('itbkk_access_token')
@@ -11,6 +13,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function clearUserData() {
+    boardStore.clearBoardData()
     localStorage.removeItem('itbkk_access_token')
     localStorage.removeItem('itbkk_refresh_token')
     user.value = null

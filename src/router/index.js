@@ -20,6 +20,7 @@ const router = createRouter({
       component: BoardView,
       beforeEnter: async (to, from, next) => {
         const boardStore = useBoardStore()
+        boardStore.clearBoardData()
         await boardStore.loadAllBoards()
         if (from.name === 'all-task') {
           next()
