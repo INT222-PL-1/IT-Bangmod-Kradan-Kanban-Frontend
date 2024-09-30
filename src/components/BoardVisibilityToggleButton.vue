@@ -15,7 +15,7 @@ const boardStore = useBoardStore()
 </script>
 
 <template>
-  <BaseToggleButton colorTypeOff="base" colorTypeOn="warning" :currentValue="boardStore.currentBoard?.isPublic" :labelOn="BoardVisibility.public" :labelOff="BoardVisibility.private" :disabled="disabled" />
+  <BaseToggleButton className="itbkk-board-visibility" colorTypeOff="base" colorTypeOn="warning" :currentValue="boardStore.currentBoard?.isPublic" :labelOn="BoardVisibility.public" :labelOff="BoardVisibility.private" :disabled="disabled" />
 </template>
 
 <style scoped>

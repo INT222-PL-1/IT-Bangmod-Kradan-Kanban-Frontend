@@ -144,7 +144,7 @@ router.beforeEach(async (to, from, next) => {
   }
   else {
     console.log('No token', to.name)
-    if (['all-task', 'status-manage'].includes(to.name)) {
+    if (['all-task', 'status-manage', 'task-view'].includes(to.name)) {
       next()
       return
     }

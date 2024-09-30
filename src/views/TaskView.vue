@@ -120,11 +120,11 @@ const handleToggleBoardVisibility = async () => {
   <Transition>
     <BaseModal :isLoading="isLoading" @clickBG="boardVisibilityModalOpenState = false" :show="boardVisibilityModalOpenState" :mobileCenter="true">
       <div class="itbkk-modal-alert bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-lg font-bold p-4 border-b-2 border-base-100 break-words flex-none">Do you want to change board visibility to {{ boardStore.currentBoard?.isPublic ? 'private' : 'public' }}?</div>
+        <div class="itbkk-message text-lg font-bold p-4 border-b-2 border-base-100 break-words flex-none">Do you want to change board visibility to {{ boardStore.currentBoard?.isPublic ? 'private' : 'public' }}?</div>
         <div class="px-4 pt-4 text-error">
           This board is currently in <span class="font-semibold">{{ boardStore.currentBoard?.isPublic ? 'Public' : 'Private' }}</span> mode.
         </div>
-        <div class="itbkk-message px-4 pb-4">
+        <div class="px-4 pb-4">
           {{
             boardStore.currentBoard?.isPublic
               ? 'In private, only board owner can access/control board. Do you want to change the visibility to Private?'
