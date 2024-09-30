@@ -15,6 +15,7 @@ import StatusFilterBar from '@/components/StatusFilterBar.vue'
 import BoardVisibilityToggleButton from '@/components/BoardVisibilityToggleButton.vue'
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import { useUserStore } from '@/stores/user'
+import TaskCard from '@/components/TaskCard.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -175,7 +176,47 @@ const handleToggleBoardVisibility = async () => {
     </Transition>
   </RouterView>
 
-  <div class="max-w-full pt-10 pb-20">
+  <div class="max-w-full pt-5 pb-20">
+    <div class="block sm:hidden">
+      <div class="px-4 mb-4 flex justify-between">
+        <StatusFilterBar compact />
+        <div class="flex gap-2">
+          <BaseMenu side="left">
+            <template #icon>
+              <IconSVG iconName="three-dots" scale="1.25" />
+            </template>
+            <template #menu>
+              <button @click="handleRefreshBtnClick" type="button"
+                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <div :class="{ 'animate-spin': boardStore.isLoading.task }">
+                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+                </div>Refresh Tasks
+              </button>
+              <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
+                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <IconSVG iconName="plus" :scale="1.25" />Add Task
+              </button>
+              <button v-if="isBoardOwner" @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <IconSVG iconName="gear" :scale="1.25" />Board Settings
+              </button>
+            </template>
+          </BaseMenu>
+          <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" :disabled="isBoardOwner === false" />
+        </div>
+        
+      </div>
+      <div
+        v-for="(task, index) in boardStore.tasks"
+        :key="task.id"
+      >
+        <TaskCard
+          :task="task"
+          :index="index"
+        />
+        <div class="divider"></div>
+      </div>
+    </div>
+    
     <div class="hidden sm:block bg-base-300 rounded-lg shadow-md">
       <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-3 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
         <div class="flex justify-between py-2">
@@ -201,15 +242,8 @@ const handleToggleBoardVisibility = async () => {
                 </button>
               </template>
             </BaseMenu>
-            <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" :disabled="isBoardOwner === false" />
-            <!-- <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden md:flex">
-              <IconSVG iconName="gear" :scale="1.25" />Board Settings
-            </button> -->
-            <!-- <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden md:flex">
-              <div :class="{ 'animate-spin': boardStore.isLoading.task }">
-                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-              </div>Refresh Tasks
-            </button> -->
+            <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" 
+            className="itbkk-board-visibility" :disabled="isBoardOwner === false" />
             <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
               class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
               <IconSVG iconName="plus" :scale="1.25" />Add Task

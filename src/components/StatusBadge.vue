@@ -14,7 +14,7 @@ const props = defineProps({
   showLimit: {
     type: Boolean,
     default: false
-  }
+  },
 })
 
 const boardStore = useBoardStore()

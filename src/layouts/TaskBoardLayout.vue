@@ -21,29 +21,34 @@ const sidebarOpenState = ref(false)
   <aside class="sm:hidden fixed z-50 w-screen" :class="{ 'pointer-events-none': sidebarOpenState === false }">
     <div @click="sidebarOpenState = false" class="absolute w-screen h-screen bg-[#0005] backdrop-blur-sm transition duration-1000" :class="sidebarOpenState ? 'opacity-100' : 'opacity-0'"></div>
     <div class="absolute w-[90vw] max-w-[20rem] h-screen flex flex-col bg-base-300 overflow-hidden transition duration-1000" :class="sidebarOpenState ? 'translate-x-[0%]' : 'translate-x-[-100%]'">
-      <div class="bg-base-200 p-4 flex flex-col">
+      <div class="bg-base-200 p-4 flex flex-col gap-4">
         <!-- <IconSVG iconName="itbkk-logo" scale="3" size="3rem" />
         <div class="text-3xl font-bold">ITBKK</div> -->
-        <div class="flex">
+        <div class="flex justify-between">
           <IconSVG iconName="person-circle" scale="4" size="4rem" />
-          <IconSVG iconName="itbkk-logo" scale="3" size="3rem" />
+          <IconSVG iconName="itbkk-logo" scale="1.5" size="1.5rem" />
         </div>
-        <div class="text-2xl font-bold">{{ userStore.user ? userStore.user.name : 'Guest' }}</div>
+        <div class="text-xl font-bold">{{ userStore.user ? userStore.user.name : 'Guest' }}</div>
       </div>
       <!-- <div class="divider"></div> -->
       <div class="flex flex-col p-4 gap-2">
-        <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100 "
-          class="btn btn-ghost justify-start">
+        <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100"
+          class="btn btn-ghost justify-start gap-4">
           <IconSVG iconName="house" :scale="1.25" />Home
         </RouterLink>
         <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100"
-          class="btn btn-ghost justify-start">
+          class="btn btn-ghost justify-start gap-4">
           <IconSVG iconName="kanban" :scale="1.25" />Task Board
         </RouterLink>
         <RouterLink :to="{ name: 'status-manage' }" exact-active-class="bg-neutral opacity-100"
-          class="btn btn-ghost justify-start">
+          class="btn btn-ghost justify-start gap-4">
           <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
         </RouterLink>
+        <div class="divider"></div>
+        <button @click="handleSignButtonClick" class="btn btn-ghost justify-start gap-4">
+          <IconSVG :iconName="userStore.user ? 'box-arrow-left' : 'box-arrow-in-right'" :scale="1.25" />
+          Sign {{ userStore.user ? 'Out' : 'In' }}
+        </button>
       </div>
     </div>
   </aside>

@@ -7,7 +7,11 @@ defineProps({
   disabled: {
     type: Boolean,
     default: false,
-  }
+  },
+  className: {
+    type: String,
+    default: '',
+  },
 })
 
 const boardStore = useBoardStore()
@@ -15,7 +19,7 @@ const boardStore = useBoardStore()
 </script>
 
 <template>
-  <BaseToggleButton className="itbkk-board-visibility" colorTypeOff="base" colorTypeOn="warning" :currentValue="boardStore.currentBoard?.isPublic" :labelOn="BoardVisibility.public" :labelOff="BoardVisibility.private" :disabled="disabled" />
+  <BaseToggleButton :className="className" colorTypeOff="base" colorTypeOn="warning" :currentValue="boardStore.currentBoard?.isPublic" :labelOn="BoardVisibility.public" :labelOff="BoardVisibility.private" :disabled="disabled" />
 </template>
 
 <style scoped>
