@@ -46,7 +46,7 @@ async function loadSelectedTaskData() {
   if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${res.message}`,
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
       status: 'error'
     })
     router.replace({ name: 'all-task' })
@@ -88,7 +88,7 @@ const handleClickConfirm = async () => {
     if (res.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: `An error occurred while adding the task.\n${res.message}`,
+        description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
         status: 'error'
       })
     } else {
@@ -98,15 +98,15 @@ const handleClickConfirm = async () => {
         description: `The task "${createdTask.title}" is added successfully.`,
         status: 'success'
       })
+      router.push({ name: 'all-task' })
     }
     await boardStore.loadTasks()
-    router.push({ name: 'all-task' })
   } else if (taskModalMode.value === 'edit') {
     const res = await updateTask(taskModalData.value)
     if (res.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: `An error occurred while updating the task.\n${res.message}`,
+        description: `An error occurred while updating the task.\nPlease try again.`,
         status: 'error'
       })
     } else {
@@ -116,9 +116,9 @@ const handleClickConfirm = async () => {
         description: `The task "${updatedTask.title}" is updated successfully`,
         status: 'success'
       })
+      router.push({ name: 'all-task' })
     }
     await boardStore.loadTasks()
-    router.push({ name: 'all-task' })
   }
 }
 

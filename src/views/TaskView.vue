@@ -59,11 +59,11 @@ const handleOpenDeleteModal = (taskData) => {
 }
 
 const handleDeleteTask = async (taskId) => {
-  const responseObj = await deleteTask(taskId, route.params.boardId)
-  if (responseObj.status === 'error') {
+  const res = await deleteTask(taskId, route.params.boardId)
+  if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${responseObj.message}.`,
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
       status: 'error'
     })
     await refreshBoardTasks()

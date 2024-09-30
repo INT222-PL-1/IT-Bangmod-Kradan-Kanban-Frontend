@@ -62,11 +62,11 @@ const handleOpenDeleteModal = (statusData) => {
 
 const handleTransferStatus = async (fromStatusId, toStatusId) => {
   const { boardId } = route.params
-  const responseObj = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
-  if (responseObj.status === 'error') {
+  const res = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
+  if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${responseObj.message}.`,
+      description: `An error has occurred.\nPlease try again.`,
       status: 'error'
     })
   } else {
@@ -82,11 +82,11 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
 
 const handleDeleteStatus = async (statusId) => {
   const { boardId } = route.params
-  const responseObj = await deleteStatus(statusId, boardId)
-  if (responseObj.status === 'error') {
+  const res = await deleteStatus(statusId, boardId)
+  if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${responseObj.message}.`,
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
       status: 'error'
     })
     await boardStore.loadStatuses()

@@ -10,7 +10,7 @@ const globalResponseHandler = async (response) => {
   if (response.statusCode === 401) {
     if (router.currentRoute.value.name === 'login') return
     localStorage.removeItem('itbkk_access_token')
-    if (response.data.type === Pl1ErrorTypes.TOKEN_MALFORMED) {
+    if (response.data.type === Pl1ErrorTypes.TOKEN_EXPIRED) {
       // toastStore.createToast({
       //   title: 'Error',
       //   description: 'Your authentication has expired.\nPlease login again.',
@@ -18,7 +18,7 @@ const globalResponseHandler = async (response) => {
       //   delay: 500,
       // })
       // router.push({ name: 'login' })
-      console.log('Token malformed')
+      // console.log('Token malformed')
       try {
         const res = await refreshAccessToken()
         if (res.status === 'success') {
