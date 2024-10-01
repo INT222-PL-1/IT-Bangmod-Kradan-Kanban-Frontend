@@ -10,7 +10,12 @@ const globalResponseHandler = async (response) => {
   if (response.statusCode === 401) {
     if (router.currentRoute.value.name === 'login') return
     localStorage.removeItem('itbkk_access_token')
-    if (response.data.type === Pl1ErrorTypes.TOKEN_EXPIRED) {
+    if ([
+      Pl1ErrorTypes.TOKEN_EXPIRED,
+      Pl1ErrorTypes.TOKEN_MALFORMED,
+      Pl1ErrorTypes.TOKEN_NOT_BEGIN_WITH_BEARER,
+      Pl1ErrorTypes.TOKEN_TEMPERED
+    ].includes(response.data.type)) {
       // toastStore.createToast({
       //   title: 'Error',
       //   description: 'Your authentication has expired.\nPlease login again.',
