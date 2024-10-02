@@ -1,16 +1,14 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { getBoardById, getBoards } from '@/libs/boardManagement'
+import { getBoardById, getBoards, patchBoard } from '@/libs/boardManagement'
 import { getStatuses } from '@/libs/statusManagement'
 import { getTasks } from '@/libs/taskManagement'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useToastStore } from './toast'
 
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
-  const router = useRouter()
-  const toastStore = useToastStore
-  ()
+  const toastStore = useToastStore()
   const isLoading = ref({
     board: false,
     task: false,
@@ -57,19 +55,9 @@ export const useBoardStore = defineStore('board', () => {
     isLoading.value.board = true
     const res = await getBoardById(boardId)
     if (res.status === 'success') {
-      currentBoard.value = res.data
+      currentBoard.value = { ...res.data, isPublic: res.data.visibility === 'PUBLIC' }
       await loadTasks(boardId)
       await loadStatuses(boardId)
-    } else if (res.status === 'error' && res.statusCode === 404) {
-      await loadStatuses(boardId)
-      router.push({ name: 'not-found' })
-    } else {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'Failed to load board. Please try again later.',
-        status: 'error'
-      })
-      router.push({ name: 'all-board' })
     }
     isLoading.value.board = false
   }
@@ -92,6 +80,38 @@ export const useBoardStore = defineStore('board', () => {
     options.value.filterStatuses.splice(0, options.value.filterStatuses.length)
   }
 
+  async function toggleBoardVisibility() {
+    const res = await patchBoard(currentBoard.value.id, {
+      visibility: currentBoard.value.isPublic ? 'PRIVATE' : 'PUBLIC'
+    }, {
+      noGlobalResponseHandler: true
+    })
+    if (res.status === 'success') {
+      currentBoard.value.isPublic = !currentBoard.value.isPublic
+    } else if (res.statusCode === 403) {
+      toastStore.createToast({
+        title: 'Error',
+        description: 'You do not have permission to change board visibility mode.',
+        status: 'error'
+      })
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: 'Failed to update board visibility. Please try again later.',
+        status: 'error'
+      })
+    }
+  }
+
+  function clearBoardData() {
+    currentBoard.value = null
+    tasks.value.splice(0, tasks.value.length)
+    statuses.value.splice(0, statuses.value.length)
+    options.value.sortBy = null
+    options.value.sortDirection = null
+    clearTaskFilterStatus()
+  }
+
   // watch(() => options.value.boardId, fetchBoard, { immediate: true })
 
   watch(options, async () => {
@@ -112,6 +132,8 @@ export const useBoardStore = defineStore('board', () => {
     sortTasks,
     addTaskFilterStatus,
     removeTaskFilterStatus,
-    clearTaskFilterStatus
+    clearTaskFilterStatus,
+    toggleBoardVisibility,
+    clearBoardData
   }
 })

@@ -30,11 +30,11 @@ const exceedLimitOpenState = ref(false)
 const exceedLimitStatus = ref([])
 
 const handleSaveSettingsStatus = async ({ message }) => {
-  const responseObj = await patchBoard(boardStore.currentBoard.id, newSettings.value)
-  if (responseObj.status === 'error') {
+  const res = await patchBoard(boardStore.currentBoard.id, newSettings.value)
+  if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${responseObj.message}.`,
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
       status: 'error'
     })
   } else {
@@ -46,7 +46,7 @@ const handleSaveSettingsStatus = async ({ message }) => {
     await boardStore.loadBoard()
   }
 
-  const patchedBoard = responseObj.data
+  const patchedBoard = res.data
 
   if (patchedBoard.isTaskLimitEnabled && patchedBoard.exceedLimitStatus.length > 0) {
     exceedLimitStatus.value.push(...patchedBoard.exceedLimitStatus)

@@ -13,17 +13,8 @@ const props = defineProps({
   },
   width: {
     type: String,
-    default: '8rem'
+    default: '5rem'
   },
-  description: {
-    type: String,
-    default: ''
-  },
-  textWrapMode: {
-    type: String,
-    default: 'wrap',
-    validator: (value) => ['wrap', 'truncate'].includes(value)
-  }
 })
 
 const validatedColor = computed(() => {
@@ -33,13 +24,13 @@ const validatedColor = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-lg cursor-default" :style="{
+  <div class="rounded-full cursor-default" :style="{
     border: `1px solid ${validatedColor}`,
     backgroundColor: validatedColor + 11,
     width
-  }" :title="description">
-    <div class="my-1 flex justify-center items-center" :style="{ width }">
-      <div :class="textWrapMode === 'truncate' ? 'truncate' : 'break-words'" class="max-w-[90%]"
+  }">
+    <div class="my-[0.125rem] flex justify-center items-center" :style="{ width }">
+      <div class="max-w-[90%] truncate text-xs"
         :style="{ color: validatedColor }">
         <slot></slot>
       </div>

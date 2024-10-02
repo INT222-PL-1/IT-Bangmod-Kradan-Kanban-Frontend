@@ -5,6 +5,13 @@ import StatusBadge from './StatusBadge.vue'
 import { useBoardStore } from '@/stores/board'
 import NotificationIndicator from './NotificationIndicator.vue'
 
+defineProps({
+  compact: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const boardStore = useBoardStore()
 const searchTerm = ref('')
 
@@ -21,6 +28,10 @@ const filteredStatusList = computed(() => {
   return statusList.value.filter(status => status.name.toLowerCase().includes(searchTerm.value.toLowerCase())).sort((a, b) => b.id - a.id)
 })
 
+const handleFilterClick = async () => {
+  await boardStore.loadStatuses()
+}
+
 const handleStatusClick = (statusName) => {
   if (boardStore.options.filterStatuses.includes(statusName)) {
     boardStore.removeTaskFilterStatus(statusName)
@@ -34,7 +45,7 @@ const handleClearFilterButtonClick = () => {
 </script>
 
 <template>
-  <div class="dropdown">
+  <div @click="handleFilterClick" class="dropdown">
     <NotificationIndicator v-show="boardStore.options.filterStatuses.length > 0" type="warning" class="absolute top-[0.125rem] left-[0.125rem]" />
     <div class="flex items-center rounded-md overflow-hidden h-full bg-base-200">
       <div class="hover:bg-base-100 h-full">
@@ -42,7 +53,7 @@ const handleClearFilterButtonClick = () => {
           <IconSVG iconName="filter" scale="1.25" size="2rem" />
         </button>
       </div>
-      <div tabindex="0" role="button"
+      <div v-if="compact === false" tabindex="0" role="button"
         class="flex gap-1 items-center py-1 px-2 w-36 sm:w-64 lg:w-96 h-full cursor-pointer border-x-2 border-base-100 bg-base-200">
         <div v-show="boardStore.options.filterStatuses.length === 0" class="text-sm font-semibold opacity-50">
           Filter By Status(es)
@@ -55,7 +66,7 @@ const handleClearFilterButtonClick = () => {
           </div>
         </div>
       </div>
-      <div class="bg-base-200 hover:bg-base-100 h-full">
+      <div v-if="compact === false" class="bg-base-200 hover:bg-base-100 h-full">
         <button @click="handleClearFilterButtonClick" class="active:scale-90" title="Clear Filter">
           <IconSVG iconName="x" scale="1.25" size="2rem" class="cursor-pointer" />
         </button>

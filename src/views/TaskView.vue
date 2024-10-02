@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
@@ -12,16 +12,27 @@ import SortButton from '@/components/SortButton.vue'
 import { useBoardStore } from '@/stores/board'
 import BoardSettingsModal from '@/components/BoardSettingsModal.vue'
 import StatusFilterBar from '@/components/StatusFilterBar.vue'
+import BoardVisibilityToggleButton from '@/components/BoardVisibilityToggleButton.vue'
+import BaseTooltip from '@/components/BaseTooltip.vue'
+import { useUserStore } from '@/stores/user'
+import TaskCard from '@/components/TaskCard.vue'
 
 const route = useRoute()
 const router = useRouter()
+
+const isLoading = ref(false)
+
 const toastStore = useToastStore()
 const boardStore = useBoardStore()
+const userStore = useUserStore()
+
+const isBoardOwner = computed(() => boardStore.currentBoard?.owner.oid === userStore.user?.oid)
 
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
 const boardSettingsModalOpenState = ref(false)
 
+const boardVisibilityModalOpenState = ref(false)
 
 async function refreshBoardTasks() {
   await boardStore.loadBoard()
@@ -49,11 +60,11 @@ const handleOpenDeleteModal = (taskData) => {
 }
 
 const handleDeleteTask = async (taskId) => {
-  const responseObj = await deleteTask(taskId, route.params.boardId)
-  if (responseObj.status === 'error') {
+  const res = await deleteTask(taskId, route.params.boardId)
+  if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${responseObj.message}.`,
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
       status: 'error'
     })
     await refreshBoardTasks()
@@ -80,14 +91,61 @@ const handleSettingsButtonClick = () => {
   boardSettingsModalOpenState.value = true
 }
 
-defineExpose({
-  test: 'test'
-})
+const handleToggleVisibilityButtonClick = () => {
+  boardVisibilityModalOpenState.value = true
+}
+
+const handleToggleBoardVisibility = async () => {
+
+  try {
+    isLoading.value = true
+
+    await new Promise(resolve => setTimeout(() => {
+      boardVisibilityModalOpenState.value = false
+      resolve()
+    }, 300))
+    await boardStore.toggleBoardVisibility()
+    await refreshBoardTasks()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>
 
   <BoardSettingsModal :show="boardSettingsModalOpenState" @clickClose="boardSettingsModalOpenState = false" />
+
+  <Transition>
+    <BaseModal :isLoading="isLoading" @clickBG="boardVisibilityModalOpenState = false" :show="boardVisibilityModalOpenState" :mobileCenter="true">
+      <div class="itbkk-modal-alert bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+        <div class="itbkk-message text-lg font-bold p-4 border-b-2 border-base-100 break-words flex-none">Do you want to change board visibility to {{ boardStore.currentBoard?.isPublic ? 'private' : 'public' }}?</div>
+        <div class="px-4 pt-4 text-error">
+          This board is currently in <span class="font-semibold">{{ boardStore.currentBoard?.isPublic ? 'Public' : 'Private' }}</span> mode.
+        </div>
+        <div class="px-4 pb-4">
+          {{
+            boardStore.currentBoard?.isPublic
+              ? 'In private, only board owner can access/control board. Do you want to change the visibility to Private?'
+              : 'In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public?'
+          }}
+        </div>
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
+          <div class="flex gap-2">
+            <button @click="boardVisibilityModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+              Cancel
+            </button>
+            <button @click="handleToggleBoardVisibility" :disabled="isLoading"
+              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
+  </Transition>
 
   <Transition>
     <BaseModal @clickBG="taskDeleteModalOpenState = false" :show="taskDeleteModalOpenState" :mobileCenter="true">
@@ -118,8 +176,63 @@ defineExpose({
     </Transition>
   </RouterView>
 
-  <div class="max-w-full pt-10 pb-20">
-    <div class="bg-base-300 rounded-lg shadow-md">
+  <div class="max-w-full pt-5 pb-20">
+    <div class="block sm:hidden">
+      <div class="px-4 mb-4 flex justify-between">
+        <StatusFilterBar compact />
+        <div class="flex gap-2">
+          <BaseMenu side="left">
+            <template #icon>
+              <IconSVG iconName="three-dots" scale="1.25" />
+            </template>
+            <template #menu>
+              <button @click="handleRefreshBtnClick" type="button"
+                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <div :class="{ 'animate-spin': boardStore.isLoading.task }">
+                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+                </div>Refresh Tasks
+              </button>
+              <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
+                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <IconSVG iconName="plus" :scale="1.25" />Add Task
+              </button>
+              <button v-if="isBoardOwner" @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <IconSVG iconName="gear" :scale="1.25" />Board Settings
+              </button>
+            </template>
+          </BaseMenu>
+          <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" :disabled="isBoardOwner === false" />
+        </div>
+        
+      </div>
+      <div v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
+        <div colspan="4" class="flex justify-center items-center h-32">Loading tasks...</div>
+      </div>
+      <div v-else-if="boardStore.tasks === null">
+        <div colspan="4" class="flex justify-center items-center h-32">Error while loading tasks from server. Please try again later.</div>
+      </div>
+      <div v-else-if="boardStore.tasks.length === 0">
+        <div colspan="4" class="flex justify-center items-center h-32">No task</div>
+      </div>
+      <div v-else>
+        <div
+          v-for="(task, index) in boardStore.tasks"
+          :key="task.id"
+        >
+          <TaskCard
+            @titleClick="handleTaskClick(task.id)"
+            @editClick="handleEditBtnClick(task.id)"
+            @deleteClick="handleOpenDeleteModal(task)"
+            :task="task"
+            :index="index"
+            :hasWritePermission="isBoardOwner"
+          />
+          <div class="divider"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="hidden sm:block bg-base-300 rounded-lg shadow-md">
       <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-3 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
         <div class="flex justify-between py-2">
           <StatusFilterBar />
@@ -135,27 +248,33 @@ defineExpose({
                     <IconSVG iconName="arrow-clockwise" :scale="1.25" />
                   </div>Refresh Tasks
                 </button>
-                <button @click="handleAddBtnClick" type="button"
+                <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
                   class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
                   <IconSVG iconName="plus" :scale="1.25" />Add Task
                 </button>
-                <button @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <button v-if="isBoardOwner" @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
                   <IconSVG iconName="gear" :scale="1.25" />Board Settings
                 </button>
               </template>
             </BaseMenu>
-            <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-ghost btn-sm hidden md:flex">
-              <IconSVG iconName="gear" :scale="1.25" />Board Settings
-            </button>
-            <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm hidden md:flex">
-              <div :class="{ 'animate-spin': boardStore.isLoading.task }">
-                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-              </div>Refresh Tasks
-            </button>
-            <button @click="handleAddBtnClick" type="button"
+            <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" 
+            className="itbkk-board-visibility" :disabled="isBoardOwner === false" />
+            <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
               class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
               <IconSVG iconName="plus" :scale="1.25" />Add Task
             </button>
+            <BaseTooltip text="Refresh Tasks">
+              <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm btn-square hidden md:flex">
+                <div :class="{ 'animate-spin': boardStore.isLoading.task }">
+                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+                </div>
+              </button>
+            </BaseTooltip>
+            <BaseTooltip v-if="isBoardOwner" text="Board Setting">
+              <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-secondary btn-sm btn-square hidden md:flex">
+                <IconSVG iconName="gear" :scale="1.25" />
+              </button>
+            </BaseTooltip>
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@ import { RouterLink } from 'vue-router'
     <ThemeSwitch />
   </div>
   <div class="flex flex-col justify-center items-center h-screen gap-4">
-    <div class="text-center">
+    <div class="w-[90vw] max-w-[30rem] text-center">
       <div class="text-8xl font-bold tracking-wider">404</div>
       <div class="text-2xl">Page not found</div>
     </div>

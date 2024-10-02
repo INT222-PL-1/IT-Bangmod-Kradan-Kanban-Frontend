@@ -105,3 +105,30 @@ export async function copyToClipboard(text) {
     console.error('Failed to copy!', err);
   }
 }
+
+export function humanReadDate(rawDate) {
+
+	const date = new Date(rawDate)
+
+	if (date.getDate() === new Date().getDate() && date.getMonth() === new Date().getMonth() && date.getFullYear() === new Date().getFullYear()) {
+		if (date.getHours() === new Date().getHours()) {
+			if (date.getMinutes() === new Date().getMinutes()) {
+				return 'just now'
+			}
+
+			return new Date().getMinutes() - date.getMinutes()  + ' minutes ago'
+		}
+		return 'today at ' + date.toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: 'numeric'
+		})
+	}
+
+	return date.toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric'
+	})
+}
