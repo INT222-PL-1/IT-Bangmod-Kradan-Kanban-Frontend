@@ -23,9 +23,6 @@ defineProps({
 </script>
 
 <template>
-  <!-- <div>
-    {{ task }}
-  </div> -->
   <div class="w-screen px-4 py-2 flex gap-2">
     <div class="flex-none text-xl">•</div>
     <div class="flex-grow flex flex-col gap-2 overflow-hidden">
