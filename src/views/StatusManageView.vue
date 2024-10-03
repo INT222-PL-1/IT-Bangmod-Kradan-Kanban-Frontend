@@ -196,7 +196,8 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
               <IconSVG iconName="plus" :scale="1.25" />Add Status
             </button>
             <BaseTooltip text="Refresh Statuses">
-              <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm btn-square hidden md:flex">
+              <button @click="handleRefreshBtnClick" type="button"
+                class="btn btn-secondary btn-sm btn-square hidden md:flex">
                 <div :class="{ 'animate-spin': boardStore.isLoading.status }">
                   <IconSVG iconName="arrow-clockwise" :scale="1.25" />
                 </div>
@@ -234,8 +235,8 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
                 </div>
               </td>
               <td class="overflow-hidden min-w-52 max-w-52">
-                <StatusBadge :statusData="status" textWrapMode="wrap"
-                  class="itbkk-status-name cursor-default" width="100%" />
+                <StatusBadge :statusData="status" textWrapMode="wrap" class="itbkk-status-name cursor-default"
+                  width="100%" />
               </td>
               <td :class="{ 'italic text-[grey]': !status.description }"
                 class="itbkk-status-description min-w-96 max-w-96 break-words">
@@ -259,7 +260,8 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
               <td v-if="isBoardOwner">
                 <div v-if="status.isPredefined === false" class="flex justify-center items-center gap-1 w-full">
                   <ButtonWithIcon @click="handleEditBtnClick(status.id)"
-                    className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap" iconName="pencil-square">
+                    className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap"
+                    iconName="pencil-square">
                     Edit
                   </ButtonWithIcon>
                   <ButtonWithIcon @click="handleOpenDeleteModal(status)"
