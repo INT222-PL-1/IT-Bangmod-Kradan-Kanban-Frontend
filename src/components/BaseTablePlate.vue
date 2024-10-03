@@ -14,7 +14,7 @@
           </div>
         </div>
       </div>
-      <div class="table-overflow-x-scroll p-4">
+      <div class="table-overflow-x-scroll p-4 max-w-[85vw]">
         <slot name="table">
           <table class="table table-zebra">
             <thead>
