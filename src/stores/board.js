@@ -56,8 +56,9 @@ export const useBoardStore = defineStore('board', () => {
     const res = await getBoardById(boardId)
     if (res.status === 'success') {
       currentBoard.value = { ...res.data, isPublic: res.data.visibility === 'PUBLIC' }
-      await loadTasks(boardId)
-      await loadStatuses(boardId)
+      // await loadTasks(boardId)
+      // await loadStatuses(boardId)
+      await Promise.all([loadTasks(boardId), loadStatuses(boardId)])
     }
     isLoading.value.board = false
   }
@@ -88,16 +89,10 @@ export const useBoardStore = defineStore('board', () => {
     })
     if (res.status === 'success') {
       currentBoard.value.isPublic = !currentBoard.value.isPublic
-    } else if (res.statusCode === 403) {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'You do not have permission to change board visibility mode.',
-        status: 'error'
-      })
     } else {
       toastStore.createToast({
         title: 'Error',
-        description: 'Failed to update board visibility. Please try again later.',
+        description: res.statusCode === 403 ? 'You do not have permission to change board visibility mode.' : 'Failed to update board visibility. Please try again later.',
         status: 'error'
       })
     }
