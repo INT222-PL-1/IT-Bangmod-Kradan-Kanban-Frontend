@@ -86,6 +86,11 @@ const handleLoginSubmit = async () => {
                 <button type="submit" :disabled="username.length === 0 || password.length === 0"
                     :class="{ 'disabled': username.length === 0 || password.length === 0 }"
                     class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
+                <div class="divider">Or</div>
+                <button class="btn btn-neutral gap-3" disabled>
+                    <IconSVG iconName="microsoft-logo" size="1.5rem" :scale="1.5" />
+                    Login with Microsoft
+                </button>
             </form>
         </div>
     </main> 

@@ -15,10 +15,19 @@ const props = defineProps({
   size: {
     type: [Number, String],
     default: '1rem'
+  },
+  className: {
+    type: String,
+    default: ''
   }
 })
 
 const icon = ref('')
+
+/**
+ * @type {HTMLElement}
+ */
+const thisIcon = ref(null)
 
 onMounted(async () => {
   icon.value = (await import(`@/assets/icons/${props.iconName}.svg?raw`)).default
@@ -29,7 +38,9 @@ onMounted(async () => {
 <template>
   <div
     :style="{ width: size, height: size }"
-    class="grid place-items-center"
+    :class="[className]"
+    class="grid place-items-center icon-svg"
+    ref="thisIcon"
   >
     <div
       v-html="icon"
@@ -40,3 +51,11 @@ onMounted(async () => {
     ></div>
   </div>
 </template>
+
+<style scoped>
+
+*[disabled] > .icon-svg {
+  opacity: 0.5;
+}
+
+</style>

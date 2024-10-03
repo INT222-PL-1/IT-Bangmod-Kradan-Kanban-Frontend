@@ -84,19 +84,30 @@ const handleSignButtonClick = () => {
     class="hidden sm:flex sticky top-[5rem] z-20 px-4 h-[3rem] justify-between items-center bg-base-300 shadow-md">
     <div class="flex gap-4">
       <div class="flex">
-        <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100 "
+        <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100"
           class="btn btn-ghost btn-sm">
           <IconSVG iconName="house" :scale="1.25" />Home
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
-        <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100"
+        <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100 nav-selected"
           class="btn btn-ghost btn-sm">
-          <IconSVG iconName="kanban" :scale="1.25" />Task Board
+          <IconSVG iconName="kanban" :scale="1.25" className="nav-icon" />
+          <IconSVG iconName="kanban-fill" :scale="1.25" className="nav-icon-selected" />
+          Task Board
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
-        <RouterLink :to="{ name: 'status-manage' }" exact-active-class="bg-neutral opacity-100"
+        <RouterLink :to="{ name: 'status-manage' }" exact-active-class="bg-neutral opacity-100 nav-selected"
           class="itbkk-manage-status btn btn-ghost btn-sm">
-          <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
+          <IconSVG iconName="tags" :scale="1.25" className="nav-icon" />
+          <IconSVG iconName="tags-fill" :scale="1.25" className="nav-icon-selected" />
+          Manage Status
+        </RouterLink>
+        <div class="divider divider-horizontal m-0"></div>
+        <RouterLink :to="{ name: 'collab-manage' }" exact-active-class="bg-neutral opacity-100 nav-selected"
+          class="itbkk-manage-status btn btn-ghost btn-sm">
+          <IconSVG iconName="people" :scale="1.25" className="nav-icon" />
+          <IconSVG iconName="people-fill" :scale="1.25" className="nav-icon-selected" />
+          Manage Collaborators
         </RouterLink>
       </div>
     </div>
@@ -111,3 +122,19 @@ const handleSignButtonClick = () => {
     </aside>
   </footer>
 </template>
+
+<style scoped>
+
+.nav-icon-selected {
+  display: none;
+}
+
+.nav-selected .nav-icon {
+  display: none;
+}
+
+.nav-selected .nav-icon-selected {
+  display: block;
+}
+
+</style>

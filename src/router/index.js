@@ -88,6 +88,11 @@ const router = createRouter({
             }
           ]
         },
+        {
+          path: 'collab',
+          name: 'collab-manage',
+          component: () => import('@/views/CollabManageView.vue'),
+        }
       ]
     },
     {
