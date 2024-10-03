@@ -9,11 +9,11 @@ const BASE_URL = `${SERVER_URL}/${VERSION}/boards`
  * @param {string} boardId
  * @returns
  */
-export async function getStatuses(boardId) {
+export async function getStatuses(boardId, zyosOptions) {
   const url = `${BASE_URL}/${boardId}/statuses`
 
   try {
-    const res = await zyos.fetch(url)
+    const res = await zyos.fetch(url, zyosOptions)
     return res
   } catch (error) {
     console.error(error)
@@ -27,7 +27,7 @@ export async function getStatuses(boardId) {
  * @param {Number} boardId
  * @returns
  */
-export async function getStatusById(statusId, boardId) {
+export async function getStatusById(statusId, boardId, zyosOptions) {
   const url = `${BASE_URL}/${boardId}/statuses/${statusId}`
 
   try {
@@ -37,7 +37,8 @@ export async function getStatusById(statusId, boardId) {
           if (data[key] === null) data[key] = ''
         }
         return data
-      }
+      },
+      ...zyosOptions
     })
     return res
   } catch (error) {
@@ -46,7 +47,7 @@ export async function getStatusById(statusId, boardId) {
   }
 }
 
-export async function createStatus({ name, description, color }, boardId) {
+export async function createStatus({ name, description, color }, boardId, zyosOptions) {
   const url = `${BASE_URL}/${boardId}/statuses`
 
   try {
@@ -56,7 +57,8 @@ export async function createStatus({ name, description, color }, boardId) {
         name,
         description: description === '' ? null : description,
         color: color === '' ? '#666666' : color
-      }
+      },
+      ...zyosOptions
     })
     return res
   } catch (error) {
@@ -70,7 +72,7 @@ export async function updateStatus({
   name,
   description,
   color,
-}, boardId) {
+}, boardId, zyosOptions) {
   const url = `${BASE_URL}/${boardId}/statuses/${statusId}`
 
   try {
@@ -80,7 +82,8 @@ export async function updateStatus({
         name,
         description: description === '' ? null : description,
         color: color === '' ? '#999999' : color,
-      }
+      },
+      ...zyosOptions
     })
     return res
   } catch (error) {

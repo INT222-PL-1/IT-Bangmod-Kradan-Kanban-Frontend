@@ -46,7 +46,7 @@ async function loadSelectedTaskData() {
   if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
       status: 'error'
     })
     router.replace({ name: 'all-task' })
@@ -88,7 +88,7 @@ const handleClickConfirm = async () => {
     if (res.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
+        description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
         status: 'error'
       })
     } else {
@@ -106,7 +106,7 @@ const handleClickConfirm = async () => {
     if (res.status === 'error') {
       toastStore.createToast({
         title: 'Error',
-        description: `An error occurred while updating the task.\nPlease try again.`,
+        description: `An error occurred while updating the task.\nPlease try again later`,
         status: 'error'
       })
     } else {

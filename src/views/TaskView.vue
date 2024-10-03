@@ -16,6 +16,7 @@ import BoardVisibilityToggleButton from '@/components/BoardVisibilityToggleButto
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import { useUserStore } from '@/stores/user'
 import TaskCard from '@/components/TaskCard.vue'
+import BaseTablePlate from '@/components/BaseTablePlate.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -64,7 +65,7 @@ const handleDeleteTask = async (taskId) => {
   if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
       status: 'error'
     })
     await refreshBoardTasks()
@@ -176,7 +177,7 @@ const handleToggleBoardVisibility = async () => {
     </Transition>
   </RouterView>
 
-  <div class="max-w-full pt-5 pb-20">
+  <section class="max-w-full pt-10 pb-20">
     <div class="block sm:hidden">
       <div class="px-4 mb-4 flex justify-between">
         <StatusFilterBar compact />
@@ -232,53 +233,51 @@ const handleToggleBoardVisibility = async () => {
       </div>
     </div>
     
-    <div class="hidden sm:block bg-base-300 rounded-lg shadow-md">
-      <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-3 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
-        <div class="flex justify-between py-2">
-          <StatusFilterBar />
-          <div class="flex gap-2">
-            <BaseMenu side="left" class="md:hidden">
-              <template #icon>
-                <IconSVG iconName="three-dots" scale="1.25" />
-              </template>
-              <template #menu>
-                <button @click="handleRefreshBtnClick" type="button"
-                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                  <div :class="{ 'animate-spin': boardStore.isLoading.task }">
-                    <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-                  </div>Refresh Tasks
-                </button>
-                <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                  <IconSVG iconName="plus" :scale="1.25" />Add Task
-                </button>
-                <button v-if="isBoardOwner" @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                  <IconSVG iconName="gear" :scale="1.25" />Board Settings
-                </button>
-              </template>
-            </BaseMenu>
-            <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" 
-            className="itbkk-board-visibility" :disabled="isBoardOwner === false" />
+    <BaseTablePlate>
+      <template #left-menu>
+        <StatusFilterBar />
+      </template>
+      <template #right-menu>
+        <BaseMenu side="left" class="md:hidden">
+          <template #icon>
+            <IconSVG iconName="three-dots" scale="1.25" />
+          </template>
+          <template #menu>
+            <button @click="handleRefreshBtnClick" type="button"
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+              <div :class="{ 'animate-spin': boardStore.isLoading.task }">
+                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+              </div>Refresh Tasks
+            </button>
             <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
               <IconSVG iconName="plus" :scale="1.25" />Add Task
             </button>
-            <BaseTooltip text="Refresh Tasks">
-              <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm btn-square hidden md:flex">
-                <div :class="{ 'animate-spin': boardStore.isLoading.task }">
-                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-                </div>
-              </button>
-            </BaseTooltip>
-            <BaseTooltip v-if="isBoardOwner" text="Board Setting">
-              <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-secondary btn-sm btn-square hidden md:flex">
-                <IconSVG iconName="gear" :scale="1.25" />
-              </button>
-            </BaseTooltip>
-          </div>
-        </div>
-      </div>
-      <div class="table-overflow-x-scroll p-4">
+            <button v-if="isBoardOwner" @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+              <IconSVG iconName="gear" :scale="1.25" />Board Settings
+            </button>
+          </template>
+        </BaseMenu>
+        <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" 
+        className="itbkk-board-visibility" :disabled="isBoardOwner === false" />
+        <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
+          class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
+          <IconSVG iconName="plus" :scale="1.25" />Add Task
+        </button>
+        <BaseTooltip text="Refresh Tasks">
+          <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm btn-square hidden md:flex">
+            <div :class="{ 'animate-spin': boardStore.isLoading.task }">
+              <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+            </div>
+          </button>
+        </BaseTooltip>
+        <BaseTooltip v-if="isBoardOwner" text="Board Setting">
+          <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-secondary btn-sm btn-square hidden md:flex">
+            <IconSVG iconName="gear" :scale="1.25" />
+          </button>
+        </BaseTooltip>
+      </template>
+      <template #table>
         <table class="table table-zebra">
           <thead>
             <tr class="select-none">
@@ -360,10 +359,9 @@ const handleToggleBoardVisibility = async () => {
             </tr>
           </tbody>
         </table>
-        <div class="h-16"></div>
-      </div>
-    </div>
-  </div>
+      </template>
+    </BaseTablePlate>
+  </section>
 </template>
 
 <style scoped>

@@ -12,6 +12,7 @@ import BaseMenu from '@/components/BaseMenu.vue'
 import { useBoardStore } from '@/stores/board'
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import { useUserStore } from '@/stores/user'
+import BaseTablePlate from '@/components/BaseTablePlate.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -66,7 +67,7 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
   if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\nPlease try again.`,
+      description: `An error has occurred.\nPlease try again later`,
       status: 'error'
     })
   } else {
@@ -86,7 +87,7 @@ const handleDeleteStatus = async (statusId) => {
   if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
       status: 'error'
     })
     await boardStore.loadStatuses()
@@ -169,50 +170,46 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     </Transition>
   </RouterView>
 
-  <div class="max-w-full pt-10 pb-20">
-    <div class="bg-base-300 rounded-lg shadow-md">
-      <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-3 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
-        <div class="flex justify-end py-2">
-          <div class="flex gap-2">
-            <BaseMenu side="left" class="md:hidden">
-              <template #icon>
-                <IconSVG iconName="three-dots" scale="1.25" />
-              </template>
-              <template #menu>
-                <button @click="handleRefreshBtnClick" type="button"
-                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                  <div :class="{ 'animate-spin': boardStore.isLoading.status }">
-                    <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-                  </div>Refresh Statuses
-                </button>
-                <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                  <IconSVG iconName="plus" :scale="1.25" />Add Status
-                </button>
-              </template>
-            </BaseMenu>
+  <section class="max-w-full pt-10 pb-20">
+    <BaseTablePlate>
+      <template #right-menu>
+        <BaseMenu side="left" class="md:hidden">
+          <template #icon>
+            <IconSVG iconName="three-dots" scale="1.25" />
+          </template>
+          <template #menu>
+            <button @click="handleRefreshBtnClick" type="button"
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+              <div :class="{ 'animate-spin': boardStore.isLoading.status }">
+                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+              </div>Refresh Statuses
+            </button>
             <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
               <IconSVG iconName="plus" :scale="1.25" />Add Status
             </button>
-            <BaseTooltip text="Refresh Statuses">
-              <button @click="handleRefreshBtnClick" type="button"
-                class="btn btn-secondary btn-sm btn-square hidden md:flex">
-                <div :class="{ 'animate-spin': boardStore.isLoading.status }">
-                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-                </div>
-              </button>
-            </BaseTooltip>
-          </div>
-        </div>
-      </div>
-      <div class="table-overflow-x-scroll p-4">
+          </template>
+        </BaseMenu>
+        <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
+          class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
+          <IconSVG iconName="plus" :scale="1.25" />Add Status
+        </button>
+        <BaseTooltip text="Refresh Statuses">
+          <button @click="handleRefreshBtnClick" type="button"
+            class="btn btn-secondary btn-sm btn-square hidden md:flex">
+            <div :class="{ 'animate-spin': boardStore.isLoading.status }">
+              <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+            </div>
+          </button>
+        </BaseTooltip>
+      </template>
+      <template #table>
         <table class="table table-zebra">
           <thead>
             <tr class="select-none">
               <th class="min-w-16 max-w-16"></th>
               <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
-              <th class="min-w-96 max-w-96 sm:min-w-[35vw] sm:max-w-[35vw]">Description</th>
+              <th class="min-w-96 max-w-96 sm:min-w-[20vw] sm:max-w-[30vw]">Description</th>
               <th class="min-w-16 max-w-16">Tasks</th>
               <th v-if="isBoardOwner" class="min-w-60 max-w-60">Action</th>
               <th v-else class="min-w-60 max-w-60"></th>
@@ -275,10 +272,9 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
             </tr>
           </tbody>
         </table>
-        <div class="h-20"></div>
-      </div>
-    </div>
-  </div>
+      </template>
+    </BaseTablePlate>
+  </section>
 </template>
 
 <style scoped>
