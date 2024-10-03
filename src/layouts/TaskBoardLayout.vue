@@ -104,7 +104,7 @@ const handleSignButtonClick = () => {
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
         <RouterLink :to="{ name: 'collab-manage' }" exact-active-class="bg-neutral opacity-100 nav-selected"
-          class="itbkk-manage-status btn btn-ghost btn-sm">
+          class="itbkk-manage-collaborator btn btn-ghost btn-sm">
           <IconSVG iconName="people" :scale="1.25" className="nav-icon" />
           <IconSVG iconName="people-fill" :scale="1.25" className="nav-icon-selected" />
           Manage Collaborators
