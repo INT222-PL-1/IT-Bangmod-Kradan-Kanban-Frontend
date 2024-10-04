@@ -1,9 +1,6 @@
 <script setup>
 import BoardListItem from '@/components/BoardListItem.vue'
 import IconSVG from '@/components/IconSVG.vue'
-import ResponsiveLogo from '@/components/ResponsiveLogo.vue'
-import ThemeSwitch from '@/components/ThemeSwitch.vue'
-import UserMenuButton from '@/components/UserMenuButton.vue'
 import { useBoardStore } from '@/stores/board'
 import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
@@ -39,13 +36,6 @@ const handleBoardClick = async (boardId) => {
     </Transition>
   </RouterView>
 
-  <header class="h-[5rem] top-0 sticky flex justify-between items-center px-6 bg-base-300 shadow-md z-20">
-    <ResponsiveLogo type="compact" />
-    <div class="flex">
-      <ThemeSwitch />
-      <UserMenuButton />
-    </div>
-  </header>
   <div class="h-[7rem] top-[5rem] sticky flex justify-center items-center bg-base-100 z-10">
     <div class="text-3xl font-bold flex items-center gap-2">
       <IconSVG iconName="kanban" :scale="2" size="2rem" />
@@ -75,11 +65,7 @@ const handleBoardClick = async (boardId) => {
       </div>
     </div>
   </div>
-  <footer class="footer footer-center p-4 bg-base-300 text-base-content">
-    <aside>
-      <p>Copyright © 2024 - All right reserved by Dawnbreakers Team</p>
-    </aside>
-  </footer>
+  
 </template>
 
 <style scoped>

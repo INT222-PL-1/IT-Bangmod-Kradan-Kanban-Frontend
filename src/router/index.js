@@ -6,6 +6,7 @@ import BoardView from '@/views/BoardView.vue'
 import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast'
 import { refreshAccessToken } from '@/libs/userManagement'
+import BoardSelectLayout from '@/layouts/BoardSelectLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,26 +18,32 @@ const router = createRouter({
     },
     {
       path: '/board',
-      name: 'all-board',
-      component: BoardView,
-      beforeEnter: async (to, from, next) => {
-        const boardStore = useBoardStore()
-        boardStore.clearBoardData()
-        await boardStore.loadAllBoards()
-        if (from.name === 'all-task') {
-          next()
-          return
-        }
-        if (boardStore.boards.length === 1) {
-          next({ name: 'all-task', params: { boardId: boardStore.boards[0].id } })
-        }
-        else next()
-      },
+      component: BoardSelectLayout,
       children: [
         {
-          path: 'add',
-          name: 'board-add',
-          component: () => import('@/components/BoardAddModal.vue')
+          path: '/',
+          name: 'all-board',
+          component: BoardView,
+          beforeEnter: async (to, from, next) => {
+            const boardStore = useBoardStore()
+            boardStore.clearBoardData()
+            await boardStore.loadAllBoards()
+            if (from.name === 'all-task') {
+              next()
+              return
+            }
+            if (boardStore.boards.length === 1) {
+              next({ name: 'all-task', params: { boardId: boardStore.boards[0].id } })
+            }
+            else next()
+          },
+          children: [
+            {
+              path: 'add',
+              name: 'board-add',
+              component: () => import('@/components/BoardAddModal.vue')
+            }
+          ]
         }
       ]
     },
