@@ -187,8 +187,7 @@ const handleToggleBoardVisibility = async () => {
               <IconSVG iconName="three-dots" scale="1.25" />
             </template>
             <template #menu>
-              <button @click="handleRefreshBtnClick" type="button"
-                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+              <button @click="handleRefreshBtnClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
                 <div :class="{ 'animate-spin': boardStore.isLoading.task }">
                   <IconSVG iconName="arrow-clockwise" :scale="1.25" />
                 </div>Refresh Tasks
@@ -204,7 +203,6 @@ const handleToggleBoardVisibility = async () => {
           </BaseMenu>
           <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" :disabled="isBoardOwner === false" />
         </div>
-        
       </div>
       <div v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
         <div colspan="4" class="flex justify-center items-center h-32">Loading tasks...</div>

@@ -63,6 +63,18 @@ export const useBoardStore = defineStore('board', () => {
     isLoading.value.board = false
   }
 
+  async function updateBoard(boardId, boardData) {
+    isLoading.value.board = true
+    const res = await patchBoard(boardId, boardData)
+    if (res.status === 'success') {
+      currentBoard.value = { ...currentBoard.value, ...res.data }
+    } else {
+      throw new Error(res.message)
+    }
+    isLoading.value.board = false
+    return res.data
+  }
+
   function sortTasks(sortBy, sortDirection) {
     options.value.sortBy = sortBy
     options.value.sortDirection = sortDirection
@@ -107,8 +119,6 @@ export const useBoardStore = defineStore('board', () => {
     clearTaskFilterStatus()
   }
 
-  // watch(() => options.value.boardId, fetchBoard, { immediate: true })
-
   watch(options, async () => {
     await loadTasks()
   }, { deep: true })
@@ -129,6 +139,7 @@ export const useBoardStore = defineStore('board', () => {
     removeTaskFilterStatus,
     clearTaskFilterStatus,
     toggleBoardVisibility,
-    clearBoardData
+    clearBoardData,
+    updateBoard
   }
 })

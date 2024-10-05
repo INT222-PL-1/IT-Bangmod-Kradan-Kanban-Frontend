@@ -36,20 +36,20 @@ const handleBoardClick = async (boardId) => {
     </Transition>
   </RouterView>
 
-  <div class="h-[7rem] top-[5rem] sticky flex justify-center items-center bg-base-100 z-10">
+  <!-- <div class="h-[7rem] top-[5rem] sticky flex justify-center items-center bg-base-100 z-10">
     <div class="text-3xl font-bold flex items-center gap-2">
       <IconSVG iconName="kanban" :scale="2" size="2rem" />
       <div>{{ userStore.user.name }}'s boards</div>
     </div>
-  </div>
+  </div> -->
   <div class="flex justify-center">
     <div class="w-fit">
-      <div class="h-[3rem] top-[12rem] sticky flex justify-end bg-base-100 z-10 border-b-2 border-base-300">
+      <!-- <div class="h-[3rem] top-[12rem] sticky flex justify-end bg-base-100 z-10 border-b-2 border-base-300">
         <button class="itbkk-button-create btn btn-primary btn-sm mr-6" @click="handleAddBoardClick">
           <IconSVG iconName="plus" scale="1.75" size="1rem" />
           Add New Board
         </button>
-      </div>
+      </div> -->
       <div class="min-h-[calc(100vh-15rem)] board-scrollbar pt-5 pb-32 flex flex-col items-center">
         <div v-if="!isLoading">
           <div v-if="boardStore.boards.length === 0" class="flex flex-col items-center justify-center h-[25rem] max-w-[50rem] w-[90vw]">
