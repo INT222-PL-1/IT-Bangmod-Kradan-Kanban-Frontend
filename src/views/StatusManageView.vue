@@ -67,7 +67,7 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
   if (res.status === 'error') {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\nPlease try again later`,
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
       status: 'error'
     })
   } else {

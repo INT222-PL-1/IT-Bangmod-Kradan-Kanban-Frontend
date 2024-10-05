@@ -1,10 +1,9 @@
 <script setup>
-import { useBoardStore } from '@/stores/board';
+import { useBoardStore } from '@/stores/board'
 import BaseModal from './BaseModal.vue'
-import { useToastStore } from '@/stores/toast';
-import { computed, ref, watch } from 'vue';
-import { patchBoard } from '@/libs/boardManagement';
-import StatusBadge from './StatusBadge.vue';
+import { useToastStore } from '@/stores/toast'
+import { computed, ref, watch } from 'vue'
+import StatusBadge from './StatusBadge.vue'
 
 const emits = defineEmits(['clickClose'])
 
@@ -21,49 +20,44 @@ const newSettings = ref({
   isTaskLimitEnabled: false,
   taskLimitPerStatus: 10
 })
-const disabledSaveSettingsBtn = computed(() => {
-  return newSettings.value.isTaskLimitEnabled === boardStore.currentBoard.isTaskLimitEnabled &&
+const disabledApplySettingsBtn = computed(() => {
+  return boardStore.isLoading.board || (
+    newSettings.value.isTaskLimitEnabled === boardStore.currentBoard.isTaskLimitEnabled &&
     newSettings.value.taskLimitPerStatus === boardStore.currentBoard.taskLimitPerStatus
+  )
 })
-const confirmLimitOpenState = ref(false)
 const exceedLimitOpenState = ref(false)
 const exceedLimitStatus = ref([])
 
-const handleSaveSettingsStatus = async ({ message }) => {
-  const res = await patchBoard(boardStore.currentBoard.id, newSettings.value)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
-      status: 'error'
-    })
-  } else {
+const handleApplySetting = async ({ message }) => {
+  let res
+  try {
+    res = await boardStore.updateBoard(boardStore.currentBoard.id, newSettings.value)
     toastStore.createToast({
       title: 'Success',
       description: `The board settings have been updated.\n${message || ''}`,
       status: 'success'
     })
-    await boardStore.loadBoard()
-  }
+  } catch (error) {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
+      status: 'error'
+    })
+  } 
 
-  const patchedBoard = res.data
-
-  if (patchedBoard.isTaskLimitEnabled && patchedBoard.exceedLimitStatus.length > 0) {
-    exceedLimitStatus.value.push(...patchedBoard.exceedLimitStatus)
+  if (boardStore.currentBoard.isTaskLimitEnabled && boardStore.currentBoard.exceedLimitStatus.length > 0) {
+    exceedLimitStatus.value.push(...boardStore.currentBoard.exceedLimitStatus)
     exceedLimitOpenState.value = true
   }
 }
 
-const handleConfirmLimit = async () => {
-  await handleSaveSettingsStatus({
-    message: newSettings.value.isTaskLimitEnabled ? `The Kanban board now limits ${newSettings.value.taskLimitPerStatus} tasks in each status.` : 'The Kanban board has disabled the task limit in each status.'
-  })
-  confirmLimitOpenState.value = false
-}
-
-const handleCancelConfirmLimit = () => {
-  newSettings.value.isTaskLimitEnabled = boardStore.currentBoard.isTaskLimitEnabled
-  confirmLimitOpenState.value = false
+const handleCloseSetting = () => {
+  // Reset the settings to the current board settings
+  newSettings.value = {
+    isTaskLimitEnabled: boardStore.currentBoard.isTaskLimitEnabled,
+    taskLimitPerStatus: boardStore.currentBoard.taskLimitPerStatus
+  }
   emits('clickClose')
 }
 
@@ -72,14 +66,11 @@ const handleCloseExceedLimitModal = () => {
   exceedLimitOpenState.value = false
 }
 
-watch(() => newSettings.value?.isTaskLimitEnabled, (newVal) => {
-  if (newVal !== boardStore.currentBoard?.isTaskLimitEnabled) {
-    confirmLimitOpenState.value = true
-  }
-})
-
 watch(() => boardStore.currentBoard, (newBoard) => {
-  newSettings.value = { ...newBoard }
+  newSettings.value = {
+    isTaskLimitEnabled: newBoard?.isTaskLimitEnabled,
+    taskLimitPerStatus: newBoard?.taskLimitPerStatus
+  }
 }, { immediate: true })
 
 </script>
@@ -112,41 +103,15 @@ watch(() => boardStore.currentBoard, (newBoard) => {
         </div>
         <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
-            <button @click="handleSaveSettingsStatus" class="btn btn-sm btn-success"
-              :class="{ 'itbkk-button-confirm': confirmLimitOpenState === false }" :disabled="disabledSaveSettingsBtn">
+            <button @click="handleApplySetting" class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledApplySettingsBtn">
               Apply
             </button>
-            <button @click="$emit('clickClose')" class="btn btn-sm btn-neutral"
-              :class="{ 'itbkk-button-cancel': confirmLimitOpenState === false }">
+            <button @click="handleCloseSetting" class="itbkk-button-cancel btn btn-sm btn-neutral">
               Go back
             </button>
           </div>
         </div>
       </div>
-      <Transition>
-        <BaseModal :show="confirmLimitOpenState" @clickBG="handleCancelConfirmLimit" :mobileCenter="true">
-          <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-            <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Confirm {{
-              newSettings.isTaskLimitEnabled ? 'Enable' : 'Disable' }} Limit</div>
-            <div v-show="newSettings.isTaskLimitEnabled" class="flex flex-col gap-2 p-4 break-words">
-              The Kanban board will limit the number of tasks in each status to {{ newSettings.taskLimitPerStatus }}.
-            </div>
-            <div v-show="!newSettings.isTaskLimitEnabled" class="flex flex-col gap-2 p-4 break-words">
-              The Kanban board will disable the task limit in each status.
-            </div>
-            <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-              <div class="flex gap-2">
-                <button @click="handleConfirmLimit" class="itbkk-button-confirm btn btn-sm btn-success">
-                  Confirm
-                </button>
-                <button @click="handleCancelConfirmLimit" class="itbkk-button-cancel btn btn-sm btn-neutral">
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </BaseModal>
-      </Transition>
       <Transition>
         <BaseModal :show="exceedLimitOpenState" @clickBG="handleCloseExceedLimitModal" :mobileCenter="true">
           <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
