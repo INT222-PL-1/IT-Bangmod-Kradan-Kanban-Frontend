@@ -15,7 +15,7 @@ import { RouterView } from 'vue-router'
       <UserMenuButton />
     </div>
   </header>
-  <section class="flex flex-col sm:items-center max-w-full min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-8rem)] h-auto">
+  <section class="flex flex-col sm:items-center max-w-full min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-5rem)] h-auto">
     <RouterView />
   </section>
   <footer class="footer footer-center p-4 bg-base-300 text-base-content">

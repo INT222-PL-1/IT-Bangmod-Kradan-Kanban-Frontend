@@ -15,6 +15,7 @@ export const useBoardStore = defineStore('board', () => {
     status: false
   })
   const boards = ref([])
+  const collaborativeBoards = ref([])
   const currentBoard = ref(null)
   const tasks = ref([])
   const statuses = ref([])
@@ -140,6 +141,7 @@ export const useBoardStore = defineStore('board', () => {
     clearTaskFilterStatus,
     toggleBoardVisibility,
     clearBoardData,
-    updateBoard
+    updateBoard,
+    collaborativeBoards
   }
 })
