@@ -157,3 +157,4 @@ watch(() => boardStore.currentBoard, (newBoard) => {
   opacity: 0;
 }
 </style>
+
