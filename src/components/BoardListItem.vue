@@ -17,7 +17,7 @@ const boardUrl = window.location.href + `/${props.board.id}`
 </script>
 
 <template>
-  <div class="group bg-base-300 shadow-md rounded-md m-4 flex justify-between min-h-[7rem] max-w-[50rem] w-[90vw]">
+  <div class="group bg-base-300 shadow-md rounded-md flex justify-between min-h-[7rem] max-w-[50rem] w-[90vw]">
     <div class="flex w-full">
       <div class="h-full w-2 transition-[width] bg-primary rounded-l-[0.25rem]" />
       <div class="flex justify-between w-full px-6 py-4">
