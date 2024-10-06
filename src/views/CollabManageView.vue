@@ -29,7 +29,7 @@ const handleRefreshBtnClick = async () => {
 </script>
 
 <template>
-  <div class="w-[70%] max-w-full pt-10">
+  <section class="max-w-full pt-10 pb-20">
     <!-- <div class="text-md text-bold py-3">{{ boardModalData.name }} <span class="font-bold"> > Collaborator </span></div> -->
     <!-- <div class="text-2xl p-4 text-center">Collaborator Management</div> -->
 
@@ -37,8 +37,9 @@ const handleRefreshBtnClick = async () => {
     <BaseTablePlate>
       <template #right-menu>
         <ButtonWithIcon
-          className="btn btn-sm text-neutral bg-primary hover:bg-[#d14117] px-4 min-h-8 flex items-center justify-center itbkk-collaborative-add"
-          iconName="person-plus">Add Collaborator
+          className="btn btn-sm btn-primary text-neutral itbkk-collaborative-add"
+          iconName="person-plus">
+          Add Collaborator
         </ButtonWithIcon>
 
         <button @click="handleRefreshBtnClick" type="button"
@@ -57,30 +58,38 @@ const handleRefreshBtnClick = async () => {
               <th class="min-w-16 max-w-16"></th>
               <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Members</th>
               <th class="min-w-96 max-w-96 sm:min-w-[20vw] sm:max-w-[30vw]">Access Right</th>
-              <th v-if="isBoardOwner" class="min-w-60 max-w-60">Action</th>
-              <th v-else class="min-w-60 max-w-60"></th>
+              <th class="min-w-60 max-w-60">{{ isBoardOwner ? 'Action' : '' }}</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr>
+            <tr v-if="boardStore.isLoading.collaborator">
+              <td colspan="4" class="text-center h-32">Loading collaborators...</td>
+            </tr>
+            <tr v-else-if="boardStore.collaborators === null">
+              <td colspan="4" class="text-center h-32">Error while loading collaborators from server. Please try again later.</td>
+            </tr>
+            <tr v-else-if="boardStore.collaborators.length === 0">
+              <td colspan="4" class="text-center h-32">No collaborator</td>
+            </tr>
+            <tr v-else v-for="(collaborator, index) in boardStore.collaborators" :key="collaborator.oid">
               <td class="min-w-16 max-w-16 itbkk-item">
                 <div class="grid place-items-center">
-                  <div>1</div>
+                  <div>{{ index + 1 }}</div>
                 </div>
               </td>
 
               <td class="min-w-16 max-w-16 justify-center">
-                <div class="text-md font-bold"> Meow meow </div>
-                <div class="text-sm text-gray-500 itbkk-email"> Meow@gmail.com </div>
+                <div class="text-md font-bold">{{ collaborator.name }}</div>
+                <div class="text-sm text-gray-500 itbkk-email">{{ collaborator.email }}</div>
               </td>
 
               <td class="min-w-18 max-w-18">
-                <div class="dropdown itbkk-access-right">
-                  <select class="transition flex bg-base-200 rounded-xl px-8 py-2 hover:contrast-75">
-                    <option value="read">Read</option>
-                    <option value="write">Write</option>
-                    <IconSVG iconName="chevron-down" size="1rem" />
+                <div class="itbkk-access-right dropdown">
+                  <select v-model="collaborator.accessRight" class="transition flex bg-base-200 rounded-xl px-8 py-2 hover:contrast-75">
+                    <option value="READ">Read</option>
+                    <option value="WRITE">Write</option>
+                    <!-- <IconSVG iconName="chevron-down" size="1rem" /> -->
                   </select>
                 </div>
               </td>
@@ -89,15 +98,12 @@ const handleRefreshBtnClick = async () => {
                 <button class="itbkk-button-remove btn btn-sm btn-error btn-outline min-w-35 max-w-35">Remove</button>
               </td>
               <td v-else class="min-w-60 max-w-60"></td>
-
             </tr>
-
           </tbody>
-
         </table>
       </template>
     </BaseTablePlate>
-  </div>
+  </section>
 </template>
 
 <style scoped></style>

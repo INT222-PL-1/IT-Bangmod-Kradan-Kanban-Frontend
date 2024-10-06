@@ -5,20 +5,28 @@ import { getStatuses } from '@/libs/statusManagement'
 import { getTasks } from '@/libs/taskManagement'
 import { useRoute } from 'vue-router'
 import { useToastStore } from './toast'
+import { getCollaborators } from '@/libs/collaboratorManagement'
+import { useUserStore } from './user'
 
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
   const toastStore = useToastStore()
+  const userStore = useUserStore()
   const isLoading = ref({
     board: false,
     task: false,
-    status: false
+    status: false,
+    collaborator: false
   })
+
   const boards = ref([])
   const collaborativeBoards = ref([])
+  
   const currentBoard = ref(null)
   const tasks = ref([])
   const statuses = ref([])
+  const collaborators = ref([])
+
   const options = ref({
     sortBy: null,
     sortDirection: null,
@@ -27,7 +35,7 @@ export const useBoardStore = defineStore('board', () => {
   
   async function loadTasks(boardId = route.params.boardId) {
     isLoading.value.task = true
-    const res = await getTasks(options.value, boardId)
+    const res = await getTasks(boardId, options.value)
     if (res.status === 'success') {
       tasks.value = res.data
     }
@@ -43,11 +51,32 @@ export const useBoardStore = defineStore('board', () => {
     isLoading.value.status = false
   }
 
+  async function loadCollaborators(boardId) {
+    isLoading.value.collaborator = true
+    const res = await getCollaborators(boardId)
+    console.log(res.data)
+    if (res.status === 'success') {
+      collaborators.value = res.data
+    }
+    isLoading.value.collaborator = false
+  }
+
   async function loadAllBoards() {
     isLoading.value.board = true
     const res = await getBoards()
     if (res.status === 'success') {
-      boards.value = res.data
+      const allBoards = res.data
+      const tempBoards = []
+      const tempCollaborativeBoards = []
+      for (const board of allBoards) {
+        if (board.ownerOid !== userStore.user.oid) {
+          tempCollaborativeBoards.push(board)
+        } else {
+          tempBoards.push(board)
+        }
+      }
+      boards.value = tempBoards
+      collaborativeBoards.value = tempCollaborativeBoards
     }
     isLoading.value.board = false    
   }
@@ -59,7 +88,7 @@ export const useBoardStore = defineStore('board', () => {
       currentBoard.value = { ...res.data, isPublic: res.data.visibility === 'PUBLIC' }
       // await loadTasks(boardId)
       // await loadStatuses(boardId)
-      await Promise.all([loadTasks(boardId), loadStatuses(boardId)])
+      await Promise.all([loadTasks(boardId), loadStatuses(boardId), loadCollaborators(boardId)])
     }
     isLoading.value.board = false
   }
@@ -142,6 +171,8 @@ export const useBoardStore = defineStore('board', () => {
     toggleBoardVisibility,
     clearBoardData,
     updateBoard,
-    collaborativeBoards
+    collaborativeBoards,
+    loadCollaborators,
+    collaborators,
   }
 })
