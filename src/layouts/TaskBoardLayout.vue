@@ -16,15 +16,19 @@ const userStore = useUserStore()
 const sidebarOpenState = ref(false)
 const handleSignButtonClick = () => {
   if (userStore.user) userStore.clearUserData()
-  router.push({ name: 'login'})
+  router.push({ name: 'login' })
 }
 </script>
 
 <template>
   <BackToTopButton />
   <aside class="sm:hidden fixed z-50 w-screen" :class="{ 'pointer-events-none': sidebarOpenState === false }">
-    <div @click="sidebarOpenState = false" class="absolute w-screen h-screen bg-[#0005] backdrop-blur-sm transition duration-1000" :class="sidebarOpenState ? 'opacity-100' : 'opacity-0'"></div>
-    <div class="absolute w-[90vw] max-w-[20rem] h-screen flex flex-col bg-base-300 overflow-hidden transition duration-1000" :class="sidebarOpenState ? 'translate-x-[0%]' : 'translate-x-[-100%]'">
+    <div @click="sidebarOpenState = false"
+      class="absolute w-screen h-screen bg-[#0005] backdrop-blur-sm transition duration-1000"
+      :class="sidebarOpenState ? 'opacity-100' : 'opacity-0'"></div>
+    <div
+      class="absolute w-[90vw] max-w-[20rem] h-screen flex flex-col bg-base-300 overflow-hidden transition duration-1000"
+      :class="sidebarOpenState ? 'translate-x-[0%]' : 'translate-x-[-100%]'">
       <div class="bg-base-200 p-4 flex flex-col gap-4">
         <!-- <IconSVG iconName="itbkk-logo" scale="3" size="3rem" />
         <div class="text-3xl font-bold">ITBKK</div> -->
@@ -72,7 +76,8 @@ const handleSignButtonClick = () => {
         <div class="text-secondary">
           <IconSVG iconName="chevron-right" :scale="1" />
         </div>
-        <div class="text-xl truncate max-w-[45vw]" :title="boardStore.currentBoard?.name">{{ boardStore.currentBoard?.name }}</div>
+        <div class="text-xl truncate max-w-[45vw]" :title="boardStore.currentBoard?.name">{{
+          boardStore.currentBoard?.name }}</div>
       </div>
       <div class="flex gap-2">
         <ThemeSwitch />
@@ -80,8 +85,7 @@ const handleSignButtonClick = () => {
       </div>
     </div>
   </header>
-  <nav
-    class="hidden sm:flex sticky top-[5rem] z-20 px-4 h-[3rem] justify-between items-center bg-base-300 shadow-md">
+  <nav class="hidden sm:flex sticky top-[5rem] z-20 px-4 h-[3rem] justify-between items-center bg-base-300 shadow-md">
     <div class="flex gap-4">
       <div class="flex">
         <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100"
@@ -124,7 +128,6 @@ const handleSignButtonClick = () => {
 </template>
 
 <style scoped>
-
 .nav-icon-selected {
   display: none;
 }
@@ -136,5 +139,4 @@ const handleSignButtonClick = () => {
 .nav-selected .nav-icon-selected {
   display: block;
 }
-
 </style>
