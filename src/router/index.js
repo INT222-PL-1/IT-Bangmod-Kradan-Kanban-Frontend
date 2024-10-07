@@ -196,7 +196,7 @@ router.beforeEach(async (to, from, next) => {
     return
   }
 
-  alert('refresh token: ' + refreshToken + ', access token: ' + accessToken)
+  // alert('refresh token: ' + refreshToken + ', access token: ' + accessToken)
   toastStore.createToast({
     title: 'Error',
     description: 'Cannot enter the page. Please login and try again. ffffff',
