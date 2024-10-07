@@ -32,7 +32,7 @@ const router = createRouter({
               next()
               return
             }
-            if (boardStore.boards.length === 1) {
+            if (boardStore.boards.length === 1 && boardStore.collaborativeBoards.length === 0) {
               next({ name: 'all-task', params: { boardId: boardStore.boards[0].id } })
             }
             else next()
@@ -162,7 +162,7 @@ router.beforeEach(async (to, from, next) => {
       userStore.clearUserData()
       toastStore.createToast({
         title: 'Error',
-        description: 'Cannot enter the page. Please login and try again.',
+        description: 'Cannot enter the page. Please login and try again. ฟฟฟฟ',
         status: 'error',
       });
       next({ name: 'login' })
@@ -196,12 +196,17 @@ router.beforeEach(async (to, from, next) => {
     return
   }
 
+  alert('refresh token: ' + refreshToken + ', access token: ' + accessToken)
   toastStore.createToast({
     title: 'Error',
-    description: 'Cannot enter the page. Please login and try again.',
+    description: 'Cannot enter the page. Please login and try again. ffffff',
     status: 'error',
   })
   next({ name: 'login' })
 })
+
+// router.beforeEach(async (to, from) => {
+//   if ([ 'login', 'not-found', 'forbidden' ].includes(to.name)) return
+// })
 
 export default router

@@ -62,7 +62,7 @@ const handleBoardClick = async (boardId) => {
             Add New Board
           </button>
         </div>
-        <div class="items-center">
+        <div class="items-center pt-4 pb-16">
           <div v-if="!isLoading" class="flex flex-col gap-4">
             <div v-if="boardStore.boards.length === 0" class="flex flex-col items-center justify-center h-[25rem] max-w-[50rem] w-[90vw]">
               <IconSVG iconName="inbox-empty" :scale="12" size="12rem" class="text-base-300" />
@@ -84,7 +84,7 @@ const handleBoardClick = async (boardId) => {
           </div>
           <div class="flex-grow h-[2px] bg-base-content"></div>
         </div>
-        <div class="items-center pb-32">
+        <div class="items-center pt-4 pb-16">
           <div v-if="!isLoading" class="flex flex-col gap-4">
             <div v-if="boardStore.collaborativeBoards.length === 0" class="flex flex-col items-center justify-center h-[25rem] max-w-[50rem] w-[90vw]">
               <IconSVG iconName="inbox-empty" :scale="12" size="12rem" class="text-base-300" />

@@ -6,12 +6,14 @@ import { getTasks } from '@/libs/taskManagement'
 import { useRoute } from 'vue-router'
 import { useToastStore } from './toast'
 import { getCollaborators } from '@/libs/collaboratorManagement'
-import { useUserStore } from './user'
+// import { useUserStore } from './user'
+import Pl1AccessRight from '@/libs/enum/Pl1AccessRight'
+import Pl1VisibilityType from '@/libs/enum/Pl1VisibilityType'
 
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
   const toastStore = useToastStore()
-  const userStore = useUserStore()
+  // const userStore = useUserStore()
   const isLoading = ref({
     board: false,
     task: false,
@@ -69,7 +71,7 @@ export const useBoardStore = defineStore('board', () => {
       const tempBoards = []
       const tempCollaborativeBoards = []
       for (const board of allBoards) {
-        if (board.ownerOid !== userStore.user.oid) {
+        if (board.accessRight !== Pl1AccessRight.OWNER) {
           tempCollaborativeBoards.push(board)
         } else {
           tempBoards.push(board)
@@ -85,7 +87,7 @@ export const useBoardStore = defineStore('board', () => {
     isLoading.value.board = true
     const res = await getBoardById(boardId)
     if (res.status === 'success') {
-      currentBoard.value = { ...res.data, isPublic: res.data.visibility === 'PUBLIC' }
+      currentBoard.value = { ...res.data, isPublic: res.data.visibility === Pl1VisibilityType.PUBLIC }
       // await loadTasks(boardId)
       // await loadStatuses(boardId)
       await Promise.all([loadTasks(boardId), loadStatuses(boardId), loadCollaborators(boardId)])
@@ -125,7 +127,7 @@ export const useBoardStore = defineStore('board', () => {
 
   async function toggleBoardVisibility() {
     const res = await patchBoard(currentBoard.value.id, {
-      visibility: currentBoard.value.isPublic ? 'PRIVATE' : 'PUBLIC'
+      visibility: currentBoard.value.isPublic ? Pl1VisibilityType.PRIVATE : Pl1VisibilityType.PUBLIC
     }, {
       noGlobalResponseHandler: true
     })
