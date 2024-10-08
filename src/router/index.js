@@ -143,28 +143,29 @@ router.beforeEach(async (to, from, next) => {
       return
     }
 
+    // let res
     try {
-      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/token/validate`)
-      
+      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/token/validate`, { retry: 5, timeout: 1000 })
+
       if (res.status === 'error') {
         localStorage.removeItem('itbkk_access_token')
         throw new Error('Invalid token')
       }
-
-      // Load user data after validation
-      console.log('User loaded:', to.name)
+      
+      //? Load user data after validation
+      // console.log('User loaded:', to.name)
       userStore.loadUserData();
-      console.log('User:', userStore.user)
+      // console.log('User:', userStore.user)
       next()
-
+      
     } catch (error) {
       console.error(error)
       userStore.clearUserData()
       toastStore.createToast({
         title: 'Error',
-        description: 'Cannot enter the page. Please login and try again. ฟฟฟฟ',
+        description: 'Cannot enter the page. Please login and try again later.',
         status: 'error',
-      });
+      })
       next({ name: 'login' })
     }
 
@@ -199,7 +200,7 @@ router.beforeEach(async (to, from, next) => {
   // alert('refresh token: ' + refreshToken + ', access token: ' + accessToken)
   toastStore.createToast({
     title: 'Error',
-    description: 'Cannot enter the page. Please login and try again. ffffff',
+    description: 'Cannot enter the page. Please login and try again later.',
     status: 'error',
   })
   next({ name: 'login' })
