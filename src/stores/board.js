@@ -129,7 +129,7 @@ export const useBoardStore = defineStore('board', () => {
     const res = await patchBoard(currentBoard.value.id, {
       visibility: currentBoard.value.isPublic ? Pl1VisibilityType.PRIVATE : Pl1VisibilityType.PUBLIC
     }, {
-      noGlobalResponseHandler: true
+      noGlobalResponseHandling: true
     })
     if (res.status === 'success') {
       currentBoard.value.isPublic = !currentBoard.value.isPublic
