@@ -14,7 +14,7 @@ const props = defineProps({
   }
 })
 
-const boardUrl = window.location.href + `board/${props.board.id}`
+const boardUrl = window.location.href + `/${props.board.id}`
 
 </script>
 
