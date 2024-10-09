@@ -21,7 +21,7 @@ const router = createRouter({
       component: BoardSelectLayout,
       children: [
         {
-          path: '/',
+          path: '',
           name: 'all-board',
           component: BoardView,
           beforeEnter: async (to, from, next) => {
