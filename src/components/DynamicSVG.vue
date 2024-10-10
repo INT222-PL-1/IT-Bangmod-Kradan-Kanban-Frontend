@@ -3,34 +3,29 @@
 import { ref, onMounted } from 'vue'
 
 const props = defineProps({
-  iconName: {
+  svgName: {
     type: String,
     required: true
   },
-  color: String,
-  scale: {
-    type: [Number, String],
-    default: 1
-  },
   size: {
     type: [Number, String],
-    default: '1rem'
+    default: 'auto'
   },
   className: {
     type: String,
     default: ''
-  }
+  },
 })
 
-const icon = ref('')
+const svg = ref('')
 
 /**
  * @type {HTMLElement}
  */
-const thisIcon = ref(null)
+const thisSvg = ref(null)
 
 onMounted(async () => {
-  icon.value = (await import(`@/assets/icons/${props.iconName}.svg?raw`)).default
+  svg.value = (await import(`@/assets/svgs/${props.svgName}.svg?raw`)).default
 })
 
 </script>
@@ -40,14 +35,10 @@ onMounted(async () => {
     :style="{ width: size, height: size }"
     :class="[className]"
     class="grid place-items-center icon-svg"
-    ref="thisIcon"
+    ref="thisSvg"
   >
     <div
-      v-html="icon"
-      :style="{
-        color,
-        transform: `scale(${scale})`
-      }"
+      v-html="svg"
     ></div>
   </div>
 </template>
