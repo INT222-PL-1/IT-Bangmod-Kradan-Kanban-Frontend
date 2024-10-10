@@ -8,10 +8,13 @@ import ResponsiveLogo from '@/components/ResponsiveLogo.vue'
 import { useBoardStore } from '@/stores/board'
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { useThemeStore } from '@/stores/theme'
+import GhostHaunting from '@/components/festival/halloween/GhostHaunting.vue'
 
 const router = useRouter()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
+const themeStore = useThemeStore()
 
 const sidebarOpenState = ref(false)
 const handleSignButtonClick = () => {
@@ -21,6 +24,9 @@ const handleSignButtonClick = () => {
 </script>
 
 <template>
+  <div v-if="themeStore.festivalThemeState && themeStore.festivalName === 'halloween'">
+    <GhostHaunting />
+  </div>
   <BackToTopButton />
   <aside class="sm:hidden fixed z-50 w-screen" :class="{ 'pointer-events-none': sidebarOpenState === false }">
     <div @click="sidebarOpenState = false"

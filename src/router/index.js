@@ -7,6 +7,7 @@ import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast'
 import { refreshAccessToken } from '@/libs/userManagement'
 import BoardSelectLayout from '@/layouts/BoardSelectLayout.vue'
+import { useThemeStore } from '@/stores/theme'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -121,8 +122,14 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+  const themeStore = useThemeStore()
   const userStore = useUserStore()
   const toastStore = useToastStore()
+
+  if (themeStore.isFestivalMonth === false) {
+    themeStore.setFestivalThemeState(false)
+    localStorage.removeItem('itbkk_festival_theme')
+  }
 
   // Check if the route is public
   if (['login', 'not-found', 'forbidden'].includes(to.name)) {

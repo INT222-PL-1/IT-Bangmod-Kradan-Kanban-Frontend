@@ -5,10 +5,6 @@ import { onMounted, watch } from 'vue'
 const themeStore = useThemeStore()
 
 onMounted(() => {
-  // console.log('FestivalThemeSwitch mounted')
-  if (themeStore.isFestivalMonth === false) {
-    themeStore.setFestivalThemeState(false)
-  }
 
   const festivalThemeState = localStorage.getItem('itbkk_festival_theme')
   if (festivalThemeState !== null) {

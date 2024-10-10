@@ -5,7 +5,7 @@ export const useThemeStore = defineStore('theme', () => {
 
   const festivalMonths = {
     10: 'halloween',
-    12: 'christmas',
+    // 12: 'christmas',
   }
 
   const festivalThemeState = ref(true)
