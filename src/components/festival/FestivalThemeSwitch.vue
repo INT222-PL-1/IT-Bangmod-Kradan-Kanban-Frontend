@@ -1,21 +1,27 @@
 <script setup>
 import { useThemeStore } from '@/stores/theme';
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 
 const themeStore = useThemeStore()
 
 onMounted(() => {
   // console.log('FestivalThemeSwitch mounted')
-  if (themeStore.isFestivalMonth === false) return
+  if (themeStore.isFestivalMonth === false) {
+    themeStore.setFestivalThemeState(false)
+  }
 
   const festivalThemeState = localStorage.getItem('itbkk_festival_theme')
-  if (festivalThemeState) {
+  if (festivalThemeState !== null) {
     themeStore.setFestivalThemeState(festivalThemeState === 'true')
   } else {
     localStorage.setItem('itbkk_festival_theme', 'true')
     themeStore.setFestivalThemeState(true)
   }
+})
 
+watch(() => themeStore.festivalThemeState, (newVal) => {
+  localStorage.setItem('itbkk_festival_theme', newVal)
+  themeStore.setFestivalThemeState(newVal)
 })
 
 </script>

@@ -4,8 +4,8 @@ import { defineStore } from 'pinia'
 export const useThemeStore = defineStore('theme', () => {
 
   const festivalMonths = {
-    10: 'Halloween',
-    12: 'Christmas',
+    10: 'halloween',
+    12: 'christmas',
   }
 
   const festivalThemeState = ref(true)
