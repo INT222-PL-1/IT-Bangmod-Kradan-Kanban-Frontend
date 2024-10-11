@@ -1,10 +1,12 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { User } from '@/libs/classes/User'
 import { useBoardStore } from './board'
 
 export const useUserStore = defineStore('user', () => {
   const user = ref(null)
+  const isUserLoaded = computed(() => user.value !== null)
+
   const boardStore = useBoardStore()
 
   function loadUserData() {
@@ -21,5 +23,5 @@ export const useUserStore = defineStore('user', () => {
     user.value = null
   }
 
-  return { user, loadUserData, clearUserData }
+  return { user, isUserLoaded, loadUserData, clearUserData }
 })

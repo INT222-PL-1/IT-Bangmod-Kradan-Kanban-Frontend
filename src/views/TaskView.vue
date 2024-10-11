@@ -304,7 +304,7 @@ const handleToggleBoardVisibility = async () => {
             </tr>
           </thead>
           <tbody>
-            <tr v-if="boardStore.isLoading.task">
+            <tr v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
               <td colspan="4" class="text-center h-32">Loading tasks...</td>
             </tr>
             <tr v-else-if="boardStore.tasks === null">

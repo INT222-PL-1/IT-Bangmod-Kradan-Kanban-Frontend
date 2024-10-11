@@ -2,18 +2,14 @@
 import BoardListItem from '@/components/BoardListItem.vue'
 import IconSVG from '@/components/IconSVG.vue'
 import { useBoardStore } from '@/stores/board'
-import { ref } from 'vue'
+// import { onMounted } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 
-// const isLoading = ref(true)
-const isLoading = ref(false)
 const router = useRouter()
 const boardStore = useBoardStore()
 
 // onMounted(async () => {
-//   isLoading.value = true
 //   await boardStore.loadAllBoards()
-//   isLoading.value = false
 // })
 
 const handleAddBoardClick = () => {
@@ -21,7 +17,7 @@ const handleAddBoardClick = () => {
 }
 
 const handleBoardClick = async (boardId) => {
-  await boardStore.loadBoard(boardId)
+  // await boardStore.loadBoard(boardId)
   router.push({ name: 'all-task', params: { boardId } })
 }
 
@@ -57,22 +53,22 @@ const handleBoardClick = async (boardId) => {
             <div>Personal Boards</div>
           </div>
           <div class="flex-grow h-[2px] bg-base-content"></div>
-          <button class="itbkk-button-create flex-none btn btn-primary btn-sm" @click="handleAddBoardClick">
+          <!-- <button class="itbkk-button-create flex-none btn btn-primary btn-sm" @click="handleAddBoardClick">
             <IconSVG iconName="plus" scale="1.75" size="1rem" />
             Add New Board
-          </button>
+          </button> -->
         </div>
         <div class="items-center pt-4 pb-16">
-          <div v-if="!isLoading" class="flex flex-col gap-4">
+          <div v-if="boardStore.isLoading.board && boardStore.boards !== 0" class="flex items-center justify-center max-w-[50rem] w-[90vw]">
+            <div class="loading loading-lg loading-dots" />
+          </div>
+          <div v-else class="flex flex-col gap-4">
             <div v-if="boardStore.boards.length === 0" class="flex flex-col items-center justify-center h-[25rem] max-w-[50rem] w-[90vw]">
               <IconSVG iconName="inbox-empty" :scale="12" size="12rem" class="text-base-300" />
               <div>You have no board yet.</div>
               <div>Join other boards or <span @click="handleAddBoardClick" class="text-primary underline underline-offset-2 cursor-pointer">create a new one.</span></div>
             </div>
             <BoardListItem v-else v-for="board in boardStore.boards" :key="board" :board="board" @boardClick="handleBoardClick" />
-          </div>
-          <div v-else class="flex items-center justify-center max-w-[50rem] w-[90vw]">
-            <div class="loading loading-lg loading-dots" />
           </div>
         </div>
 
@@ -85,7 +81,10 @@ const handleBoardClick = async (boardId) => {
           <div class="flex-grow h-[2px] bg-base-content"></div>
         </div>
         <div class="items-center pt-4 pb-16">
-          <div v-if="!isLoading" class="flex flex-col gap-4">
+          <div v-if="boardStore.isLoading.board && boardStore.boards !== 0" class="flex items-center justify-center max-w-[50rem] w-[90vw]">
+            <div class="loading loading-lg loading-dots" />
+          </div>
+          <div v-else class="flex flex-col gap-4">
             <div v-if="boardStore.collaborativeBoards.length === 0" class="flex flex-col items-center justify-center h-[25rem] max-w-[50rem] w-[90vw]">
               <IconSVG iconName="inbox-empty" :scale="12" size="12rem" class="text-base-300" />
               <div>You have no collaborative board yet.</div>
@@ -93,9 +92,6 @@ const handleBoardClick = async (boardId) => {
             </div>
             <BoardListItem v-else v-for="board in boardStore.collaborativeBoards" :key="board" :board="board" @boardClick="handleBoardClick" />
             <!-- <BoardListItem v-else v-for="board in boardStore.boards" :key="board" :board="board" @boardClick="handleBoardClick" /> -->
-          </div>
-          <div v-else class="flex items-center justify-center max-w-[50rem] w-[90vw]">
-            <div class="loading loading-lg loading-dots" />
           </div>
         </div>
         <!-- <div class="h-[100rem]"></div> -->

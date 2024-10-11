@@ -216,7 +216,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
             </tr>
           </thead>
           <tbody>
-            <tr v-if="boardStore.isLoading.status">
+            <tr v-if="boardStore.isLoading.status && boardStore.statuses.length === 0">
               <td colspan="5" class="text-center">Loading statuses...</td>
             </tr>
             <tr v-else-if="boardStore.statuses === null">

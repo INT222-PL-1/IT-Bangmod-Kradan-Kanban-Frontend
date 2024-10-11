@@ -56,7 +56,7 @@ export const useBoardStore = defineStore('board', () => {
   async function loadCollaborators(boardId) {
     isLoading.value.collaborator = true
     const res = await getCollaborators(boardId)
-    console.log(res.data)
+    // console.log(res.data)
     if (res.status === 'success') {
       collaborators.value = res.data
     }

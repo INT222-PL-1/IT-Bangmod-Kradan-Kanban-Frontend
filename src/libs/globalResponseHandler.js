@@ -9,7 +9,7 @@ const globalResponseHandler = async (response) => {
 
   if (response.statusCode === 401) {
     if (router.currentRoute.value.name === 'login') return
-    localStorage.removeItem('itbkk_access_token')
+    // localStorage.removeItem('itbkk_access_token')
     if ([
       Pl1ErrorTypes.TOKEN_EXPIRED,
       Pl1ErrorTypes.TOKEN_MALFORMED,

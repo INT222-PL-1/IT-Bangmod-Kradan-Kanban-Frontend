@@ -95,15 +95,15 @@ const handleSignButtonClick = () => {
     <div class="flex gap-4">
       <div class="flex">
         <RouterLink :to="{ name: 'all-board' }" exact-active-class="bg-neutral opacity-100"
-          class="btn btn-ghost btn-sm">
-          <IconSVG iconName="house" :scale="1.25" />Home
+          class="btn btn-ghost btn-sm opacity-75">
+          <IconSVG iconName="arrow-left-short" :scale="1.25" />Board
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
         <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100 nav-selected"
           class="btn btn-ghost btn-sm">
           <IconSVG iconName="kanban" :scale="1.25" className="nav-icon" />
           <IconSVG iconName="kanban-fill" :scale="1.25" className="nav-icon-selected" />
-          Task Board
+          Task Table
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
         <RouterLink :to="{ name: 'status-manage' }" exact-active-class="bg-neutral opacity-100 nav-selected"
