@@ -16,6 +16,9 @@ const globalResponseHandler = async (response) => {
       Pl1ErrorTypes.TOKEN_NOT_BEGIN_WITH_BEARER,
       Pl1ErrorTypes.TOKEN_TEMPERED
     ].includes(response.data.type)) {
+
+      // TODO: Implement refresh token
+
       // toastStore.createToast({
       //   title: 'Error',
       //   description: 'Your authentication has expired.\nPlease login again.',
@@ -25,7 +28,8 @@ const globalResponseHandler = async (response) => {
       // router.push({ name: 'login' })
       // console.log('Token malformed')
       try {
-        const res = await refreshAccessToken()
+        const refreshToken = localStorage.getItem('itbkk_refresh_token')
+        const res = await refreshAccessToken(refreshToken)
         if (res.status === 'success') {
           localStorage.setItem('itbkk_access_token', res.data.access_token)
         }
