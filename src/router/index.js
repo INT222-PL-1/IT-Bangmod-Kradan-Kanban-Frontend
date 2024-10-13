@@ -27,7 +27,7 @@ const router = createRouter({
             const boardStore = useBoardStore()
             boardStore.clearBoardData()
             await boardStore.loadAllBoards()
-            if (from.name === 'all-task') {
+            if (['all-task', 'status-manage', 'collab-manage'].includes(from.name)) {
               return
             }
             if (boardStore.boards.length === 1 && boardStore.collaborativeBoards.length === 0) {

@@ -46,3 +46,19 @@ export async function removeCollaborator(boardId, collaboratorId, zyosOptions) {
     return null
   }
 }
+
+export async function patchCollaborator(boardId, collaboratorId, patchData, zyosOptions) {
+  const url = `${BASE_URL}/${boardId}/collabs/${collaboratorId}`
+
+  try {
+    const res = await zyos.fetch(url, {
+      method: 'PATCH',
+      body: patchData,
+      ...zyosOptions
+    })
+    return res
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}

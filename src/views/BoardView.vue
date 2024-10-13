@@ -1,13 +1,22 @@
 <script setup>
+import BaseModal from '@/components/BaseModal.vue';
 import BoardListItem from '@/components/BoardListItem.vue'
 import IconSVG from '@/components/IconSVG.vue'
+import { removeCollaborator } from '@/libs/collaboratorManagement';
 import { useBoardStore } from '@/stores/board'
+import { useToastStore } from '@/stores/toast';
+import { useUserStore } from '@/stores/user';
+import { ref } from 'vue';
 // import { onMounted } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 
 const router = useRouter()
 const boardStore = useBoardStore()
+const userStore = useUserStore()
+const toastStore = useToastStore()
 
+const selectedBoard = ref(null)
+const leaveModalOpenState = ref(false)
 // onMounted(async () => {
 //   await boardStore.loadAllBoards()
 // })
@@ -21,6 +30,39 @@ const handleBoardClick = async (boardId) => {
   router.push({ name: 'all-task', params: { boardId } })
 }
 
+const handleLeaveBoardClick = (board) => {
+  selectedBoard.value = board
+  leaveModalOpenState.value = true
+}
+
+const handleLeaveConfirm = async () => {
+  const res = await removeCollaborator(selectedBoard.value.id, userStore.user.oid)
+  if (res.status === 'error') {
+    if (res.statusCode === 403 || res.statusCode === 404) {
+      leaveModalOpenState.value = false
+      return
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: 'There is a problem. Please try again later.',
+        status: 'error'
+      })
+    }
+  } else {
+    toastStore.createToast({
+      title: 'Success',
+      description: 'You have successfully left the board.',
+      status: 'success'
+    })
+    leaveModalOpenState.value = false
+    await boardStore.loadAllBoards()
+  }
+}
+
+const handleLeaveCancel = () => {
+  leaveModalOpenState.value = false
+}
+
 </script>
 
 <template>
@@ -29,6 +71,30 @@ const handleBoardClick = async (boardId) => {
       <Component :is="Component" />
     </Transition>
   </RouterView>
+
+  <!-- ? Leave Board Modal -->
+  <Transition>
+    <BaseModal
+      :show="leaveModalOpenState" @clickBG="leaveModalOpenState = false" :mobileCenter="true">
+      <div class="itbkk-modal-alert absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Leave Board</div>
+        <div class="flex p-4">
+            <span>Do you want to leave <span class="italic font-semibold">{{ selectedBoard?.name }}</span> board?</span>
+        </div>
+
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
+          <div class="flex gap-2">
+            <button @click="handleLeaveConfirm" class="btn btn-sm btn-error btn-outline">
+              Confirm
+            </button>
+            <button @click="handleLeaveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
+  </Transition>
 
   <!-- <div class="h-[7rem] top-[5rem] sticky flex justify-center items-center bg-base-100 z-10">
     <div class="text-3xl font-bold flex items-center gap-2">
@@ -59,7 +125,7 @@ const handleBoardClick = async (boardId) => {
           </button> -->
         </div>
         <div class="items-center pt-4 pb-16">
-          <div v-if="boardStore.isLoading.board && boardStore.boards !== 0" class="flex items-center justify-center max-w-[50rem] w-[90vw]">
+          <div v-if="boardStore.isLoading.board && boardStore.boards === 0" class="flex items-center justify-center max-w-[50rem] w-[90vw]">
             <div class="loading loading-lg loading-dots" />
           </div>
           <div v-else class="flex flex-col gap-4">
@@ -81,7 +147,7 @@ const handleBoardClick = async (boardId) => {
           <div class="flex-grow h-[2px] bg-base-content"></div>
         </div>
         <div class="items-center pt-4 pb-16">
-          <div v-if="boardStore.isLoading.board && boardStore.boards !== 0" class="flex items-center justify-center max-w-[50rem] w-[90vw]">
+          <div v-if="boardStore.isLoading.board && boardStore.boards === 0" class="flex items-center justify-center max-w-[50rem] w-[90vw]">
             <div class="loading loading-lg loading-dots" />
           </div>
           <div v-else class="flex flex-col gap-4">
@@ -90,7 +156,7 @@ const handleBoardClick = async (boardId) => {
               <div>You have no collaborative board yet.</div>
               <div>Accept invitations and join other boards.</div>
             </div>
-            <BoardListItem v-else v-for="board in boardStore.collaborativeBoards" :key="board" :board="board" @boardClick="handleBoardClick" />
+            <BoardListItem v-else v-for="board in boardStore.collaborativeBoards" :key="board" :board="board" @boardClick="handleBoardClick" @leaveBoardClick="handleLeaveBoardClick($event)" />
             <!-- <BoardListItem v-else v-for="board in boardStore.boards" :key="board" :board="board" @boardClick="handleBoardClick" /> -->
           </div>
         </div>

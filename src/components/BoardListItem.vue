@@ -5,7 +5,7 @@ import CopyButton from './CopyButton.vue';
 import IconSVG from './IconSVG.vue';
 import Pl1VisibilityType from '@/libs/enum/Pl1VisibilityType';
 
-defineEmits(['boardClick'])
+const emits = defineEmits(['boardClick', 'leaveBoardClick'])
 
 const props = defineProps({
   board: {
@@ -15,6 +15,10 @@ const props = defineProps({
 })
 
 const boardUrl = window.location.href + `/${props.board.id}`
+
+const handleBoardLeaveClick = () => {
+  emits('leaveBoardClick', props.board)
+}
 
 </script>
 
@@ -46,7 +50,7 @@ const boardUrl = window.location.href + `/${props.board.id}`
               <span class="opacity-50">{{ board.owner.name }}</span>
             </div>
           </div>
-          <button v-show="board.accessRight !== Pl1AccessRight.OWNER" class="btn btn-xs btn-outline btn-error">
+          <button v-show="board.accessRight !== Pl1AccessRight.OWNER" @click="handleBoardLeaveClick" class="btn btn-xs btn-outline btn-error">
             Leave
           </button>
         </div>

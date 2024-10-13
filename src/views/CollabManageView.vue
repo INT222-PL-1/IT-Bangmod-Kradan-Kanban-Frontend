@@ -3,7 +3,7 @@ import BaseModal from '@/components/BaseModal.vue'
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import IconSVG from '@/components/IconSVG.vue'
-import { addCollaborator, removeCollaborator } from '@/libs/collaboratorManagement'
+import { addCollaborator, patchCollaborator, removeCollaborator } from '@/libs/collaboratorManagement'
 import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
@@ -16,15 +16,17 @@ const boardStore = useBoardStore()
 const userStore = useUserStore()
 const isBoardOwner = computed(() => boardStore.currentBoard?.owner.oid === userStore.user?.oid)
 
-const collaboratorModalData = ref({
+const defaultCollaboratorModalData = {
   email: '',
   accessRight: 'READ'
-})
-const addCollaboratorModalOpenState = ref(false)
+}
+const collaboratorModalData = ref(defaultCollaboratorModalData)
+const addModalOpenState = ref(false)
 const disabledAddButton = computed(() => !collaboratorModalData.value.email)
 
 const selectedCollaborator = ref(null)
-const removeCollaboratorModalOpenState = ref(false)
+const removeModalOpenState = ref(false)
+const changeAccessRightModalOpenState = ref(false)
 
 
 async function refreshCollaborators() {
@@ -43,9 +45,10 @@ const handleRefreshBtnClick = async () => {
   await refreshCollaborators()
 }
 
-const handleCollaboratorAddBtnClick = () => {
+const handleAddButtonClick = () => {
   console.log('Add Collaborator button clicked')
-  addCollaboratorModalOpenState.value = true
+  collaboratorModalData.value = { ...defaultCollaboratorModalData }
+  addModalOpenState.value = true
 }
 
 const handleAddConfirm = async () => {
@@ -82,19 +85,19 @@ const handleAddConfirm = async () => {
       description: 'Collaborator added successfully.',
       status: 'success'
     })
-    addCollaboratorModalOpenState.value = false
+    addModalOpenState.value = false
     await refreshCollaborators()
   }
 }
 
 const handleAddCancel = () => {
   console.log('Cancel button clicked')
-  addCollaboratorModalOpenState.value = false
+  addModalOpenState.value = false
 }
 
 const handleRemoveButtonClick = (collaborator) => {
   selectedCollaborator.value = collaborator
-  removeCollaboratorModalOpenState.value = true
+  removeModalOpenState.value = true
 }
 
 const handleRemoveConfirm = async () => {
@@ -113,6 +116,7 @@ const handleRemoveConfirm = async () => {
         description: `${selectedCollaborator.value.name} is not a collaborator.`,
         status: 'error'
       })
+      removeModalOpenState.value = false
     } else {
       toastStore.createToast({
         title: 'Error',
@@ -126,23 +130,70 @@ const handleRemoveConfirm = async () => {
       description: 'Collaborator removed successfully.',
       status: 'success'
     })
-    removeCollaboratorModalOpenState.value = false
+    removeModalOpenState.value = false
     await refreshCollaborators()
   }
 }
 
 const handleRemoveCancel = () => {
   console.log('Remove Cancel button clicked')
-  removeCollaboratorModalOpenState.value = false
+  removeModalOpenState.value = false
+}
+
+const handleAccessRightChange = (collaborator) => {
+  selectedCollaborator.value = collaborator
+  changeAccessRightModalOpenState.value = true
+}
+
+const handleAccessRightConfirm = async () => {
+  console.log('Access Right Confirm button clicked')
+  const res = await patchCollaborator(route.params.boardId, selectedCollaborator.value.oid, { accessRight: selectedCollaborator.value.accessRight })
+  if (res.status === 'error') {
+    if (res.statusCode === 403) {
+      toastStore.createToast({
+        title: 'Error',
+        description: 'You do not have permission to change collaborator access right.',
+        status: 'error'
+      })
+    } else if (res.statusCode === 404) {
+      toastStore.createToast({
+        title: 'Error',
+        description: `${selectedCollaborator.value.name} is not a collaborator.`,
+        status: 'error'
+      })
+      changeAccessRightModalOpenState.value = false
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: 'There is a problem. Please try again later.',
+        status: 'error'
+      })
+    }
+  } else {
+    toastStore.createToast({
+      title: 'Success',
+      description: 'Access right changed successfully.',
+      status: 'success'
+    })
+    changeAccessRightModalOpenState.value = false
+    await refreshCollaborators()
+  }
+}
+
+const handleAccessRightCancel = () => {
+  console.log('Access Right Cancel button clicked')
+  selectedCollaborator.value.accessRight = selectedCollaborator.value.accessRight === 'READ' ? 'WRITE' : 'READ'
+  changeAccessRightModalOpenState.value = false
 }
 
 </script>
 
 <template>
 
+  <!-- ? Add Collaborator Modal -->
   <Transition>
     <BaseModal
-      :show="addCollaboratorModalOpenState" @clickBG="addCollaboratorModalOpenState = false" :mobileCenter="true">
+      :show="addModalOpenState" @clickBG="addModalOpenState = false" :mobileCenter="true">
       <div class="itbkk-modal-alert absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
         <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Add Collaborator
         </div>
@@ -198,9 +249,10 @@ const handleRemoveCancel = () => {
     </BaseModal>
   </Transition>
 
+  <!-- ? Remove Collaborator Modal -->
   <Transition>
     <BaseModal
-      :show="removeCollaboratorModalOpenState" @clickBG="removeCollaboratorModalOpenState = false" :mobileCenter="true">
+      :show="removeModalOpenState" @clickBG="removeModalOpenState = false" :mobileCenter="true">
       <div class="itbkk-modal-alert absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
         <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Remove Collaborator
         </div>
@@ -222,6 +274,30 @@ const handleRemoveCancel = () => {
     </BaseModal>
   </Transition>
 
+  <!-- ? Change access right modal -->
+  <Transition>
+    <BaseModal
+      :show="changeAccessRightModalOpenState" @clickBG="changeAccessRightModalOpenState = false" :mobileCenter="true">
+      <div class="itbkk-modal-alert absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Change Access Right</div>
+        <div class="flex p-4">
+            <span>Do you want to change access right of <span class="italic">{{ selectedCollaborator?.name }}</span> to <span class="font-semibold">{{ selectedCollaborator?.accessRight }}</span>?</span>
+        </div>
+
+        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
+          <div class="flex gap-2">
+            <button @click="handleAccessRightConfirm" class="btn btn-sm btn-error btn-outline">
+              Confirm
+            </button>
+            <button @click="handleAccessRightCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
+  </Transition>
+
   <section class="max-w-full pt-10 pb-20">
     <!-- <div class="text-md text-bold py-3">{{ boardModalData.name }} <span class="font-bold"> > Collaborator </span></div> -->
     <!-- <div class="text-2xl p-4 text-center">Collaborator Management</div> -->
@@ -230,7 +306,7 @@ const handleRemoveCancel = () => {
     <BaseTablePlate>
       <template #right-menu>
         <ButtonWithIcon
-          @click="handleCollaboratorAddBtnClick"
+          @click="handleAddButtonClick"
           className="btn btn-sm btn-primary text-neutral itbkk-collaborative-add"
           iconName="person-plus">
           Add Collaborator
@@ -257,7 +333,7 @@ const handleRemoveCancel = () => {
           </thead>
 
           <tbody>
-            <tr v-if="boardStore.isLoading.collaborator">
+            <tr v-if="boardStore.isLoading.collaborator && boardStore.isLoading.collaborator === 0">
               <td colspan="4" class="text-center h-32">Loading collaborators...</td>
             </tr>
             <tr v-else-if="boardStore.collaborators === null">
@@ -280,7 +356,7 @@ const handleRemoveCancel = () => {
 
               <td class="min-w-18 max-w-18">
                 <div class="itbkk-access-right dropdown">
-                  <select v-model="collaborator.accessRight" class="transition flex bg-base-200 rounded-xl px-8 py-2 hover:contrast-75">
+                  <select @change="handleAccessRightChange(collaborator)" v-model="collaborator.accessRight" class="transition flex bg-base-200 rounded-xl px-8 py-2 hover:contrast-75">
                     <option value="READ">Read</option>
                     <option value="WRITE">Write</option>
                     <!-- <IconSVG iconName="chevron-down" size="1rem" /> -->
