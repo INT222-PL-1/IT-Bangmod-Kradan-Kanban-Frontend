@@ -2,11 +2,11 @@
 import DynamicSVG from '@/components/DynamicSVG.vue'
 import { onMounted, ref } from 'vue'
 
-const ghostType = ref(0)
+const ghostRandom = ref(0)
 
 onMounted(() => {
   setInterval(() => {
-    ghostType.value = Math.floor(Math.random() * 2)
+    ghostRandom.value = Math.floor(Math.random() * 3)
   }, 10000)
 })
 
@@ -14,8 +14,9 @@ onMounted(() => {
 
 <template>
   <div class="animate-ghost-haunt fixed bottom-0 right-0 -z-10 transition duration-500 opacity-30">
-    <DynamicSVG v-show="ghostType === 0" svgName="ghost" />
-    <DynamicSVG v-show="ghostType === 1" svgName="ghost-basket" />
+    <DynamicSVG v-show="ghostRandom === 0" svgName="ghost" />
+    <DynamicSVG v-show="ghostRandom === 1" svgName="ghost-basket" />
+    <DynamicSVG v-show="ghostRandom === 2" svgName="ghost-witch" />
   </div>
 </template>
 
