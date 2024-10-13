@@ -15,3 +15,34 @@ export async function getCollaborators(boardId) {
     return null
   }
 }
+
+export async function addCollaborator(boardId, { email, accessRight }, zyosOptions) {
+  const url = `${BASE_URL}/${boardId}/collabs`
+
+  try {
+    const res = await zyos.fetch(url, {
+      method: 'POST',
+      body: { email, accessRight },
+      ...zyosOptions
+    })
+    return res
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export async function removeCollaborator(boardId, collaboratorId, zyosOptions) {
+  const url = `${BASE_URL}/${boardId}/collabs/${collaboratorId}`
+
+  try {
+    const res = await zyos.fetch(url, {
+      method: 'DELETE',
+      ...zyosOptions
+    })
+    return res
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}

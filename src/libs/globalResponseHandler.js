@@ -27,6 +27,7 @@ const globalResponseHandler = async (response) => {
       // })
       // router.push({ name: 'login' })
       // console.log('Token malformed')
+      
       try {
         const refreshToken = localStorage.getItem('itbkk_refresh_token')
         const res = await refreshAccessToken(refreshToken)
