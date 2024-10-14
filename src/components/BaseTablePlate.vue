@@ -3,8 +3,8 @@
 </script>
 
 <template>
-    <div class="hidden sm:block bg-base-300 rounded-lg shadow-md">
-      <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-5 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
+    <div class="hidden sm:block bg-base-300 rounded-lg shadow-md relative">
+      <div class="px-4 min-h-8 sticky top-[8.1rem] z-20 py-5 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
         <div class="flex justify-between">
           <div class="flex gap-2">
             <slot name="left-menu"></slot>
@@ -14,7 +14,7 @@
           </div>
         </div>
       </div>
-      <div class="table-overflow-x-scroll p-4 max-w-[85vw]">
+      <div class="table-overflow-x-scroll p-4 max-w-[85vw] relative">
         <slot name="table">
           <table class="table table-zebra">
             <thead>

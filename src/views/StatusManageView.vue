@@ -2,7 +2,7 @@
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { deleteStatus, deleteStatusAndTransferTasks } from '@/libs/statusManagement'
 import { useToastStore } from '@/stores/toast'
@@ -19,8 +19,6 @@ const router = useRouter()
 const toastStore = useToastStore()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
-
-const isBoardOwner = computed(() => boardStore.currentBoard?.owner.oid === userStore.user?.oid)
 
 const statusModalData = ref(null)
 const statusDeleteModalOpenState = ref(false)
@@ -40,10 +38,12 @@ const handleRefreshBtnClick = async () => {
 }
 
 const handleAddBtnClick = () => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   router.push({ name: 'status-add' })
 }
 
 const handleEditBtnClick = (statusId) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   router.push({ name: 'status-edit', params: { statusId } })
 }
 
@@ -53,6 +53,7 @@ const handleOpenTransferModal = (statusData) => {
 }
 
 const handleOpenDeleteModal = (statusData) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   if (statusData.count > 0) {
     handleOpenTransferModal(statusData)
   } else {
@@ -62,6 +63,7 @@ const handleOpenDeleteModal = (statusData) => {
 }
 
 const handleTransferStatus = async (fromStatusId, toStatusId) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
   const res = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
   if (res.status === 'error') {
@@ -82,6 +84,7 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
 }
 
 const handleDeleteStatus = async (statusId) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
   const res = await deleteStatus(statusId, boardId)
   if (res.status === 'error') {
@@ -103,6 +106,7 @@ const handleDeleteStatus = async (statusId) => {
 }
 
 const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   await handleTransferStatus(fromStatusId, toStatusId)
 }
 </script>
@@ -171,6 +175,8 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
   </RouterView>
 
   <section class="max-w-full pt-10 pb-20">
+
+    <!-- ? Desktop View -->
     <BaseTablePlate>
       <template #right-menu>
         <BaseMenu side="left" class="md:hidden">
@@ -184,16 +190,18 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
                 <IconSVG iconName="arrow-clockwise" :scale="1.25" />
               </div>Refresh Statuses
             </button>
-            <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
+            <button v-if="userStore.hasWriteAccessOnCurrentBoard" @click="handleAddBtnClick" type="button"
               class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
               <IconSVG iconName="plus" :scale="1.25" />Add Status
             </button>
           </template>
         </BaseMenu>
-        <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-          class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
-          <IconSVG iconName="plus" :scale="1.25" />Add Status
-        </button>
+        <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+          <button @click="handleAddBtnClick" type="button"
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+            <IconSVG iconName="plus" :scale="1.25" />Add Status
+          </button>
+        </BaseTooltip>
         <BaseTooltip text="Refresh Statuses">
           <button @click="handleRefreshBtnClick" type="button"
             class="btn btn-secondary btn-sm btn-square hidden md:flex">
@@ -211,8 +219,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
               <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
               <th class="min-w-96 max-w-96 sm:min-w-[20vw] sm:max-w-[30vw]">Description</th>
               <th class="min-w-16 max-w-16">Tasks</th>
-              <th v-if="isBoardOwner" class="min-w-60 max-w-60">Action</th>
-              <th v-else class="min-w-60 max-w-60"></th>
+              <th class="min-w-60 max-w-60">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -254,21 +261,24 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
                   </div>
                 </div>
               </td>
-              <td v-if="isBoardOwner">
-                <div v-if="status.isPredefined === false" class="flex justify-center items-center gap-1 w-full">
-                  <ButtonWithIcon @click="handleEditBtnClick(status.id)"
+              <td>
+                <div v-if="status.isPredefined === false" class="flex justify-start items-center gap-2 w-full">
+                  <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+                    <ButtonWithIcon @click="handleEditBtnClick(status.id)"
                     className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap"
-                    iconName="pencil-square">
+                    iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
                     Edit
-                  </ButtonWithIcon>
-                  <ButtonWithIcon @click="handleOpenDeleteModal(status)"
-                    className="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
-                    iconName="trash-fill">
-                    Delete
-                  </ButtonWithIcon>
+                    </ButtonWithIcon>
+                  </BaseTooltip>
+                  <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+                    <ButtonWithIcon @click="handleOpenDeleteModal(status)"
+                      className="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
+                      iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                      Delete
+                    </ButtonWithIcon>
+                  </BaseTooltip>
                 </div>
               </td>
-              <td v-else></td>
             </tr>
           </tbody>
         </table>

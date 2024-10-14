@@ -7,13 +7,14 @@ import { useRoute } from 'vue-router'
 import { useToastStore } from './toast'
 import { getCollaborators } from '@/libs/collaboratorManagement'
 // import { useUserStore } from './user'
-import Pl1AccessRight from '@/libs/enum/Pl1AccessRight'
+// import Pl1AccessRight from '@/libs/enum/Pl1AccessRight'
 import Pl1VisibilityType from '@/libs/enum/Pl1VisibilityType'
+import { useUserStore } from './user'
 
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
   const toastStore = useToastStore()
-  // const userStore = useUserStore()
+  const userStore = useUserStore()
   const isLoading = ref({
     board: false,
     task: false,
@@ -68,18 +69,8 @@ export const useBoardStore = defineStore('board', () => {
     isLoading.value.board = true
     const res = await getBoards()
     if (res.status === 'success') {
-      const allBoards = res.data
-      const tempBoards = []
-      const tempCollaborativeBoards = []
-      for (const board of allBoards) {
-        if (board.accessRight !== Pl1AccessRight.OWNER) {
-          tempCollaborativeBoards.push(board)
-        } else {
-          tempBoards.push(board)
-        }
-      }
-      boards.value = tempBoards
-      collaborativeBoards.value = tempCollaborativeBoards
+      boards.value = res.data.personalBoards.filter(board => board.owner.oid === userStore.user.oid)
+      collaborativeBoards.value = res.data.collaborativeBoards
     }
     isLoading.value.board = false    
   }
@@ -176,6 +167,6 @@ export const useBoardStore = defineStore('board', () => {
     updateBoard,
     collaborativeBoards,
     loadCollaborators,
-    collaborators,
+    collaborators
   }
 })

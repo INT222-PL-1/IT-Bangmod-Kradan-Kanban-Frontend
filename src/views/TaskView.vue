@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
@@ -27,8 +27,6 @@ const toastStore = useToastStore()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
 
-const isBoardOwner = computed(() => boardStore.currentBoard?.owner.oid === userStore.user?.oid)
-
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
 const boardSettingsModalOpenState = ref(false)
@@ -52,15 +50,18 @@ const handleTaskClick = (taskId) => {
 }
 
 const handleAddBtnClick = () => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   router.push({ name: 'task-add' })
 }
 
 const handleOpenDeleteModal = (taskData) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   taskDeleteModalData.value = taskData
   taskDeleteModalOpenState.value = true
 }
 
 const handleDeleteTask = async (taskId) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const res = await deleteTask(taskId, route.params.boardId)
   if (res.status === 'error') {
     toastStore.createToast({
@@ -81,6 +82,7 @@ const handleDeleteTask = async (taskId) => {
 }
 
 const handleEditBtnClick = (taskId) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   router.push({ name: 'task-edit', params: { taskId } })
 }
 
@@ -89,18 +91,20 @@ const handleSort = (e) => {
 }
 
 const handleSettingsButtonClick = () => {
+  if (userStore.isOwnerOfCurrentBoard === false) return
   boardSettingsModalOpenState.value = true
 }
 
 const handleToggleVisibilityButtonClick = () => {
+  if (userStore.isOwnerOfCurrentBoard === false) return
   boardVisibilityModalOpenState.value = true
 }
 
 const handleToggleBoardVisibility = async () => {
+  if (userStore.isOwnerOfCurrentBoard === false) return
 
   try {
     isLoading.value = true
-
     await new Promise(resolve => setTimeout(() => {
       boardVisibilityModalOpenState.value = false
       resolve()
@@ -178,6 +182,8 @@ const handleToggleBoardVisibility = async () => {
   </RouterView>
 
   <section class="max-w-full pt-10 pb-20">
+
+    <!-- ? Mobile View -->
     <div class="block sm:hidden">
       <div class="px-4 mb-4 flex justify-between">
         <StatusFilterBar compact />
@@ -187,21 +193,21 @@ const handleToggleBoardVisibility = async () => {
               <IconSVG iconName="three-dots" scale="1.25" />
             </template>
             <template #menu>
+              <button v-if="userStore.hasWriteAccessOnCurrentBoard" @click="handleAddBtnClick" type="button"
+                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+                <IconSVG iconName="plus" :scale="1.25" />Add Task
+              </button>
               <button @click="handleRefreshBtnClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
                 <div :class="{ 'animate-spin': boardStore.isLoading.task }">
                   <IconSVG iconName="arrow-clockwise" :scale="1.25" />
                 </div>Refresh Tasks
               </button>
-              <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-                class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                <IconSVG iconName="plus" :scale="1.25" />Add Task
-              </button>
-              <button v-if="isBoardOwner" @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+              <button v-if="userStore.isOwnerOfCurrentBoard" @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
                 <IconSVG iconName="gear" :scale="1.25" />Board Settings
               </button>
             </template>
           </BaseMenu>
-          <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" :disabled="isBoardOwner === false" />
+          <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" :disabled="userStore.isOwnerOfCurrentBoard === false" />
         </div>
       </div>
       <div v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
@@ -224,13 +230,14 @@ const handleToggleBoardVisibility = async () => {
             @deleteClick="handleOpenDeleteModal(task)"
             :task="task"
             :index="index"
-            :hasWritePermission="isBoardOwner"
+            :hasWritePermission="userStore.hasWriteAccessOnCurrentBoard"
           />
           <div class="divider"></div>
         </div>
       </div>
     </div>
     
+    <!-- ? Desktop View -->
     <BaseTablePlate>
       <template #left-menu>
         <StatusFilterBar />
@@ -241,27 +248,31 @@ const handleToggleBoardVisibility = async () => {
             <IconSVG iconName="three-dots" scale="1.25" />
           </template>
           <template #menu>
+            <button v-if="userStore.hasWriteAccessOnCurrentBoard" @click="handleAddBtnClick" type="button"
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+              <IconSVG iconName="plus" :scale="1.25" />Add Task
+            </button>
             <button @click="handleRefreshBtnClick" type="button"
               class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
               <div :class="{ 'animate-spin': boardStore.isLoading.task }">
                 <IconSVG iconName="arrow-clockwise" :scale="1.25" />
               </div>Refresh Tasks
             </button>
-            <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-              <IconSVG iconName="plus" :scale="1.25" />Add Task
-            </button>
-            <button v-if="isBoardOwner" @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+            <button v-if="userStore.isOwnerOfCurrentBoard" @click="handleSettingsButtonClick" type="button" class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
               <IconSVG iconName="gear" :scale="1.25" />Board Settings
             </button>
           </template>
         </BaseMenu>
-        <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" 
-        className="itbkk-board-visibility" :disabled="isBoardOwner === false" />
-        <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-          class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
-          <IconSVG iconName="plus" :scale="1.25" />Add Task
-        </button>
+        <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
+          <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" 
+          className="itbkk-board-visibility" :disabled="userStore.isOwnerOfCurrentBoard === false" />
+        </BaseTooltip>
+        <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+          <button @click="handleAddBtnClick" type="button"
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+            <IconSVG iconName="plus" :scale="1.25" />Add Task
+          </button>
+        </BaseTooltip>
         <BaseTooltip text="Refresh Tasks">
           <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm btn-square hidden md:flex">
             <div :class="{ 'animate-spin': boardStore.isLoading.task }">
@@ -269,8 +280,8 @@ const handleToggleBoardVisibility = async () => {
             </div>
           </button>
         </BaseTooltip>
-        <BaseTooltip v-if="isBoardOwner" text="Board Setting">
-          <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-secondary btn-sm btn-square hidden md:flex">
+        <BaseTooltip :text="userStore.isOwnerOfCurrentBoard ? 'Board Setting' : 'You need to be board owner to perform this action.'">
+          <button @click="handleSettingsButtonClick" type="button" class="itbkk-status-setting btn btn-secondary btn-sm btn-square hidden md:flex" :disabled="userStore.isOwnerOfCurrentBoard === false">
             <IconSVG iconName="gear" :scale="1.25" />
           </button>
         </BaseTooltip>
@@ -322,20 +333,24 @@ const handleToggleBoardVisibility = async () => {
                       <IconSVG iconName="three-dots-vertical" />
                     </template>
                     <template #menu>
-                      <li>
-                        <ButtonWithIcon @click="handleEditBtnClick(task.id)"
-                          className="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap"
-                          iconName="pencil-square">
-                          Edit
-                        </ButtonWithIcon>
-                      </li>
-                      <li>
-                        <ButtonWithIcon @click="handleOpenDeleteModal(task)"
-                          className="itbkk-button-delete btn btn-sm btn-ghost justify-start text-error flex flex-nowrap"
-                          iconName="trash-fill">
-                          Delete
-                        </ButtonWithIcon>
-                      </li>
+                      <div>
+                        <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" className="w-full">
+                          <ButtonWithIcon @click="handleEditBtnClick(task.id)"
+                            className="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap w-full"
+                            iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                            Edit
+                          </ButtonWithIcon>
+                        </BaseTooltip>
+                      </div>
+                      <div>
+                        <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" className="w-full">
+                          <ButtonWithIcon @click="handleOpenDeleteModal(task)"
+                            className="itbkk-button-delete btn btn-sm btn-ghost justify-start text-error flex flex-nowrap w-full"
+                            iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                            Delete
+                          </ButtonWithIcon>
+                        </BaseTooltip>
+                      </div>
                     </template>
                   </BaseMenu>
                 </div>

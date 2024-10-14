@@ -1,6 +1,7 @@
 <script setup>
 import BaseModal from '@/components/BaseModal.vue'
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
+import BaseTooltip from '@/components/BaseTooltip.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import IconSVG from '@/components/IconSVG.vue'
 import { addCollaborator, patchCollaborator, removeCollaborator } from '@/libs/collaboratorManagement'
@@ -14,7 +15,6 @@ const route = useRoute()
 const toastStore = useToastStore()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
-const isBoardOwner = computed(() => boardStore.currentBoard?.owner.oid === userStore.user?.oid)
 
 const defaultCollaboratorModalData = {
   email: '',
@@ -46,12 +46,16 @@ const handleRefreshBtnClick = async () => {
 }
 
 const handleAddButtonClick = () => {
+  if (userStore.isOwnerOfCurrentBoard === false) return
+
   console.log('Add Collaborator button clicked')
   collaboratorModalData.value = { ...defaultCollaboratorModalData }
   addModalOpenState.value = true
 }
 
 const handleAddConfirm = async () => {
+  if (userStore.isOwnerOfCurrentBoard === false) return
+
   const res = await addCollaborator(route.params.boardId, collaboratorModalData.value)
   if (res.status === 'error') {
     if (res.statusCode === 403) {
@@ -96,11 +100,15 @@ const handleAddCancel = () => {
 }
 
 const handleRemoveButtonClick = (collaborator) => {
+  if (userStore.isOwnerOfCurrentBoard === false) return
+
   selectedCollaborator.value = collaborator
   removeModalOpenState.value = true
 }
 
 const handleRemoveConfirm = async () => {
+  if (userStore.isOwnerOfCurrentBoard === false) return
+
   console.log('Remove Confirm button clicked')
   const res = await removeCollaborator(route.params.boardId, selectedCollaborator.value.oid)
   if (res.status === 'error') {
@@ -141,11 +149,15 @@ const handleRemoveCancel = () => {
 }
 
 const handleAccessRightChange = (collaborator) => {
+  if (userStore.isOwnerOfCurrentBoard === false) return
+
   selectedCollaborator.value = collaborator
   changeAccessRightModalOpenState.value = true
 }
 
 const handleAccessRightConfirm = async () => {
+  if (userStore.isOwnerOfCurrentBoard === false) return
+
   console.log('Access Right Confirm button clicked')
   const res = await patchCollaborator(route.params.boardId, selectedCollaborator.value.oid, { accessRight: selectedCollaborator.value.accessRight })
   if (res.status === 'error') {
@@ -237,7 +249,7 @@ const handleAccessRightCancel = () => {
 
         <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
-            <button @click="handleAddConfirm" :class="{ disabled: disabledAddButton }" class="itbkk-button-ok btn btn-sm btn-success" :disabled="disabledAddButton">
+            <button @click="handleAddConfirm" :class="{ disabled: disabledAddButton }" class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledAddButton">
               Add
             </button>
             <button @click="handleAddCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
@@ -262,7 +274,7 @@ const handleAccessRightCancel = () => {
 
         <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
-            <button @click="handleRemoveConfirm" class="btn btn-sm btn-error btn-outline">
+            <button @click="handleRemoveConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
               Confirm
             </button>
             <button @click="handleRemoveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
@@ -286,7 +298,7 @@ const handleAccessRightCancel = () => {
 
         <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
-            <button @click="handleAccessRightConfirm" class="btn btn-sm btn-error btn-outline">
+            <button @click="handleAccessRightConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
               Confirm
             </button>
             <button @click="handleAccessRightCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
@@ -305,12 +317,14 @@ const handleAccessRightCancel = () => {
 
     <BaseTablePlate>
       <template #right-menu>
-        <ButtonWithIcon
-          @click="handleAddButtonClick"
-          className="btn btn-sm btn-primary text-neutral itbkk-collaborative-add"
-          iconName="person-plus">
-          Add Collaborator
-        </ButtonWithIcon>
+        <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
+          <ButtonWithIcon
+            @click="handleAddButtonClick"
+            className="itbkk-collaborator-add btn btn-sm btn-primary text-neutral"
+            iconName="person-plus"  :disabled="userStore.isOwnerOfCurrentBoard === false">
+            Add Collaborator
+          </ButtonWithIcon>
+        </BaseTooltip>
 
         <button @click="handleRefreshBtnClick" type="button"
           class="btn btn-sm btn-secondary justify-start flex flex-nowrap ">
@@ -328,7 +342,7 @@ const handleAccessRightCancel = () => {
               <th class="min-w-16 max-w-16"></th>
               <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Members</th>
               <th class="min-w-96 max-w-96 sm:min-w-[20vw] sm:max-w-[30vw]">Access Right</th>
-              <th class="min-w-60 max-w-60">{{ isBoardOwner ? 'Action' : '' }}</th>
+              <th class="min-w-60 max-w-60">Action</th>
             </tr>
           </thead>
 
@@ -342,7 +356,7 @@ const handleAccessRightCancel = () => {
             <tr v-else-if="boardStore.collaborators.length === 0">
               <td colspan="4" class="text-center h-32">No collaborator</td>
             </tr>
-            <tr v-else v-for="(collaborator, index) in boardStore.collaborators" :key="collaborator.oid">
+            <tr v-else v-for="(collaborator, index) in boardStore.collaborators" :key="collaborator.oid" class="itbkk-item">
               <td class="min-w-16 max-w-16 itbkk-item">
                 <div class="grid place-items-center">
                   <div>{{ index + 1 }}</div>
@@ -350,24 +364,25 @@ const handleAccessRightCancel = () => {
               </td>
 
               <td class="min-w-16 max-w-16 justify-center">
-                <div class="text-md font-bold">{{ collaborator.name }}</div>
-                <div class="text-sm text-gray-500 itbkk-email">{{ collaborator.email }}</div>
+                <div class="itbkk-name text-md font-bold">{{ collaborator.name }}</div>
+                <div class="itbkk-email text-sm text-gray-500 itbkk-email">{{ collaborator.email }}</div>
               </td>
 
               <td class="min-w-18 max-w-18">
-                <div class="itbkk-access-right dropdown">
-                  <select @change="handleAccessRightChange(collaborator)" v-model="collaborator.accessRight" class="transition flex bg-base-200 rounded-xl px-8 py-2 hover:contrast-75">
+                <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
+                  <select @change="handleAccessRightChange(collaborator)" v-model="collaborator.accessRight" class="itbkk-access-right transition flex bg-base-100 select select-ghost select-sm"  :disabled="userStore.isOwnerOfCurrentBoard === false">
                     <option value="READ">Read</option>
                     <option value="WRITE">Write</option>
                     <!-- <IconSVG iconName="chevron-down" size="1rem" /> -->
                   </select>
-                </div>
+                </BaseTooltip>
               </td>
 
-              <td v-if="isBoardOwner">
-                <button @click="handleRemoveButtonClick(collaborator)" class="itbkk-button-remove btn btn-sm btn-error btn-outline min-w-35 max-w-35">Remove</button>
+              <td>
+                <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
+                  <button @click="handleRemoveButtonClick(collaborator)" class="itbkk-collab-remove btn btn-sm btn-error btn-outline min-w-35 max-w-35"  :disabled="userStore.isOwnerOfCurrentBoard === false">Remove</button>
+                </BaseTooltip>
               </td>
-              <td v-else class="min-w-35 max-w-35"></td>
             </tr>
           </tbody>
         </table>
