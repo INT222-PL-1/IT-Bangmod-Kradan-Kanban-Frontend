@@ -4,7 +4,7 @@
 
 <template>
     <div class="hidden sm:block bg-base-300 rounded-lg shadow-md relative">
-      <div class="px-4 min-h-8 sticky top-[8.1rem] z-20 py-5 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
+      <div class="px-4 min-h-8 sticky top-[8.1rem] z-30 py-5 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
         <div class="flex justify-between">
           <div class="flex gap-2">
             <slot name="left-menu"></slot>
