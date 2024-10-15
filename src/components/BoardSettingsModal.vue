@@ -4,6 +4,7 @@ import BaseModal from './BaseModal.vue'
 import { useToastStore } from '@/stores/toast'
 import { computed, ref, watch } from 'vue'
 import StatusBadge from './StatusBadge.vue'
+import MiniModal from './MiniModal.vue'
 
 const emits = defineEmits(['clickClose'])
 
@@ -44,7 +45,7 @@ const handleApplySetting = async ({ message }) => {
       description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
       status: 'error'
     })
-  } 
+  }
 
   if (boardStore.currentBoard.isTaskLimitEnabled && boardStore.currentBoard.exceedLimitStatus.length > 0) {
     exceedLimitStatus.value.push(...boardStore.currentBoard.exceedLimitStatus)
@@ -103,7 +104,8 @@ watch(() => boardStore.currentBoard, (newBoard) => {
         </div>
         <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
           <div class="flex gap-2">
-            <button @click="handleApplySetting" class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledApplySettingsBtn">
+            <button @click="handleApplySetting" class="itbkk-button-confirm btn btn-sm btn-success"
+              :disabled="disabledApplySettingsBtn">
               Apply
             </button>
             <button @click="handleCloseSetting" class="itbkk-button-cancel btn btn-sm btn-neutral">
@@ -112,36 +114,32 @@ watch(() => boardStore.currentBoard, (newBoard) => {
           </div>
         </div>
       </div>
-      <Transition>
-        <BaseModal :show="exceedLimitOpenState" @clickBG="handleCloseExceedLimitModal" :mobileCenter="true">
-          <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-            <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Status Exceed Limit
-            </div>
-            <div class="flex flex-col gap-2 p-4 break-words">
-              <div>
-                These statuses that have reached the task limit. No additional tasks can be added to these statuses at
-                this time.
-              </div>
-              <div class="flex flex-col gap-2">
-                <div v-for="status of exceedLimitStatus" :key="status" class="flex items-center gap-2">
-                  <StatusBadge :statusData="status" textWrapMode="truncate" />
-                  <div>has <span class="text-error">{{ status.count }}/{{ boardStore.currentBoard.taskLimitPerStatus }}</span>
-                    tasks</div>
-                  <div class="text-error">({{ status.count - boardStore.currentBoard.taskLimitPerStatus }} task{{
-                    status.count - boardStore.currentBoard.taskLimitPerStatus > 1 ? 's' : '' }} over limit)</div>
-                </div>
-              </div>
-            </div>
-            <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-              <div class="flex gap-2">
-                <button @click="handleCloseExceedLimitModal" class="itbkk-button-cancel btn btn-sm btn-neutral">
-                  Ok
-                </button>
-              </div>
+      <MiniModal :show="exceedLimitOpenState" @clickBG="handleCloseExceedLimitModal">
+        <template #title>
+          Status Exceed Limit
+        </template>
+        <template #content>
+          <div>
+            These statuses that have reached the task limit. No additional tasks can be added to these statuses at
+            this time.
+          </div>
+          <div class="flex flex-col gap-2">
+            <div v-for="status of exceedLimitStatus" :key="status" class="flex items-center gap-2">
+              <StatusBadge :statusData="status" textWrapMode="truncate" />
+              <div>has <span class="text-error">{{ status.count }}/{{ boardStore.currentBoard.taskLimitPerStatus
+                  }}</span>
+                tasks</div>
+              <div class="text-error">({{ status.count - boardStore.currentBoard.taskLimitPerStatus }} task{{
+                status.count - boardStore.currentBoard.taskLimitPerStatus > 1 ? 's' : '' }} over limit)</div>
             </div>
           </div>
-        </BaseModal>
-      </Transition>
+        </template>
+        <template #actions>
+          <button @click="handleCloseExceedLimitModal" class="itbkk-button-cancel btn btn-sm btn-neutral">
+            Ok
+          </button>
+        </template>
+      </MiniModal>
     </BaseModal>
   </Transition>
 </template>
@@ -157,4 +155,3 @@ watch(() => boardStore.currentBoard, (newBoard) => {
   opacity: 0;
 }
 </style>
-
