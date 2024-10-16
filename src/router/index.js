@@ -23,6 +23,7 @@ const router = createRouter({
           path: '',
           name: 'all-board',
           component: BoardView,
+          meta: { title: 'Boards' },
           beforeEnter: async (_, from) => {
             const boardStore = useBoardStore()
             boardStore.clearBoardData()
@@ -49,6 +50,7 @@ const router = createRouter({
       path: '/board/:boardId',
       redirect: { name: 'all-task' },
       component: TaskBoardLayout,
+      meta: { title: 'Tasks' },
       children: [
         {
           path: 'task',
@@ -79,6 +81,7 @@ const router = createRouter({
         {
           path: 'status/manage',
           name: 'status-manage',
+          meta: { title: 'Status Management' },
           component: () => import('@/views/StatusManageView.vue'),
           children: [
             {
@@ -96,23 +99,27 @@ const router = createRouter({
         {
           path: 'collab',
           name: 'collab-manage',
+          meta: { title: 'Collaborator Management' },
           component: () => import('@/views/CollabManageView.vue'),
         }
       ]
     },
     {
-      path: '/login',
+      path: '/login',      
       name: 'login',
+      meta: { title: 'Login' },
       component: () => import('../views/LoginView.vue')
     },
     {
       path: '/forbidden',
       name: 'forbidden',
+      meta: { title: 'Forbidden' },
       component: () => import('../views/ForbiddenView.vue')
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
+      meta: { title: 'Not found' },
       component: () => import('../views/NotFoundView.vue')
     }
   ]
@@ -187,6 +194,11 @@ router.beforeEach(async (to) => {
 
   const nextRoute = await handleUserValidation()
   return nextRoute
+})
+
+router.afterEach((to) => {
+  if (to.meta.title) document.title = `ITBKK - ${to.meta.title}`
+  else document.title = 'ITBKK'
 })
 
 export default router

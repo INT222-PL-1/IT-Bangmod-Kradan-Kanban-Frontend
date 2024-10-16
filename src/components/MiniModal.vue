@@ -10,13 +10,17 @@ defineProps({
     type: Function,
     default: () => {}
   },
+  width: {
+    type: String,
+    default: '40rem'
+  },
 })
 </script>
 
 <template>
   <Transition>
     <BaseModal :show="show" @clickBG="clickBG" :mobileCenter="true">
-      <div class="absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
+      <div class="absolute bg-base-300 max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col" :style="{ width }">
         <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">
           <slot name="title">Title</slot>
         </div>
