@@ -2,10 +2,12 @@ import router from "@/router"
 import { useToastStore } from "@/stores/toast"
 import Pl1ErrorTypes from "./enum/Pl1ErrorTypes"
 import { refreshAccessToken } from "./userManagement"
+import { useUserStore } from "@/stores/user"
 
 
 const globalResponseHandler = async (response) => {
   const toastStore = useToastStore()
+  const userStore = useUserStore()
 
   if (response.statusCode === 401) {
     if (router.currentRoute.value.name === 'login') return
@@ -17,17 +19,6 @@ const globalResponseHandler = async (response) => {
       Pl1ErrorTypes.TOKEN_TEMPERED
     ].includes(response.data.type)) {
 
-      // TODO: Implement refresh token
-
-      // toastStore.createToast({
-      //   title: 'Error',
-      //   description: 'Your authentication has expired.\nPlease login again.',
-      //   status: 'error',
-      //   delay: 500,
-      // })
-      // router.push({ name: 'login' })
-      // console.log('Token malformed')
-      
       try {
         const refreshToken = localStorage.getItem('itbkk_refresh_token')
         const res = await refreshAccessToken(refreshToken)
@@ -76,6 +67,15 @@ const globalResponseHandler = async (response) => {
       console.log('Not found')
       router.push({ name: 'not-found' })
     }
+  } else if (response.statusCode === 500) {
+    userStore.clearUserData()
+    toastStore.createToast({
+      title: 'Error',
+      description: 'An unexpected error occurred.\nPlease login and try again later.',
+      status: 'error',
+      delay: 500,
+    })
+    router.push({ name: 'login' })
   }
 }
 
