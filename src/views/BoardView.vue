@@ -1,7 +1,7 @@
 <script setup>
-import BaseModal from '@/components/BaseModal.vue';
 import BoardListItem from '@/components/BoardListItem.vue'
 import IconSVG from '@/components/IconSVG.vue'
+import MiniModal from '@/components/MiniModal.vue';
 import { removeCollaborator } from '@/libs/collaboratorManagement';
 import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast';
@@ -73,28 +73,23 @@ const handleLeaveCancel = () => {
   </RouterView>
 
   <!-- ? Leave Board Modal -->
-  <Transition>
-    <BaseModal
-      :show="leaveModalOpenState" @clickBG="leaveModalOpenState = false" :mobileCenter="true">
-      <div class="itbkk-modal-alert absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Leave Board</div>
-        <div class="flex p-4">
-            <span>Do you want to leave <span class="italic font-semibold">{{ selectedBoard?.name }}</span> board?</span>
-        </div>
-
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="handleLeaveConfirm" class="btn btn-sm btn-error btn-outline">
-              Confirm
-            </button>
-            <button @click="handleLeaveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    </BaseModal>
-  </Transition>
+  <MiniModal
+    :show="leaveModalOpenState" @clickBG="leaveModalOpenState = false" :mobileCenter="true">
+    <template #title>
+      Leave Board
+    </template>
+    <template #content>
+      <span>Do you want to leave <span class="italic font-semibold">{{ selectedBoard?.name }}</span> board?</span>
+    </template>
+    <template #actions>
+      <button @click="handleLeaveConfirm" class="btn btn-sm btn-error btn-outline">
+        Confirm
+      </button>
+      <button @click="handleLeaveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+    </template>
+  </MiniModal>
 
   <!-- <div class="h-[7rem] top-[5rem] sticky flex justify-center items-center bg-base-100 z-10">
     <div class="text-3xl font-bold flex items-center gap-2">

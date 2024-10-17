@@ -6,13 +6,13 @@ import { onMounted, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { deleteStatus, deleteStatusAndTransferTasks } from '@/libs/statusManagement'
 import { useToastStore } from '@/stores/toast'
-import BaseModal from '@/components/BaseModal.vue'
 import StatusSelector from '@/components/StatusSelector.vue'
 import BaseMenu from '@/components/BaseMenu.vue'
 import { useBoardStore } from '@/stores/board'
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import { useUserStore } from '@/stores/user'
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
+import MiniModal from '@/components/MiniModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -112,61 +112,52 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
 </script>
 
 <template>
-  <Transition>
-    <BaseModal @clickBG="statusDeleteModalOpenState = false" :show="statusDeleteModalOpenState" :mobileCenter="true">
-      <div class="bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Delete a Status</div>
-        <div class="itbkk-message p-4 break-words">
-          Do you want to delete the <span class="opacity-75 italic">{{ statusModalData.name }}</span> status?
-        </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="statusDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
-            <button @click="handleDeleteStatus(statusModalData.id)"
-              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
-              Confirm
-            </button>
-          </div>
-        </div>
+  <MiniModal @clickBG="statusDeleteModalOpenState = false" :show="statusDeleteModalOpenState" :mobileCenter="true">
+    <template #title>Delete a Status</template>
+    <template #content>
+      <div class="itbkk-message break-words">
+        Do you want to delete the <span class="opacity-75 italic">{{ statusModalData.name }}</span> status?
       </div>
-    </BaseModal>
-  </Transition>
+    </template>
+    <template #actions>
+      <button @click="statusDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+      <button @click="handleDeleteStatus(statusModalData.id)"
+        class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+        Confirm
+      </button>
+    </template>
+  </MiniModal>
 
-  <Transition>
-    <BaseModal @clickBG="statusTransferModalOpenState = false" :show="statusTransferModalOpenState"
-      :mobileCenter="true">
-      <div class="bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Transfer a Status</div>
-        <div class="itbkk-message p-4 break-words">
-          <div>
-            <div>There are <span class="font-semibold">{{ statusModalData.count }}</span> task{{
-              statusModalData.count > 1 ? 's' : '' }} in <span class="opacity-75 italic">{{
-                statusModalData.name }}</span> status.
-            </div> In order to delete this status, the system must transfer
-            task{{ statusModalData.count > 1 ? 's' : '' }} in this status to existing status.
-            <div class="flex items-center gap-2 mt-4">
-              Transfer tasks to
-              <StatusSelector v-model="statusIdToTransfer" :excludeStatusId="statusModalData.id" />
-            </div>
-          </div>
-        </div>
-        <div
-          class="flex justify-end items-center flex-none h-14 px-4 rounded-b-xl border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="statusTransferModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
-            <button @click="handleTransferAndDeleteStatus(statusModalData.id, statusIdToTransfer)"
-              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
-              Transfer and Delete
-            </button>
+  <MiniModal @clickBG="statusTransferModalOpenState = false" :show="statusTransferModalOpenState"
+    :mobileCenter="true">
+    <template #title>Transfer a Status</template>
+    <template #content>
+      <div class="itbkk-message break-words">
+        <div>
+          <div>There are <span class="font-semibold">{{ statusModalData.count }}</span> task{{
+            statusModalData.count > 1 ? 's' : '' }} in <span class="opacity-75 italic">{{
+              statusModalData.name }}</span> status.
+          </div> In order to delete this status, the system must transfer
+          task{{ statusModalData.count > 1 ? 's' : '' }} in this status to existing status.
+          <div class="flex items-center gap-2 mt-4">
+            Transfer tasks to
+            <StatusSelector v-model="statusIdToTransfer" :excludeStatusId="statusModalData.id" />
           </div>
         </div>
       </div>
-    </BaseModal>
-  </Transition>
+    </template>
+    <template #actions>
+      <button @click="statusTransferModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+      <button @click="handleTransferAndDeleteStatus(statusModalData.id, statusIdToTransfer)"
+        class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+        Transfer and Delete
+      </button>
+    </template>
+  </MiniModal>
 
   <RouterView v-slot="{ Component }">
     <Transition>

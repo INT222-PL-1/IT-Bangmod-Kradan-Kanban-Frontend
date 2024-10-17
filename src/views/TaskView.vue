@@ -5,7 +5,6 @@ import { useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
 import BaseMenu from '@/components/BaseMenu.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
-import BaseModal from '@/components/BaseModal.vue'
 import { deleteTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import SortButton from '@/components/SortButton.vue'
@@ -17,6 +16,7 @@ import BaseTooltip from '@/components/BaseTooltip.vue'
 import { useUserStore } from '@/stores/user'
 import TaskCard from '@/components/TaskCard.vue'
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
+import MiniModal from '@/components/MiniModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -123,57 +123,49 @@ const handleToggleBoardVisibility = async () => {
 
   <BoardSettingsModal :show="boardSettingsModalOpenState" @clickClose="boardSettingsModalOpenState = false" />
 
-  <Transition>
-    <BaseModal :isLoading="isLoading" @clickBG="boardVisibilityModalOpenState = false" :show="boardVisibilityModalOpenState" :mobileCenter="true">
-      <div class="itbkk-modal-alert bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="itbkk-message text-lg font-bold p-4 border-b-2 border-base-100 break-words flex-none">Do you want to change board visibility to {{ boardStore.currentBoard?.isPublic ? 'private' : 'public' }}?</div>
-        <div class="px-4 pt-4 text-error">
-          This board is currently in <span class="font-semibold">{{ boardStore.currentBoard?.isPublic ? 'Public' : 'Private' }}</span> mode.
-        </div>
-        <div class="px-4 pb-4">
-          {{
-            boardStore.currentBoard?.isPublic
-              ? 'In private, only board owner can access/control board. Do you want to change the visibility to Private?'
-              : 'In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public?'
-          }}
-        </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="boardVisibilityModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
-            <button @click="handleToggleBoardVisibility" :disabled="isLoading"
-              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
-              Confirm
-            </button>
-          </div>
-        </div>
+  <MiniModal Modal :isLoading="isLoading" @clickBG="boardVisibilityModalOpenState = false" :show="boardVisibilityModalOpenState" :mobileCenter="true">
+    <template #title>Do you want to change board visibility to {{ boardStore.currentBoard?.isPublic ? 'private' : 'public' }}?</template>
+    <template #content>
+      <div class="text-error">
+        This board is currently in <span class="font-semibold">{{ boardStore.currentBoard?.isPublic ? 'Public' : 'Private' }}</span> mode.
       </div>
-    </BaseModal>
-  </Transition>
+      <div>
+        {{
+          boardStore.currentBoard?.isPublic
+            ? 'In private, only board owner can access/control board. Do you want to change the visibility to Private?'
+            : 'In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public?'
+        }}
+      </div>
+    </template>
+    <template #actions>
+      <button @click="boardVisibilityModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+      <button @click="handleToggleBoardVisibility" :disabled="isLoading"
+        class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+        Confirm
+      </button>
+    </template>
+  </MiniModal>
 
-  <Transition>
-    <BaseModal @clickBG="taskDeleteModalOpenState = false" :show="taskDeleteModalOpenState" :mobileCenter="true">
-      <div class="bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Delete Task</div>
-        <div class="itbkk-message p-4 break-words">
-          Do you want to delete the task number {{ taskDeleteModalData.id }} -
-          "<span class="opacity-75 italic">{{ taskDeleteModalData.title }}</span>"?
-        </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="taskDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
-            <button @click="handleDeleteTask(taskDeleteModalData.id)"
-              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
-              Confirm
-            </button>
-          </div>
-        </div>
+  <MiniModal @clickBG="taskDeleteModalOpenState = false" :show="taskDeleteModalOpenState" :mobileCenter="true">
+    <template #title>Delete Task</template>
+    <template #content>
+      <div class="itbkk-message break-words">
+        Do you want to delete the task number {{ taskDeleteModalData.id }} -
+        "<span class="opacity-75 italic">{{ taskDeleteModalData.title }}</span>"?
       </div>
-    </BaseModal>
-  </Transition>
+    </template>
+    <template #actions>
+      <button @click="taskDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+      <button @click="handleDeleteTask(taskDeleteModalData.id)"
+        class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+        Confirm
+      </button>
+    </template>
+  </MiniModal>
 
   <RouterView v-slot="{ Component }">
     <Transition>

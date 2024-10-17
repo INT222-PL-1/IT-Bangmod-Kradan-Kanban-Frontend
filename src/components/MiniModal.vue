@@ -14,6 +14,11 @@ defineProps({
     type: String,
     default: '40rem'
   },
+  contentFlow: {
+    type: String,
+    default: 'column',
+    validator: (value) => ['column', 'row'].includes(value)
+  }
 })
 </script>
 
@@ -24,7 +29,7 @@ defineProps({
         <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">
           <slot name="title">Title</slot>
         </div>
-        <div class="flex flex-col gap-2 p-4 break-words">
+        <div class="flex gap-2 p-4 break-words" :class="contentFlow === 'column' ? 'flex-col' : 'flex-row'">
           <slot name="content">Content</slot>
         </div>
         <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">

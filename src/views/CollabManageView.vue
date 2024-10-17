@@ -1,9 +1,9 @@
 <script setup>
-import BaseModal from '@/components/BaseModal.vue'
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
 import IconSVG from '@/components/IconSVG.vue'
+import MiniModal from '@/components/MiniModal.vue'
 import { addCollaborator, patchCollaborator, removeCollaborator } from '@/libs/collaboratorManagement'
 import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast'
@@ -203,118 +203,91 @@ const handleAccessRightCancel = () => {
 <template>
 
   <!-- ? Add Collaborator Modal -->
-  <Transition>
-    <BaseModal
-      :show="addModalOpenState" @clickBG="addModalOpenState = false" :mobileCenter="true">
-      <div class="itbkk-modal-alert absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Add Collaborator
-        </div>
-        <div class="flex p-4">
-          <div class="flex flex-col gap-2 flex-[2]">
-            <span class="text-lg font-semibold">
-              <span>Collaborator e-mail </span>
-              <span class="text-error">* </span>
-              <span class="text-sm">
-                ({{ collaboratorModalData.email.length + '/50' }})
-              </span>
-            </span>
-            <div>
-              <div v-show="collaboratorModalData.email.length > 50"
-                class="text-error text-xs">Email can not be more than 50
-                characters</div>
-              <div :class="{ 'border border-error animate-shake-x-in': collaboratorModalData.email.length > 50 }"
-                class="bg-base-200 px-4 py-2 mt-2 rounded-lg">
-                <input v-model.trim="collaboratorModalData.email" placeholder="Enter Collaborator E-mail (Required)"
-                  class="itbkk-collaborator-email break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none" />
-              </div>
-            </div>
-          </div>
-          <div class="divider divider-horizontal"></div>
-          <div class="flex flex-col gap-2 flex-[1]">
-            <div>
-              <span class="text-lg font-semibold">
-                <span>Access Right</span>
-              </span>
-            </div>
-            <div :class="{ 'border border-error animate-shake-x-in': false }"
-              class="bg-base-200 mt-2 rounded-lg">
-              <select v-model="collaboratorModalData.accessRight"
-                class="itbkk-access-right select select-ghost select-sm w-full my-1">
-                <option value="READ">Read</option>
-                <option value="WRITE">Write</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="handleAddConfirm" :class="{ disabled: disabledAddButton }" class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledAddButton">
-              Add
-            </button>
-            <button @click="handleAddCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
+  <MiniModal
+    :show="addModalOpenState" @clickBG="addModalOpenState = false" contentFlow="row" :mobileCenter="true">
+    <template #title>Add Collaborator</template>
+    <template #content>
+      <div class="flex flex-col gap-2 flex-[2]">
+        <span class="text-lg font-semibold">
+          <span>Collaborator e-mail </span>
+          <span class="text-error">* </span>
+          <span class="text-sm">
+            ({{ collaboratorModalData.email.length + '/50' }})
+          </span>
+        </span>
+        <div>
+          <div v-show="collaboratorModalData.email.length > 50"
+            class="text-error text-xs">Email can not be more than 50
+            characters</div>
+          <div :class="{ 'border border-error animate-shake-x-in': collaboratorModalData.email.length > 50 }"
+            class="bg-base-200 px-4 py-2 mt-2 rounded-lg">
+            <input v-model.trim="collaboratorModalData.email" placeholder="Enter Collaborator E-mail (Required)"
+              class="itbkk-collaborator-email break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none" />
           </div>
         </div>
       </div>
-    </BaseModal>
-  </Transition>
+      <div class="divider divider-horizontal"></div>
+      <div class="flex flex-col gap-2 flex-[1]">
+        <div>
+          <span class="text-lg font-semibold">
+            <span>Access Right</span>
+          </span>
+        </div>
+        <div :class="{ 'border border-error animate-shake-x-in': false }"
+          class="bg-base-200 mt-2 rounded-lg">
+          <select v-model="collaboratorModalData.accessRight"
+            class="itbkk-access-right select select-ghost select-sm w-full my-1">
+            <option value="READ">Read</option>
+            <option value="WRITE">Write</option>
+          </select>
+        </div>
+      </div>
+    </template>
+    <template #actions>
+      <button @click="handleAddConfirm" :class="{ disabled: disabledAddButton }" class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledAddButton">
+        Add
+      </button>
+      <button @click="handleAddCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+    </template>
+  </MiniModal>
 
   <!-- ? Remove Collaborator Modal -->
-  <Transition>
-    <BaseModal
-      :show="removeModalOpenState" @clickBG="removeModalOpenState = false" :mobileCenter="true">
-      <div class="itbkk-modal-alert absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Remove Collaborator
-        </div>
-        <div class="flex p-4">
-            <span>Do you want to remove <span class="italic">{{ selectedCollaborator?.name }}</span> from the board?</span>
-        </div>
-
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="handleRemoveConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
-              Confirm
-            </button>
-            <button @click="handleRemoveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    </BaseModal>
-  </Transition>
+  <MiniModal
+    :show="removeModalOpenState" @clickBG="removeModalOpenState = false" :mobileCenter="true">
+    <template #title>Remove Collaborator</template>
+    <template #content>
+      <span>Do you want to remove <span class="italic">{{ selectedCollaborator?.name }}</span> from the board?</span>
+    </template>
+    <template #actions>
+      <button @click="handleRemoveConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+        Confirm
+      </button>
+      <button @click="handleRemoveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+    </template>
+  </MiniModal>
 
   <!-- ? Change access right modal -->
-  <Transition>
-    <BaseModal
-      :show="changeAccessRightModalOpenState" @clickBG="changeAccessRightModalOpenState = false" :mobileCenter="true">
-      <div class="itbkk-modal-alert absolute bg-base-300 w-[40rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-200 break-words flex-none">Change Access Right</div>
-        <div class="flex p-4">
-            <span>Do you want to change access right of <span class="italic">{{ selectedCollaborator?.name }}</span> to <span class="font-semibold">{{ selectedCollaborator?.accessRight }}</span>?</span>
-        </div>
-
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="handleAccessRightConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
-              Confirm
-            </button>
-            <button @click="handleAccessRightCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    </BaseModal>
-  </Transition>
+  <MiniModal
+    :show="changeAccessRightModalOpenState" @clickBG="changeAccessRightModalOpenState = false" :mobileCenter="true">
+    <template #title>Change Access Right</template>
+    <template #content>
+      <span>Do you want to change access right of <span class="italic">{{ selectedCollaborator?.name }}</span> to <span class="font-semibold">{{ selectedCollaborator?.accessRight }}</span>?</span>
+    </template>
+    <template #actions>
+      <button @click="handleAccessRightConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+        Confirm
+      </button>
+      <button @click="handleAccessRightCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+    </template>
+  </MiniModal>
 
   <section class="max-w-full pt-10 pb-20">
-    <!-- <div class="text-md text-bold py-3">{{ boardModalData.name }} <span class="font-bold"> > Collaborator </span></div> -->
-    <!-- <div class="text-2xl p-4 text-center">Collaborator Management</div> -->
-
-
     <BaseTablePlate>
       <template #right-menu>
         <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
@@ -392,13 +365,4 @@ const handleAccessRightCancel = () => {
 </template>
 
 <style scoped>
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.3s;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
-}
 </style>
