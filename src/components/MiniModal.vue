@@ -1,4 +1,5 @@
 <script setup>
+import { useThemeStore } from '@/stores/theme';
 import BaseModal from './BaseModal.vue';
 import SpiderWebbing from './festival/halloween/SpiderWebbing.vue';
 
@@ -21,6 +22,9 @@ defineProps({
     validator: (value) => ['column', 'row'].includes(value)
   }
 })
+
+const themeStore = useThemeStore()
+
 </script>
 
 <template>
@@ -29,7 +33,7 @@ defineProps({
       <div class="absolute bg-base-300 max-w-[90vw] rounded-xl h-auto flex flex-col" :style="{ width }">
         <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none flex justify-between">
           <slot name="title">Title</slot>
-          <div class="grid place-items-center -translate-x-10 translate-y-5">
+          <div v-if="themeStore.festivalThemeState && themeStore.festivalName === 'halloween'" class="grid place-items-center -translate-x-10 translate-y-5">
             <SpiderWebbing />
           </div>
         </div>
