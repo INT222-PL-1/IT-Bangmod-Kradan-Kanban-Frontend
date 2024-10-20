@@ -13,6 +13,7 @@ import BaseTooltip from '@/components/BaseTooltip.vue'
 import { useUserStore } from '@/stores/user'
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import MiniModal from '@/components/MiniModal.vue'
+import { HttpStatusCode } from 'zyos'
 
 const route = useRoute()
 const router = useRouter()
@@ -66,19 +67,19 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
   if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
   const res = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
-      status: 'error'
-    })
-  } else {
+  if (res.ok) {
     toastStore.createToast({
       title: 'Success',
       description: 'The tasks have been transferred and the status has been deleted.',
       status: 'success'
     })
     await boardStore.loadStatuses()
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      status: 'error'
+    })
   }
   statusTransferModalOpenState.value = false
 }
@@ -87,18 +88,18 @@ const handleDeleteStatus = async (statusId) => {
   if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
   const res = await deleteStatus(statusId, boardId)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
-      status: 'error'
-    })
-    await boardStore.loadStatuses()
-  } else {
+  if (res.ok) {
     toastStore.createToast({
       title: 'Success',
       description: 'The status has been deleted',
       status: 'success'
+    })
+    await boardStore.loadStatuses()
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      status: 'error'
     })
     await boardStore.loadStatuses()
   }

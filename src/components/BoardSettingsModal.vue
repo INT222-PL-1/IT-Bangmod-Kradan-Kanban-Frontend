@@ -4,6 +4,7 @@ import { useToastStore } from '@/stores/toast'
 import { computed, ref, watch } from 'vue'
 import StatusBadge from './StatusBadge.vue'
 import MiniModal from './MiniModal.vue'
+import { HttpStatusCode } from 'zyos'
 
 const emits = defineEmits(['clickClose'])
 
@@ -41,7 +42,7 @@ const handleApplySetting = async ({ message }) => {
   } catch (error) {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
       status: 'error'
     })
   }

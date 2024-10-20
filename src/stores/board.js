@@ -6,16 +6,16 @@ import { getTasks } from '@/libs/taskManagement'
 import { useRoute } from 'vue-router'
 import { useToastStore } from './toast'
 import { getCollaborators } from '@/libs/collaboratorManagement'
-// import { useUserStore } from './user'
-// import Pl1AccessRight from '@/libs/enum/Pl1AccessRight'
 import Pl1VisibilityType from '@/libs/enum/Pl1VisibilityType'
 import { useUserStore } from './user'
+import { HttpStatusCode } from 'zyos'
 
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
   const toastStore = useToastStore()
   const userStore = useUserStore()
   const isLoading = ref({
+    microAction: false,
     board: false,
     task: false,
     status: false,
@@ -39,7 +39,7 @@ export const useBoardStore = defineStore('board', () => {
   async function loadTasks(boardId = route.params.boardId) {
     isLoading.value.task = true
     const res = await getTasks(boardId, options.value)
-    if (res.status === 'success') {
+    if (res.ok) {
       tasks.value = res.data
     }
     isLoading.value.task = false
@@ -48,7 +48,7 @@ export const useBoardStore = defineStore('board', () => {
   async function loadStatuses(boardId = route.params.boardId) {
     isLoading.value.status = true
     const res = await getStatuses(boardId)
-    if (res.status === 'success') {
+    if (res.ok) {
       statuses.value = res.data
     }
     isLoading.value.status = false
@@ -59,7 +59,7 @@ export const useBoardStore = defineStore('board', () => {
     isLoading.value.collaborator = true
     const res = await getCollaborators(boardId)
     // console.log(res.data)
-    if (res.status === 'success') {
+    if (res.ok) {
       collaborators.value = res.data
     }
     isLoading.value.collaborator = false
@@ -68,7 +68,7 @@ export const useBoardStore = defineStore('board', () => {
   async function loadAllBoards() {
     isLoading.value.board = true
     const res = await getBoards()
-    if (res.status === 'success') {
+    if (res.ok) {
       boards.value = res.data.personalBoards.filter(board => board.owner.oid === userStore.user.oid)
       collaborativeBoards.value = res.data.collaborativeBoards
     }
@@ -78,7 +78,7 @@ export const useBoardStore = defineStore('board', () => {
   async function loadBoard(boardId = route.params.boardId) {
     isLoading.value.board = true
     const res = await getBoardById(boardId)
-    if (res.status === 'success') {
+    if (res.ok) {
       currentBoard.value = { ...res.data, isPublic: res.data.visibility === Pl1VisibilityType.PUBLIC }
       // await loadTasks(boardId)
       // await loadStatuses(boardId)
@@ -90,7 +90,7 @@ export const useBoardStore = defineStore('board', () => {
   async function updateBoard(boardId, boardData) {
     isLoading.value.board = true
     const res = await patchBoard(boardId, boardData)
-    if (res.status === 'success') {
+    if (res.ok) {
       currentBoard.value = { ...currentBoard.value, ...res.data }
     } else {
       throw new Error(res.message)
@@ -123,12 +123,12 @@ export const useBoardStore = defineStore('board', () => {
     }, {
       noGlobalResponseHandling: true
     })
-    if (res.status === 'success') {
+    if (res.ok) {
       currentBoard.value.isPublic = !currentBoard.value.isPublic
     } else {
       toastStore.createToast({
         title: 'Error',
-        description: res.statusCode === 403 ? 'You do not have permission to change board visibility mode.' : 'Failed to update board visibility. Please try again later.',
+        description: res.statusCode === HttpStatusCode.FORBIDDEN ? 'You do not have permission to change board visibility mode.' : 'Failed to update board visibility. Please try again later.',
         status: 'error'
       })
     }

@@ -8,6 +8,7 @@ import { computed, onMounted, ref } from 'vue'
 import { createTask, getTaskById, updateTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import { useBoardStore } from '@/stores/board'
+import { HttpStatusCode } from 'zyos'
 
 defineProps({
   show: {
@@ -43,18 +44,18 @@ const disabledSaveButton = computed(() => {
 async function loadSelectedTaskData() {
   const { taskId, boardId } = route.params
   const res = await getTaskById(taskId, boardId)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
-      status: 'error'
-    })
-    router.replace({ name: 'all-task' })
-  } else {
+  if (res.ok) {
     taskModalData.value = res.data
     if (taskModalMode.value === 'edit') {
       previousTaskData = { ...taskModalData.value, status: { ...taskModalData.value.status } }
     }
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      status: 'error'
+    })
+    router.replace({ name: 'all-task' })
   }
 }
 
@@ -85,13 +86,7 @@ const handleClickClose = () => {
 const handleClickConfirm = async () => {
   if (taskModalMode.value === 'add') {
     const res = await createTask(taskModalData.value)
-    if (res.status === 'error') {
-      toastStore.createToast({
-        title: 'Error',
-        description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
-        status: 'error'
-      })
-    } else {
+    if (res.ok) {
       const createdTask = res.data
       toastStore.createToast({
         title: 'Success',
@@ -99,17 +94,17 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
       router.push({ name: 'all-task' })
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+        status: 'error'
+      })
     }
     await boardStore.loadTasks()
   } else if (taskModalMode.value === 'edit') {
     const res = await updateTask(taskModalData.value)
-    if (res.status === 'error') {
-      toastStore.createToast({
-        title: 'Error',
-        description: `An error occurred while updating the task.\nPlease try again later`,
-        status: 'error'
-      })
-    } else {
+    if (res.ok) {
       const updatedTask = res.data
       toastStore.createToast({
         title: 'Success',
@@ -117,6 +112,12 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
       router.push({ name: 'all-task' })
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: `An error occurred while updating the task.\nPlease try again later`,
+        status: 'error'
+      })
     }
     await boardStore.loadTasks()
   }

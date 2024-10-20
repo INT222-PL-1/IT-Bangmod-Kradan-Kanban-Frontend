@@ -24,10 +24,13 @@ const router = createRouter({
           name: 'all-board',
           component: BoardView,
           meta: { title: 'Boards' },
-          beforeEnter: async (_, from) => {
+          beforeEnter: async (to, from) => {
             const boardStore = useBoardStore()
             boardStore.clearBoardData()
             await boardStore.loadAllBoards()
+            if (boardStore.boards.length > 0 && to.name === 'board-add') {
+              return { name: 'all-board' }
+            }
             if (['all-task', 'status-manage', 'collab-manage'].includes(from.name)) {
               return
             }
@@ -162,7 +165,7 @@ router.beforeEach(async (to) => {
         // ? If refresh token is valid, refresh access token and run user validation again.
         const res = await refreshAccessToken(refreshToken)
         
-        if (res.status === 'success') {
+        if (res.ok) {
           localStorage.setItem('itbkk_access_token', res.data.access_token)
           return await handleUserValidation()
         } else {

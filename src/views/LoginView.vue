@@ -31,11 +31,11 @@ const handleLoginSubmit = async () => {
     isLoggingIn.value = true
     isLoginFailed.value = false
 
-    const responseObject = await login(username.value, password.value)
+    const res = await login(username.value, password.value)
 
-    if (responseObject.status === 'success') {
-        localStorage.setItem('itbkk_access_token', responseObject.data.access_token)
-        localStorage.setItem('itbkk_refresh_token', responseObject.data.refresh_token)
+    if (res.ok) {
+        localStorage.setItem('itbkk_access_token', res.data.access_token)
+        localStorage.setItem('itbkk_refresh_token', res.data.refresh_token)
         router.push({ name: 'all-board' })
     } else {
         toastStore.createToast({

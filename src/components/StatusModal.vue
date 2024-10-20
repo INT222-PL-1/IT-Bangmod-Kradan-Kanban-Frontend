@@ -9,6 +9,7 @@ import StatusBadge from './StatusBadge.vue';
 import { colorValidator, errorArrayToString } from '@/libs/utils';
 import IconSVG from './IconSVG.vue';
 import { useBoardStore } from '@/stores/board';
+import { HttpStatusCode } from 'zyos';
 
 const route = useRoute()
 const router = useRouter()
@@ -36,19 +37,19 @@ const disabledSaveButton = computed(() => {
 async function loadSelectedStatusData() {
   const { statusId, boardId } = route.params
   const res = await getStatusById(statusId, boardId)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
-      status: 'error'
-    })
-    // router.back()
-    router.replace({ name: 'status-manage' })
-  } else {
+  if (res.ok) {
     statusModalData.value = res.data
     if (statusModalMode.value === 'edit') {
       previousStatusData = { ...statusModalData.value }
     }
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      status: 'error'
+    })
+    // router.back()
+    router.replace({ name: 'status-manage' })
   }
 }
 
@@ -76,18 +77,7 @@ const handleClickConfirm = async () => {
   const { boardId } = route.params
   if (statusModalMode.value === 'add') {
     const res = await createStatus(statusModalData.value, boardId)
-    if (res.status === 'error') {
-      // toastStore.createToast({
-      //   title: 'Error',
-      //   description: `An error has occurred.\n${res.message}`,
-      //   status: 'error'
-      // })
-      toastStore.createToast({
-        title: `Error while creating status`,
-        description: `An error has occurred.\n${res.data?.errors ? 'Status ' + errorArrayToString(res.data.errors) : res.message}`,
-        status: 'error'
-      })
-    } else {
+    if (res.ok) {
       const createdStatus = res.data
       toastStore.createToast({
         title: 'Success',
@@ -95,17 +85,17 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
       router.push({ name: 'status-manage' })
+    } else {
+      toastStore.createToast({
+        title: `Error while creating status`,
+        description: `An error has occurred.\n${res.data?.errors ? 'Status ' + errorArrayToString(res.data.errors) : res.message}`,
+        status: 'error'
+      })
     }
     boardStore.loadStatuses()
   } else if (statusModalMode.value === 'edit') {
     const res = await updateStatus(statusModalData.value, boardId)
-    if (res.status === 'error') {
-      toastStore.createToast({
-        title: 'Error while updating status',
-        description: `An error has occurred.\n${res.data?.errors ? 'Status ' + errorArrayToString(res.data.errors) : res.message}`,
-        status: 'error'
-      })
-    } else {
+    if (res.ok) {
       const updatedStatus = res.data
       toastStore.createToast({
         title: 'Success',
@@ -113,6 +103,12 @@ const handleClickConfirm = async () => {
         status: 'success'
       })
       router.push({ name: 'status-manage' })
+    } else {
+      toastStore.createToast({
+        title: 'Error while updating status',
+        description: `An error has occurred.\n${res.data?.errors ? 'Status ' + errorArrayToString(res.data.errors) : res.message}`,
+        status: 'error'
+      })
     }
     boardStore.loadStatuses()
   }

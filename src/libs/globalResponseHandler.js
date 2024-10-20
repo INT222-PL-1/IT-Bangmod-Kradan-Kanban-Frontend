@@ -3,13 +3,14 @@ import { useToastStore } from "@/stores/toast"
 import Pl1ErrorTypes from "./enum/Pl1ErrorTypes"
 import { refreshAccessToken } from "./userManagement"
 import { useUserStore } from "@/stores/user"
+import { HttpStatusCode } from "zyos"
 
 
 const globalResponseHandler = async (response) => {
   const toastStore = useToastStore()
   const userStore = useUserStore()
 
-  if (response.statusCode === 401) {
+  if (response.statusCode === HttpStatusCode.UNAUTHORIZED) {
     if (router.currentRoute.value.name === 'login') return
     // localStorage.removeItem('itbkk_access_token')
     if ([
@@ -22,7 +23,7 @@ const globalResponseHandler = async (response) => {
       try {
         const refreshToken = localStorage.getItem('itbkk_refresh_token')
         const res = await refreshAccessToken(refreshToken)
-        if (res.status === 'success') {
+        if (res.ok) {
           localStorage.setItem('itbkk_access_token', res.data.access_token)
         }
       } catch (error) {
@@ -54,10 +55,10 @@ const globalResponseHandler = async (response) => {
       localStorage.removeItem('itbkk_refresh_token')
       router.push({ name: 'login' })
     }
-  } else if (response.statusCode === 403) {
+  } else if (response.statusCode === HttpStatusCode.FORBIDDEN) {
     console.log('Forbidden')
     router.push({ name: 'forbidden' })
-  } else if (response.statusCode === 404) {
+  } else if (response.statusCode === HttpStatusCode.NOT_FOUND) {
     if ([
       Pl1ErrorTypes.USER_EMAIL_NOT_FOUND,
       Pl1ErrorTypes.COLLABORATOR_NOT_FOUND
@@ -67,7 +68,7 @@ const globalResponseHandler = async (response) => {
       console.log('Not found')
       router.push({ name: 'not-found' })
     }
-  } else if (response.statusCode === 500) {
+  } else if (response.statusCode === HttpStatusCode.INTERNAL_SERVER_ERROR) {
     userStore.clearUserData()
     toastStore.createToast({
       title: 'Error',

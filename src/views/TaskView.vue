@@ -17,6 +17,7 @@ import { useUserStore } from '@/stores/user'
 import TaskCard from '@/components/TaskCard.vue'
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import MiniModal from '@/components/MiniModal.vue'
+import { HttpStatusCode } from 'zyos'
 
 const route = useRoute()
 const router = useRouter()
@@ -63,18 +64,18 @@ const handleOpenDeleteModal = (taskData) => {
 const handleDeleteTask = async (taskId) => {
   if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const res = await deleteTask(taskId, route.params.boardId)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again later' : res.message}.`,
-      status: 'error'
-    })
-    await refreshBoardTasks()
-  } else {
+  if (res.ok) {
     toastStore.createToast({
       title: 'Success',
       description: 'The task has been deleted.',
       status: 'success'
+    })
+    await refreshBoardTasks()
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      status: 'error'
     })
     await refreshBoardTasks()
   }

@@ -5,31 +5,41 @@ import { useRouter } from 'vue-router';
 import { createBoard } from '@/libs/boardManagement';
 import { useToastStore } from '@/stores/toast';
 import MiniModal from './MiniModal.vue';
+import { useBoardStore } from '@/stores/board';
 
+const boardStore = useBoardStore() 
 const userStore = useUserStore()
 const router = useRouter()
-// const boardStore = useBoardStore()
 const toastStore = useToastStore()
 
 const boardModalData = ref({
   name: `${userStore.user.name} personal board`
 })
 const disabledSaveButton = computed(() => {
-  return boardModalData.value.name.length < 1 ||
+  return boardStore.isLoading.microAction ||
+    boardModalData.value.name.length < 1 ||
     boardModalData.value.name.length > 120
 })
 
 const handleClickConfirm = async () => {
-  const res = await createBoard(boardModalData.value)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `There is a problem. Please try again later.`,
-      status: 'error'
-    })
-  } else {
-    const createdBoard = res.data
-    router.push({ name: 'all-task', params: { boardId: createdBoard.id } })
+  if (boardStore.isLoading.microAction) return
+  boardStore.isLoading.microAction = true
+  try {
+    const res = await createBoard(boardModalData.value)
+    if (res.ok) {
+      const createdBoard = res.data
+      router.replace({ name: 'all-task', params: { boardId: createdBoard.id } })
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: `There is a problem. Please try again later.`,
+        status: 'error'
+      })
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    boardStore.isLoading.microAction = false
   }
 }
 

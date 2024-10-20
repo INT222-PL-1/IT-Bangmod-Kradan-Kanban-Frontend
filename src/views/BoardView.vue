@@ -9,6 +9,7 @@ import { useUserStore } from '@/stores/user';
 import { ref } from 'vue';
 // import { onMounted } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
+import { HttpStatusCode } from 'zyos';
 
 const router = useRouter()
 const boardStore = useBoardStore()
@@ -37,8 +38,16 @@ const handleLeaveBoardClick = (board) => {
 
 const handleLeaveConfirm = async () => {
   const res = await removeCollaborator(selectedBoard.value.id, userStore.user.oid)
-  if (res.status === 'error') {
-    if (res.statusCode === 403 || res.statusCode === 404) {
+  if (res.ok) {
+    toastStore.createToast({
+      title: 'Success',
+      description: 'You have successfully left the board.',
+      status: 'success'
+    })
+    leaveModalOpenState.value = false
+    await boardStore.loadAllBoards()
+  } else {
+    if (res.statusCode === HttpStatusCode.FORBIDDEN || res.statusCode === HttpStatusCode.NOT_FOUND) {
       leaveModalOpenState.value = false
       return
     } else {
@@ -48,14 +57,6 @@ const handleLeaveConfirm = async () => {
         status: 'error'
       })
     }
-  } else {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'You have successfully left the board.',
-      status: 'success'
-    })
-    leaveModalOpenState.value = false
-    await boardStore.loadAllBoards()
   }
 }
 

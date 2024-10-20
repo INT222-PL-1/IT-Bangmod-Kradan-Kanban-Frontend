@@ -52,7 +52,7 @@ export async function validateAccessToken(accessToken) {
 
         console.log(res)
 
-        if (res.status === 'success') {
+        if (res.ok) {
             return true
         } else {
             throw new Error(res.data.type)

@@ -10,6 +10,7 @@ import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { HttpStatusCode } from 'zyos'
 
 const route = useRoute()
 const toastStore = useToastStore()
@@ -57,20 +58,28 @@ const handleAddConfirm = async () => {
   if (userStore.isOwnerOfCurrentBoard === false) return
 
   const res = await addCollaborator(route.params.boardId, collaboratorModalData.value)
-  if (res.status === 'error') {
-    if (res.statusCode === 403) {
+  if (res.ok) {
+    toastStore.createToast({
+      title: 'Success',
+      description: 'Collaborator added successfully.',
+      status: 'success'
+    })
+    addModalOpenState.value = false
+    await refreshCollaborators()
+  } else {
+    if (res.statusCode === HttpStatusCode.FORBIDDEN) {
       toastStore.createToast({
         title: 'Error',
         description: 'You do not have permission to add collaborator to this board.',
         status: 'error'
       })
-    } else if (res.statusCode === 404) {
+    } else if (res.statusCode === HttpStatusCode.NOT_FOUND) {
       toastStore.createToast({
         title: 'Error',
         description: 'The user does not exists.',
         status: 'error'
       })
-    } else if (res.statusCode === 409) {
+    } else if (res.statusCode === HttpStatusCode.CONFLICT) {
       toastStore.createToast({
         title: 'Error',
         description: 'The user is already the collaborator of this board.',
@@ -83,14 +92,6 @@ const handleAddConfirm = async () => {
         status: 'error'
       })
     }
-  } else {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'Collaborator added successfully.',
-      status: 'success'
-    })
-    addModalOpenState.value = false
-    await refreshCollaborators()
   }
 }
 
@@ -111,14 +112,22 @@ const handleRemoveConfirm = async () => {
 
   console.log('Remove Confirm button clicked')
   const res = await removeCollaborator(route.params.boardId, selectedCollaborator.value.oid)
-  if (res.status === 'error') {
-    if (res.statusCode === 403) {
+  if (res.ok) {
+    toastStore.createToast({
+      title: 'Success',
+      description: 'Collaborator removed successfully.',
+      status: 'success'
+    })
+    removeModalOpenState.value = false
+    await refreshCollaborators()
+  } else {
+    if (res.statusCode === HttpStatusCode.FORBIDDEN) {
       toastStore.createToast({
         title: 'Error',
         description: 'You do not have permission to remove collaborator.',
         status: 'error'
       })
-    } else if (res.statusCode === 404) {
+    } else if (res.statusCode === HttpStatusCode.NOT_FOUND) {
       toastStore.createToast({
         title: 'Error',
         description: `${selectedCollaborator.value.name} is not a collaborator.`,
@@ -132,14 +141,6 @@ const handleRemoveConfirm = async () => {
         status: 'error'
       })
     }
-  } else {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'Collaborator removed successfully.',
-      status: 'success'
-    })
-    removeModalOpenState.value = false
-    await refreshCollaborators()
   }
 }
 
@@ -160,14 +161,22 @@ const handleAccessRightConfirm = async () => {
 
   console.log('Access Right Confirm button clicked')
   const res = await patchCollaborator(route.params.boardId, selectedCollaborator.value.oid, { accessRight: selectedCollaborator.value.accessRight })
-  if (res.status === 'error') {
-    if (res.statusCode === 403) {
+  if (res.ok) {
+    toastStore.createToast({
+      title: 'Success',
+      description: 'Access right changed successfully.',
+      status: 'success'
+    })
+    changeAccessRightModalOpenState.value = false
+    await refreshCollaborators()
+  } else {
+    if (res.statusCode === HttpStatusCode.FORBIDDEN) {
       toastStore.createToast({
         title: 'Error',
         description: 'You do not have permission to change collaborator access right.',
         status: 'error'
       })
-    } else if (res.statusCode === 404) {
+    } else if (res.statusCode === HttpStatusCode.NOT_FOUND) {
       toastStore.createToast({
         title: 'Error',
         description: `${selectedCollaborator.value.name} is not a collaborator.`,
@@ -181,14 +190,6 @@ const handleAccessRightConfirm = async () => {
         status: 'error'
       })
     }
-  } else {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'Access right changed successfully.',
-      status: 'success'
-    })
-    changeAccessRightModalOpenState.value = false
-    await refreshCollaborators()
   }
 }
 
