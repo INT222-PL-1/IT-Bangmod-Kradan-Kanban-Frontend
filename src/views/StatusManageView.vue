@@ -64,46 +64,64 @@ const handleOpenDeleteModal = (statusData) => {
 }
 
 const handleTransferStatus = async (fromStatusId, toStatusId) => {
+  if (boardStore.isLoading.microAction) return
   if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
-  const res = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
-  if (res.ok) {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'The tasks have been transferred and the status has been deleted.',
-      status: 'success'
-    })
-    await boardStore.loadStatuses()
-  } else {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
-      status: 'error'
-    })
+
+  try {
+    boardStore.isLoading.microAction = true
+    const res = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
+    if (res.ok) {
+      toastStore.createToast({
+        title: 'Success',
+        description: 'The tasks have been transferred and the status has been deleted.',
+        status: 'success'
+      })
+      await boardStore.loadStatuses()
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+        status: 'error'
+      })
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    statusTransferModalOpenState.value = false
+    boardStore.isLoading.microAction = false
   }
-  statusTransferModalOpenState.value = false
 }
 
 const handleDeleteStatus = async (statusId) => {
+  if (boardStore.isLoading.microAction) return
   if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
-  const res = await deleteStatus(statusId, boardId)
-  if (res.ok) {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'The status has been deleted',
-      status: 'success'
-    })
-    await boardStore.loadStatuses()
-  } else {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
-      status: 'error'
-    })
-    await boardStore.loadStatuses()
+
+  try {
+    boardStore.isLoading.microAction = true
+    const res = await deleteStatus(statusId, boardId)
+    if (res.ok) {
+      toastStore.createToast({
+        title: 'Success',
+        description: 'The status has been deleted',
+        status: 'success'
+      })
+      await boardStore.loadStatuses()
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+        status: 'error'
+      })
+      await boardStore.loadStatuses()
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    statusDeleteModalOpenState.value = false
+    boardStore.isLoading.microAction = false
   }
-  statusDeleteModalOpenState.value = false
 }
 
 const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
@@ -125,7 +143,9 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
         Cancel
       </button>
       <button @click="handleDeleteStatus(statusModalData.id)"
-        class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+        class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
+        :disabled="boardStore.isLoading.microAction"
+      >
         Confirm
       </button>
     </template>
@@ -154,7 +174,9 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
         Cancel
       </button>
       <button @click="handleTransferAndDeleteStatus(statusModalData.id, statusIdToTransfer)"
-        class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+        class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
+        :disabled="boardStore.isLoading.microAction"
+      >
         Transfer and Delete
       </button>
     </template>

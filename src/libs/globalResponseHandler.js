@@ -56,7 +56,6 @@ const globalResponseHandler = async (response) => {
       router.push({ name: 'login' })
     }
   } else if (response.statusCode === HttpStatusCode.FORBIDDEN) {
-    console.log('Forbidden')
     router.push({ name: 'forbidden' })
   } else if (response.statusCode === HttpStatusCode.NOT_FOUND) {
     if ([
@@ -65,7 +64,6 @@ const globalResponseHandler = async (response) => {
     ].includes(response.data.type)) {
       return
     } else {
-      console.log('Not found')
       router.push({ name: 'not-found' })
     }
   } else if (response.statusCode === HttpStatusCode.INTERNAL_SERVER_ERROR) {

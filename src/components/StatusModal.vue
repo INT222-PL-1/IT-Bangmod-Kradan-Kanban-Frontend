@@ -31,7 +31,7 @@ const disabledSaveButton = computed(() => {
         statusModalData.value.description === previousStatusData.description &&
         statusModalData.value.color === previousStatusData.color
       )
-    )
+    ) || boardStore.isLoading.microAction
 })
 
 async function loadSelectedStatusData() {
@@ -48,7 +48,6 @@ async function loadSelectedStatusData() {
       description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
       status: 'error'
     })
-    // router.back()
     router.replace({ name: 'status-manage' })
   }
 }
@@ -74,43 +73,52 @@ const handleClickClose = () => {
 }
 
 const handleClickConfirm = async () => {
+  if (boardStore.isLoading.microAction) return
   const { boardId } = route.params
-  if (statusModalMode.value === 'add') {
-    const res = await createStatus(statusModalData.value, boardId)
-    if (res.ok) {
-      const createdStatus = res.data
-      toastStore.createToast({
-        title: 'Success',
-        description: `The status "${createdStatus.name}" is added successfully`,
-        status: 'success'
-      })
-      router.push({ name: 'status-manage' })
-    } else {
-      toastStore.createToast({
-        title: `Error while creating status`,
-        description: `An error has occurred.\n${res.data?.errors ? 'Status ' + errorArrayToString(res.data.errors) : res.message}`,
-        status: 'error'
-      })
+
+  try {
+    boardStore.isLoading.microAction = true
+    if (statusModalMode.value === 'add') {
+      const res = await createStatus(statusModalData.value, boardId)
+      if (res.ok) {
+        const createdStatus = res.data
+        toastStore.createToast({
+          title: 'Success',
+          description: `The status "${createdStatus.name}" is added successfully`,
+          status: 'success'
+        })
+        router.push({ name: 'status-manage' })
+      } else {
+        toastStore.createToast({
+          title: `Error while creating status`,
+          description: `An error has occurred.\n${res.data?.errors ? 'Status ' + errorArrayToString(res.data.errors) : res.message}`,
+          status: 'error'
+        })
+      }
+      boardStore.loadStatuses()
+    } else if (statusModalMode.value === 'edit') {
+      const res = await updateStatus(statusModalData.value, boardId)
+      if (res.ok) {
+        const updatedStatus = res.data
+        toastStore.createToast({
+          title: 'Success',
+          description: `The task "${updatedStatus.name}" is updated successfully`,
+          status: 'success'
+        })
+        router.push({ name: 'status-manage' })
+      } else {
+        toastStore.createToast({
+          title: 'Error while updating status',
+          description: `An error has occurred.\n${res.data?.errors ? 'Status ' + errorArrayToString(res.data.errors) : res.message}`,
+          status: 'error'
+        })
+      }
+      boardStore.loadStatuses()
     }
-    boardStore.loadStatuses()
-  } else if (statusModalMode.value === 'edit') {
-    const res = await updateStatus(statusModalData.value, boardId)
-    if (res.ok) {
-      const updatedStatus = res.data
-      toastStore.createToast({
-        title: 'Success',
-        description: `The task "${updatedStatus.name}" is updated successfully`,
-        status: 'success'
-      })
-      router.push({ name: 'status-manage' })
-    } else {
-      toastStore.createToast({
-        title: 'Error while updating status',
-        description: `An error has occurred.\n${res.data?.errors ? 'Status ' + errorArrayToString(res.data.errors) : res.message}`,
-        status: 'error'
-      })
-    }
-    boardStore.loadStatuses()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    boardStore.isLoading.microAction = false
   }
 }
 

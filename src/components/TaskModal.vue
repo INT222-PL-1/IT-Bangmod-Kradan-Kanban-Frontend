@@ -38,7 +38,7 @@ const disabledSaveButton = computed(() => {
         taskModalData.value.assignees === previousTaskData.assignees &&
         taskModalData.value.status.id === previousTaskData.status.id
       )
-    )
+    ) || boardStore.isLoading.microAction
 })
 
 async function loadSelectedTaskData() {
@@ -84,42 +84,51 @@ const handleClickClose = () => {
 }
 
 const handleClickConfirm = async () => {
-  if (taskModalMode.value === 'add') {
-    const res = await createTask(taskModalData.value)
-    if (res.ok) {
-      const createdTask = res.data
-      toastStore.createToast({
-        title: 'Success',
-        description: `The task "${createdTask.title}" is added successfully.`,
-        status: 'success'
-      })
-      router.push({ name: 'all-task' })
-    } else {
-      toastStore.createToast({
-        title: 'Error',
-        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
-        status: 'error'
-      })
+  if (boardStore.isLoading.microAction) return
+
+  try {
+    boardStore.isLoading.microAction = true
+    if (taskModalMode.value === 'add') {
+      const res = await createTask(taskModalData.value)
+      if (res.ok) {
+        const createdTask = res.data
+        toastStore.createToast({
+          title: 'Success',
+          description: `The task "${createdTask.title}" is added successfully.`,
+          status: 'success'
+        })
+        router.push({ name: 'all-task' })
+      } else {
+        toastStore.createToast({
+          title: 'Error',
+          description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+          status: 'error'
+        })
+      }
+      await boardStore.loadTasks()
+    } else if (taskModalMode.value === 'edit') {
+      const res = await updateTask(taskModalData.value)
+      if (res.ok) {
+        const updatedTask = res.data
+        toastStore.createToast({
+          title: 'Success',
+          description: `The task "${updatedTask.title}" is updated successfully`,
+          status: 'success'
+        })
+        router.push({ name: 'all-task' })
+      } else {
+        toastStore.createToast({
+          title: 'Error',
+          description: `An error occurred while updating the task.\nPlease try again later`,
+          status: 'error'
+        })
+      }
+      await boardStore.loadTasks()
     }
-    await boardStore.loadTasks()
-  } else if (taskModalMode.value === 'edit') {
-    const res = await updateTask(taskModalData.value)
-    if (res.ok) {
-      const updatedTask = res.data
-      toastStore.createToast({
-        title: 'Success',
-        description: `The task "${updatedTask.title}" is updated successfully`,
-        status: 'success'
-      })
-      router.push({ name: 'all-task' })
-    } else {
-      toastStore.createToast({
-        title: 'Error',
-        description: `An error occurred while updating the task.\nPlease try again later`,
-        status: 'error'
-      })
-    }
-    await boardStore.loadTasks()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    boardStore.isLoading.microAction = false
   }
 }
 

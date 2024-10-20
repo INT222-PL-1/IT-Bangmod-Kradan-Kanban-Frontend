@@ -22,8 +22,6 @@ import { HttpStatusCode } from 'zyos'
 const route = useRoute()
 const router = useRouter()
 
-const isLoading = ref(false)
-
 const toastStore = useToastStore()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
@@ -31,7 +29,6 @@ const userStore = useUserStore()
 const taskDeleteModalData = ref(null)
 const taskDeleteModalOpenState = ref(false)
 const boardSettingsModalOpenState = ref(false)
-
 const boardVisibilityModalOpenState = ref(false)
 
 async function refreshBoardTasks() {
@@ -62,24 +59,33 @@ const handleOpenDeleteModal = (taskData) => {
 }
 
 const handleDeleteTask = async (taskId) => {
+  if (boardStore.isLoading.microAction) return
   if (userStore.hasWriteAccessOnCurrentBoard === false) return
-  const res = await deleteTask(taskId, route.params.boardId)
-  if (res.ok) {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'The task has been deleted.',
-      status: 'success'
-    })
-    await refreshBoardTasks()
-  } else {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
-      status: 'error'
-    })
-    await refreshBoardTasks()
+
+  boardStore.isLoading.microAction = true
+  try {
+    const res = await deleteTask(taskId, route.params.boardId)
+    if (res.ok) {
+      toastStore.createToast({
+        title: 'Success',
+        description: 'The task has been deleted.',
+        status: 'success'
+      })
+      await refreshBoardTasks()
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+        status: 'error'
+      })
+      await refreshBoardTasks()
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    taskDeleteModalOpenState.value = false
+    boardStore.isLoading.microAction = false
   }
-  taskDeleteModalOpenState.value = false
 }
 
 const handleEditBtnClick = (taskId) => {
@@ -102,10 +108,11 @@ const handleToggleVisibilityButtonClick = () => {
 }
 
 const handleToggleBoardVisibility = async () => {
+  if (boardStore.isLoading.microAction) return
   if (userStore.isOwnerOfCurrentBoard === false) return
 
   try {
-    isLoading.value = true
+    boardStore.isLoading.microAction = true
     await new Promise(resolve => setTimeout(() => {
       boardVisibilityModalOpenState.value = false
       resolve()
@@ -115,7 +122,7 @@ const handleToggleBoardVisibility = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    isLoading.value = false
+    boardStore.isLoading.microAction = false
   }
 }
 </script>
@@ -124,7 +131,7 @@ const handleToggleBoardVisibility = async () => {
 
   <BoardSettingsModal :show="boardSettingsModalOpenState" @clickClose="boardSettingsModalOpenState = false" />
 
-  <MiniModal Modal :isLoading="isLoading" @clickBG="boardVisibilityModalOpenState = false" :show="boardVisibilityModalOpenState" :mobileCenter="true">
+  <MiniModal @clickBG="boardVisibilityModalOpenState = false" :show="boardVisibilityModalOpenState" :mobileCenter="true">
     <template #title>Do you want to change board visibility to {{ boardStore.currentBoard?.isPublic ? 'private' : 'public' }}?</template>
     <template #content>
       <div class="text-error">
@@ -142,7 +149,7 @@ const handleToggleBoardVisibility = async () => {
       <button @click="boardVisibilityModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
         Cancel
       </button>
-      <button @click="handleToggleBoardVisibility" :disabled="isLoading"
+      <button @click="handleToggleBoardVisibility" :disabled="boardStore.isLoading.microAction"
         class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
         Confirm
       </button>
@@ -162,7 +169,9 @@ const handleToggleBoardVisibility = async () => {
         Cancel
       </button>
       <button @click="handleDeleteTask(taskDeleteModalData.id)"
-        class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+        class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
+        :disabled="boardStore.isLoading.microAction"
+      >
         Confirm
       </button>
     </template>

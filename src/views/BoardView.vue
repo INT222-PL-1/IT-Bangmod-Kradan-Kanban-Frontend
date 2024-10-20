@@ -37,26 +37,35 @@ const handleLeaveBoardClick = (board) => {
 }
 
 const handleLeaveConfirm = async () => {
-  const res = await removeCollaborator(selectedBoard.value.id, userStore.user.oid)
-  if (res.ok) {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'You have successfully left the board.',
-      status: 'success'
-    })
-    leaveModalOpenState.value = false
-    await boardStore.loadAllBoards()
-  } else {
-    if (res.statusCode === HttpStatusCode.FORBIDDEN || res.statusCode === HttpStatusCode.NOT_FOUND) {
-      leaveModalOpenState.value = false
-      return
-    } else {
+  if (boardStore.isLoading.microAction) return
+
+  try {
+    boardStore.isLoading.microAction = true
+    const res = await removeCollaborator(selectedBoard.value.id, userStore.user.oid)
+    if (res.ok) {
       toastStore.createToast({
-        title: 'Error',
-        description: 'There is a problem. Please try again later.',
-        status: 'error'
+        title: 'Success',
+        description: 'You have successfully left the board.',
+        status: 'success'
       })
+      leaveModalOpenState.value = false
+      await boardStore.loadAllBoards()
+    } else {
+      if (res.statusCode === HttpStatusCode.FORBIDDEN || res.statusCode === HttpStatusCode.NOT_FOUND) {
+        leaveModalOpenState.value = false
+        return
+      } else {
+        toastStore.createToast({
+          title: 'Error',
+          description: 'There is a problem. Please try again later.',
+          status: 'error'
+        })
+      }
     }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    boardStore.isLoading.microAction = false
   }
 }
 
@@ -83,7 +92,7 @@ const handleLeaveCancel = () => {
       <span>Do you want to leave <span class="italic font-semibold">{{ selectedBoard?.name }}</span> board?</span>
     </template>
     <template #actions>
-      <button @click="handleLeaveConfirm" class="btn btn-sm btn-error btn-outline">
+      <button @click="handleLeaveConfirm" class="btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.microAction">
         Confirm
       </button>
       <button @click="handleLeaveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">

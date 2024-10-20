@@ -23,7 +23,7 @@ const defaultCollaboratorModalData = {
 }
 const collaboratorModalData = ref(defaultCollaboratorModalData)
 const addModalOpenState = ref(false)
-const disabledAddButton = computed(() => !collaboratorModalData.value.email)
+const disabledAddButton = computed(() => !collaboratorModalData.value.email || collaboratorModalData.value.email.length > 50 || boardStore.isLoading.microAction)
 
 const selectedCollaborator = ref(null)
 const removeModalOpenState = ref(false)
@@ -55,43 +55,51 @@ const handleAddButtonClick = () => {
 }
 
 const handleAddConfirm = async () => {
+  if (boardStore.isLoading.microAction) return
   if (userStore.isOwnerOfCurrentBoard === false) return
 
-  const res = await addCollaborator(route.params.boardId, collaboratorModalData.value)
-  if (res.ok) {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'Collaborator added successfully.',
-      status: 'success'
-    })
-    addModalOpenState.value = false
-    await refreshCollaborators()
-  } else {
-    if (res.statusCode === HttpStatusCode.FORBIDDEN) {
+  try {
+    boardStore.isLoading.microAction = true
+    const res = await addCollaborator(route.params.boardId, collaboratorModalData.value)
+    if (res.ok) {
       toastStore.createToast({
-        title: 'Error',
-        description: 'You do not have permission to add collaborator to this board.',
-        status: 'error'
+        title: 'Success',
+        description: 'Collaborator added successfully.',
+        status: 'success'
       })
-    } else if (res.statusCode === HttpStatusCode.NOT_FOUND) {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'The user does not exists.',
-        status: 'error'
-      })
-    } else if (res.statusCode === HttpStatusCode.CONFLICT) {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'The user is already the collaborator of this board.',
-        status: 'error'
-      })
+      addModalOpenState.value = false
+      await refreshCollaborators()
     } else {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'There is a problem. Please try again later.',
-        status: 'error'
-      })
+      if (res.statusCode === HttpStatusCode.FORBIDDEN) {
+        toastStore.createToast({
+          title: 'Error',
+          description: 'You do not have permission to add collaborator to this board.',
+          status: 'error'
+        })
+      } else if (res.statusCode === HttpStatusCode.NOT_FOUND) {
+        toastStore.createToast({
+          title: 'Error',
+          description: 'The user does not exists.',
+          status: 'error'
+        })
+      } else if (res.statusCode === HttpStatusCode.CONFLICT) {
+        toastStore.createToast({
+          title: 'Error',
+          description: 'The user is already the collaborator of this board.',
+          status: 'error'
+        })
+      } else {
+        toastStore.createToast({
+          title: 'Error',
+          description: 'There is a problem. Please try again later.',
+          status: 'error'
+        })
+      }
     }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    boardStore.isLoading.microAction = false
   }
 }
 
@@ -108,39 +116,46 @@ const handleRemoveButtonClick = (collaborator) => {
 }
 
 const handleRemoveConfirm = async () => {
+  if (boardStore.isLoading.microAction) return
   if (userStore.isOwnerOfCurrentBoard === false) return
 
-  console.log('Remove Confirm button clicked')
-  const res = await removeCollaborator(route.params.boardId, selectedCollaborator.value.oid)
-  if (res.ok) {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'Collaborator removed successfully.',
-      status: 'success'
-    })
-    removeModalOpenState.value = false
-    await refreshCollaborators()
-  } else {
-    if (res.statusCode === HttpStatusCode.FORBIDDEN) {
+  try {
+    boardStore.isLoading.microAction = true
+    const res = await removeCollaborator(route.params.boardId, selectedCollaborator.value.oid)
+    if (res.ok) {
       toastStore.createToast({
-        title: 'Error',
-        description: 'You do not have permission to remove collaborator.',
-        status: 'error'
-      })
-    } else if (res.statusCode === HttpStatusCode.NOT_FOUND) {
-      toastStore.createToast({
-        title: 'Error',
-        description: `${selectedCollaborator.value.name} is not a collaborator.`,
-        status: 'error'
+        title: 'Success',
+        description: 'Collaborator removed successfully.',
+        status: 'success'
       })
       removeModalOpenState.value = false
+      await refreshCollaborators()
     } else {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'There is a problem. Please try again later.',
-        status: 'error'
-      })
+      if (res.statusCode === HttpStatusCode.FORBIDDEN) {
+        toastStore.createToast({
+          title: 'Error',
+          description: 'You do not have permission to remove collaborator.',
+          status: 'error'
+        })
+      } else if (res.statusCode === HttpStatusCode.NOT_FOUND) {
+        toastStore.createToast({
+          title: 'Error',
+          description: `${selectedCollaborator.value.name} is not a collaborator.`,
+          status: 'error'
+        })
+        removeModalOpenState.value = false
+      } else {
+        toastStore.createToast({
+          title: 'Error',
+          description: 'There is a problem. Please try again later.',
+          status: 'error'
+        })
+      }
     }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    boardStore.isLoading.microAction = false
   }
 }
 
@@ -157,39 +172,46 @@ const handleAccessRightChange = (collaborator) => {
 }
 
 const handleAccessRightConfirm = async () => {
+  if (boardStore.isLoading.microAction) return
   if (userStore.isOwnerOfCurrentBoard === false) return
 
-  console.log('Access Right Confirm button clicked')
   const res = await patchCollaborator(route.params.boardId, selectedCollaborator.value.oid, { accessRight: selectedCollaborator.value.accessRight })
-  if (res.ok) {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'Access right changed successfully.',
-      status: 'success'
-    })
-    changeAccessRightModalOpenState.value = false
-    await refreshCollaborators()
-  } else {
-    if (res.statusCode === HttpStatusCode.FORBIDDEN) {
+  try {
+    boardStore.isLoading.microAction = true
+    if (res.ok) {
       toastStore.createToast({
-        title: 'Error',
-        description: 'You do not have permission to change collaborator access right.',
-        status: 'error'
-      })
-    } else if (res.statusCode === HttpStatusCode.NOT_FOUND) {
-      toastStore.createToast({
-        title: 'Error',
-        description: `${selectedCollaborator.value.name} is not a collaborator.`,
-        status: 'error'
+        title: 'Success',
+        description: 'Access right changed successfully.',
+        status: 'success'
       })
       changeAccessRightModalOpenState.value = false
+      await refreshCollaborators()
     } else {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'There is a problem. Please try again later.',
-        status: 'error'
-      })
+      if (res.statusCode === HttpStatusCode.FORBIDDEN) {
+        toastStore.createToast({
+          title: 'Error',
+          description: 'You do not have permission to change collaborator access right.',
+          status: 'error'
+        })
+      } else if (res.statusCode === HttpStatusCode.NOT_FOUND) {
+        toastStore.createToast({
+          title: 'Error',
+          description: `${selectedCollaborator.value.name} is not a collaborator.`,
+          status: 'error'
+        })
+        changeAccessRightModalOpenState.value = false
+      } else {
+        toastStore.createToast({
+          title: 'Error',
+          description: 'There is a problem. Please try again later.',
+          status: 'error'
+        })
+      }
     }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    boardStore.isLoading.microAction = false
   }
 }
 
@@ -262,7 +284,7 @@ const handleAccessRightCancel = () => {
       <span>Do you want to remove <span class="italic">{{ selectedCollaborator?.name }}</span> from the board?</span>
     </template>
     <template #actions>
-      <button @click="handleRemoveConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+      <button @click="handleRemoveConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.microAction">
         Confirm
       </button>
       <button @click="handleRemoveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
@@ -279,7 +301,7 @@ const handleAccessRightCancel = () => {
       <span>Do you want to change access right of <span class="italic">{{ selectedCollaborator?.name }}</span> to <span class="font-semibold">{{ selectedCollaborator?.accessRight }}</span>?</span>
     </template>
     <template #actions>
-      <button @click="handleAccessRightConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
+      <button @click="handleAccessRightConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.microAction">
         Confirm
       </button>
       <button @click="handleAccessRightCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
