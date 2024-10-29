@@ -8,6 +8,7 @@ import { computed, onMounted, ref } from 'vue'
 import { createTask, getTaskById, updateTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import { useBoardStore } from '@/stores/board'
+import { HttpStatusCode } from 'zyos'
 
 defineProps({
   show: {
@@ -37,24 +38,24 @@ const disabledSaveButton = computed(() => {
         taskModalData.value.assignees === previousTaskData.assignees &&
         taskModalData.value.status.id === previousTaskData.status.id
       )
-    )
+    ) || boardStore.isLoading.microAction
 })
 
 async function loadSelectedTaskData() {
   const { taskId, boardId } = route.params
   const res = await getTaskById(taskId, boardId)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
-      status: 'error'
-    })
-    router.replace({ name: 'all-task' })
-  } else {
+  if (res.ok) {
     taskModalData.value = res.data
     if (taskModalMode.value === 'edit') {
       previousTaskData = { ...taskModalData.value, status: { ...taskModalData.value.status } }
     }
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      status: 'error'
+    })
+    router.replace({ name: 'all-task' })
   }
 }
 
@@ -83,42 +84,51 @@ const handleClickClose = () => {
 }
 
 const handleClickConfirm = async () => {
-  if (taskModalMode.value === 'add') {
-    const res = await createTask(taskModalData.value)
-    if (res.status === 'error') {
-      toastStore.createToast({
-        title: 'Error',
-        description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
-        status: 'error'
-      })
-    } else {
-      const createdTask = res.data
-      toastStore.createToast({
-        title: 'Success',
-        description: `The task "${createdTask.title}" is added successfully.`,
-        status: 'success'
-      })
-      router.push({ name: 'all-task' })
+  if (boardStore.isLoading.microAction) return
+
+  try {
+    boardStore.isLoading.microAction = true
+    if (taskModalMode.value === 'add') {
+      const res = await createTask(taskModalData.value)
+      if (res.ok) {
+        const createdTask = res.data
+        toastStore.createToast({
+          title: 'Success',
+          description: `The task "${createdTask.title}" is added successfully.`,
+          status: 'success'
+        })
+        router.push({ name: 'all-task' })
+      } else {
+        toastStore.createToast({
+          title: 'Error',
+          description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+          status: 'error'
+        })
+      }
+      await boardStore.loadTasks()
+    } else if (taskModalMode.value === 'edit') {
+      const res = await updateTask(taskModalData.value)
+      if (res.ok) {
+        const updatedTask = res.data
+        toastStore.createToast({
+          title: 'Success',
+          description: `The task "${updatedTask.title}" is updated successfully`,
+          status: 'success'
+        })
+        router.push({ name: 'all-task' })
+      } else {
+        toastStore.createToast({
+          title: 'Error',
+          description: `An error occurred while updating the task.\nPlease try again later`,
+          status: 'error'
+        })
+      }
+      await boardStore.loadTasks()
     }
-    await boardStore.loadTasks()
-  } else if (taskModalMode.value === 'edit') {
-    const res = await updateTask(taskModalData.value)
-    if (res.status === 'error') {
-      toastStore.createToast({
-        title: 'Error',
-        description: `An error occurred while updating the task.\nPlease try again.`,
-        status: 'error'
-      })
-    } else {
-      const updatedTask = res.data
-      toastStore.createToast({
-        title: 'Success',
-        description: `The task "${updatedTask.title}" is updated successfully`,
-        status: 'success'
-      })
-      router.push({ name: 'all-task' })
-    }
-    await boardStore.loadTasks()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    boardStore.isLoading.microAction = false
   }
 }
 

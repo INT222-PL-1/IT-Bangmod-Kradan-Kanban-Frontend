@@ -14,7 +14,7 @@ export const useToastStore = defineStore('toast', () => {
    * @param {Object} toastData
    * @param {String} toastData.title
    * @param {String} toastData.description
-   * @param {String | 'success' | 'error' | 'warning' | 'info'} toastData.status
+   * @param {'success' | 'error' | 'warning' | 'info'} toastData.status
    * @param {Number} toastData.duration
    * @param {Number} toastData.delay
    */
@@ -24,17 +24,15 @@ export const useToastStore = defineStore('toast', () => {
     const delay = toastData.delay || 0
     const duration = toastData.duration || 5000
 
-    const createToastTimeout = setTimeout(() => {
+    setTimeout(() => {
       toasts.value.push({
         id,
         ...toastData,
       })
-      clearTimeout(createToastTimeout)
     }, delay)
 
-    const removeToastTimeout = setTimeout(() => {
+    setTimeout(() => {
       removeToast(id)
-      clearTimeout(removeToastTimeout)
     }, duration + delay)
   }
 

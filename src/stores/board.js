@@ -5,19 +5,31 @@ import { getStatuses } from '@/libs/statusManagement'
 import { getTasks } from '@/libs/taskManagement'
 import { useRoute } from 'vue-router'
 import { useToastStore } from './toast'
+import { getCollaborators } from '@/libs/collaboratorManagement'
+import Pl1VisibilityType from '@/libs/enum/Pl1VisibilityType'
+import { useUserStore } from './user'
+import { HttpStatusCode } from 'zyos'
 
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
   const toastStore = useToastStore()
+  const userStore = useUserStore()
   const isLoading = ref({
+    microAction: false,
     board: false,
     task: false,
-    status: false
+    status: false,
+    collaborator: false
   })
+
   const boards = ref([])
+  const collaborativeBoards = ref([])
+  
   const currentBoard = ref(null)
   const tasks = ref([])
   const statuses = ref([])
+  const collaborators = ref([])
+
   const options = ref({
     sortBy: null,
     sortDirection: null,
@@ -26,8 +38,8 @@ export const useBoardStore = defineStore('board', () => {
   
   async function loadTasks(boardId = route.params.boardId) {
     isLoading.value.task = true
-    const res = await getTasks(options.value, boardId)
-    if (res.status === 'success') {
+    const res = await getTasks(boardId, options.value)
+    if (res.ok) {
       tasks.value = res.data
     }
     isLoading.value.task = false
@@ -36,17 +48,29 @@ export const useBoardStore = defineStore('board', () => {
   async function loadStatuses(boardId = route.params.boardId) {
     isLoading.value.status = true
     const res = await getStatuses(boardId)
-    if (res.status === 'success') {
+    if (res.ok) {
       statuses.value = res.data
     }
     isLoading.value.status = false
   }
 
+  async function loadCollaborators(boardId = route.params.boardId) {
+    console.log('loadCollaborators', boardId)
+    isLoading.value.collaborator = true
+    const res = await getCollaborators(boardId)
+    // console.log(res.data)
+    if (res.ok) {
+      collaborators.value = res.data
+    }
+    isLoading.value.collaborator = false
+  }
+
   async function loadAllBoards() {
     isLoading.value.board = true
     const res = await getBoards()
-    if (res.status === 'success') {
-      boards.value = res.data
+    if (res.ok) {
+      boards.value = res.data.personalBoards.filter(board => board.owner.oid === userStore.user.oid)
+      collaborativeBoards.value = res.data.collaborativeBoards
     }
     isLoading.value.board = false    
   }
@@ -54,12 +78,25 @@ export const useBoardStore = defineStore('board', () => {
   async function loadBoard(boardId = route.params.boardId) {
     isLoading.value.board = true
     const res = await getBoardById(boardId)
-    if (res.status === 'success') {
-      currentBoard.value = { ...res.data, isPublic: res.data.visibility === 'PUBLIC' }
-      await loadTasks(boardId)
-      await loadStatuses(boardId)
+    if (res.ok) {
+      currentBoard.value = { ...res.data, isPublic: res.data.visibility === Pl1VisibilityType.PUBLIC }
+      // await loadTasks(boardId)
+      // await loadStatuses(boardId)
+      await Promise.all([loadTasks(boardId), loadStatuses(boardId), loadCollaborators(boardId)])
     }
     isLoading.value.board = false
+  }
+
+  async function updateBoard(boardId, boardData) {
+    isLoading.value.board = true
+    const res = await patchBoard(boardId, boardData)
+    if (res.ok) {
+      currentBoard.value = { ...currentBoard.value, ...res.data }
+    } else {
+      throw new Error(res.message)
+    }
+    isLoading.value.board = false
+    return res.data
   }
 
   function sortTasks(sortBy, sortDirection) {
@@ -82,22 +119,16 @@ export const useBoardStore = defineStore('board', () => {
 
   async function toggleBoardVisibility() {
     const res = await patchBoard(currentBoard.value.id, {
-      visibility: currentBoard.value.isPublic ? 'PRIVATE' : 'PUBLIC'
+      visibility: currentBoard.value.isPublic ? Pl1VisibilityType.PRIVATE : Pl1VisibilityType.PUBLIC
     }, {
-      noGlobalResponseHandler: true
+      noGlobalResponseHandling: true
     })
-    if (res.status === 'success') {
+    if (res.ok) {
       currentBoard.value.isPublic = !currentBoard.value.isPublic
-    } else if (res.statusCode === 403) {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'You do not have permission to change board visibility mode.',
-        status: 'error'
-      })
     } else {
       toastStore.createToast({
         title: 'Error',
-        description: 'Failed to update board visibility. Please try again later.',
+        description: res.statusCode === HttpStatusCode.FORBIDDEN ? 'You do not have permission to change board visibility mode.' : 'Failed to update board visibility. Please try again later.',
         status: 'error'
       })
     }
@@ -111,8 +142,6 @@ export const useBoardStore = defineStore('board', () => {
     options.value.sortDirection = null
     clearTaskFilterStatus()
   }
-
-  // watch(() => options.value.boardId, fetchBoard, { immediate: true })
 
   watch(options, async () => {
     await loadTasks()
@@ -134,6 +163,10 @@ export const useBoardStore = defineStore('board', () => {
     removeTaskFilterStatus,
     clearTaskFilterStatus,
     toggleBoardVisibility,
-    clearBoardData
+    clearBoardData,
+    updateBoard,
+    collaborativeBoards,
+    loadCollaborators,
+    collaborators
   }
 })

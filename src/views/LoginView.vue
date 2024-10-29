@@ -31,11 +31,11 @@ const handleLoginSubmit = async () => {
     isLoggingIn.value = true
     isLoginFailed.value = false
 
-    const responseObject = await login(username.value, password.value)
+    const res = await login(username.value, password.value)
 
-    if (responseObject.status === 'success') {
-        localStorage.setItem('itbkk_access_token', responseObject.data.access_token)
-        localStorage.setItem('itbkk_refresh_token', responseObject.data.refresh_token)
+    if (res.ok) {
+        localStorage.setItem('itbkk_access_token', res.data.access_token)
+        localStorage.setItem('itbkk_refresh_token', res.data.refresh_token)
         router.push({ name: 'all-board' })
     } else {
         toastStore.createToast({
@@ -86,6 +86,11 @@ const handleLoginSubmit = async () => {
                 <button type="submit" :disabled="username.length === 0 || password.length === 0"
                     :class="{ 'disabled': username.length === 0 || password.length === 0 }"
                     class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
+                <div class="divider">Or</div>
+                <button class="btn btn-neutral gap-3" disabled>
+                    <IconSVG iconName="microsoft-logo" size="1.5rem" :scale="1.5" />
+                    Login with Microsoft
+                </button>
             </form>
         </div>
     </main> 

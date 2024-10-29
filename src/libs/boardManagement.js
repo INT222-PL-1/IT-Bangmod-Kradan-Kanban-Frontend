@@ -28,14 +28,14 @@ export async function getBoards() {
   }
 }
 
-export async function patchBoard(boardId, patchData, options) {
+export async function patchBoard(boardId, patchData, zyosOptions) {
   const url = `${BASE_URL}/${boardId}`
 
   try {
     const res = await zyos.fetch(url, {
       method: 'PATCH',
       body: patchData,
-      noGlobalResponseHandler: options?.noGlobalResponseHandler
+      ...zyosOptions
     })
     return res
   } catch (error) {

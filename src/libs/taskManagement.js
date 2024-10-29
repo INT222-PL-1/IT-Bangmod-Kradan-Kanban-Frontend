@@ -6,11 +6,11 @@ const BASE_URL = `${SERVER_URL}/${VERSION}/boards`
 
 /**
  * Get all tasks in a board
- * @param {object} options - query parameters
  * @param {string} boardId - board id
+ * @param {object} options - query parameters
  * @returns 
  */
-export async function getTasks(options, boardId) {
+export async function getTasks(boardId, options) {
   const url = `${BASE_URL}/${boardId}/tasks`
   const params = new URLSearchParams()
 

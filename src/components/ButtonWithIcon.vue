@@ -8,17 +8,21 @@ defineProps({
   iconName: {
     type: String,
     required: true
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 </script>
 
 <template>
-  <div :class="className" class="flex">
+  <button :class="className" class="flex" :disabled="disabled">
     <div class="flex-none">
       <IconSVG :iconName="iconName" />
     </div>
     <div class="flex-auto">
       <slot></slot>
     </div>
-  </div>
+  </button>
 </template>

@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TaskBoardLayout from '@/layouts/TaskBoardLayout.vue'
 import { useUserStore } from '@/stores/user'
-import zyos from 'zyos'
 import BoardView from '@/views/BoardView.vue'
 import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast'
-import { refreshAccessToken } from '@/libs/userManagement'
+import { refreshAccessToken, validateAccessToken } from '@/libs/userManagement'
+import BoardSelectLayout from '@/layouts/BoardSelectLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,26 +17,35 @@ const router = createRouter({
     },
     {
       path: '/board',
-      name: 'all-board',
-      component: BoardView,
-      beforeEnter: async (to, from, next) => {
-        const boardStore = useBoardStore()
-        boardStore.clearBoardData()
-        await boardStore.loadAllBoards()
-        if (from.name === 'all-task') {
-          next()
-          return
-        }
-        if (boardStore.boards.length === 1) {
-          next({ name: 'all-task', params: { boardId: boardStore.boards[0].id } })
-        }
-        else next()
-      },
+      component: BoardSelectLayout,
       children: [
         {
-          path: 'add',
-          name: 'board-add',
-          component: () => import('@/components/BoardAddModal.vue')
+          path: '',
+          name: 'all-board',
+          component: BoardView,
+          meta: { title: 'Boards' },
+          beforeEnter: async (to, from) => {
+            const boardStore = useBoardStore()
+            boardStore.clearBoardData()
+            await boardStore.loadAllBoards()
+            if (boardStore.boards.length > 0 && to.name === 'board-add') {
+              return { name: 'all-board' }
+            }
+            if (['all-task', 'status-manage', 'collab-manage'].includes(from.name)) {
+              return
+            }
+            if (boardStore.boards.length === 1 && boardStore.collaborativeBoards.length === 0) {
+              return { name: 'all-task', params: { boardId: boardStore.boards[0].id } }
+            }
+            else return
+          },
+          children: [
+            {
+              path: 'add',
+              name: 'board-add',
+              component: () => import('@/components/BoardAddModal.vue')
+            }
+          ]
         }
       ]
     },
@@ -44,6 +53,7 @@ const router = createRouter({
       path: '/board/:boardId',
       redirect: { name: 'all-task' },
       component: TaskBoardLayout,
+      meta: { title: 'Tasks' },
       children: [
         {
           path: 'task',
@@ -74,6 +84,7 @@ const router = createRouter({
         {
           path: 'status/manage',
           name: 'status-manage',
+          meta: { title: 'Status Management' },
           component: () => import('@/views/StatusManageView.vue'),
           children: [
             {
@@ -88,174 +99,109 @@ const router = createRouter({
             }
           ]
         },
+        {
+          path: 'collab',
+          name: 'collab-manage',
+          meta: { title: 'Collaborator Management' },
+          component: () => import('@/views/CollabManageView.vue'),
+        }
       ]
     },
     {
-      path: '/login',
+      path: '/login',      
       name: 'login',
+      meta: { title: 'Login' },
       component: () => import('../views/LoginView.vue')
     },
     {
       path: '/forbidden',
       name: 'forbidden',
+      meta: { title: 'Forbidden' },
       component: () => import('../views/ForbiddenView.vue')
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
+      meta: { title: 'Not found' },
       component: () => import('../views/NotFoundView.vue')
     }
   ]
 })
 
-// router.beforeEach(async (to, from, next) => {
-//   const userStore = useUserStore()
-//   const toastStore = useToastStore()
-//   if (['login', 'not-found', 'forbidden'].includes(to.name)) {
-//     console.log('Public route', to.name)
-//     next()
-//   }
-//   else if (localStorage.getItem('itbkk_access_token')) {
-//     console.log('Private route', to.name)
-//     if (userStore.user) {
-//       console.log('User already loaded', to.name)
-//       next()
-//       return
-//     }
-//     try {
-//       const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/token/validate`)
-//       if (res.status === 'error') {
-//         localStorage.removeItem('itbkk_access_token')
-//         throw new Error('Invalid token')
-//       }
-//       console.log('User loaded', to.name)
-//       userStore.loadUserData()
-//       console.log('User: ', userStore.user)
-//       next()
-//     } catch (error) {
-//       console.error(error)
-//       userStore.clearUserData()
-//       toastStore.createToast({
-//         title: 'Error',
-//         description: 'Cannot enter the page. Please login and try again.',
-//         status: 'error',
-//       })
-//       next({ name: 'login' })
-//       return
-//     }
-//   }
-//   else {
-//     console.log('No token', to.name)
-//     try {
-//       if (localStorage.getItem('itbkk_refresh_token')) {
-//         const res = await refreshAccessToken()
-//         if (res.status === 'success') {
-//           localStorage.setItem('itbkk_access_token', res.data.access_token)
-//         }
-//         next()
-//         return
-//       } else {
-//         if (['all-task', 'status-manage', 'task-view'].includes(to.name)) {
-//           next()
-//           return
-//         } else {
-//           throw new Error('Cannot enter the page. Please login and try again.')
-//         }
-//       }
-//     } catch (error) {
-//       userStore.clearUserData()
-//       toastStore.createToast({
-//         title: 'Error',
-//         description: 'Cannot enter the page. Please login and try again.',
-//         status: 'error',
-//       })
-//       next({ name: 'login' })
-//     }
-//   }
-// })
+router.beforeEach(async (to) => {
 
-router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
+  const boardStore = useBoardStore()
   const toastStore = useToastStore()
+  
+  // ? User can enter login, not-found and  forbidden page even user is not logged in.
+  if ([ 'login', 'not-found', 'forbidden' ].includes(to.name)) return
+  
+  async function handleUserValidation() {
+    const accessToken = localStorage.getItem('itbkk_access_token')
+    const refreshToken = localStorage.getItem('itbkk_refresh_token')
 
-  // Check if the route is public
-  if (['login', 'not-found', 'forbidden'].includes(to.name)) {
-    console.log('Public route:', to.name)
-    next()
-    return
-  }
+    // ? If access token exists.
+    if (accessToken) {
 
-  // If access token exists
-  const accessToken = localStorage.getItem('itbkk_access_token')
-  if (accessToken) {
-    console.log('Private route:', to.name)
-
-    // If user data is already loaded
-    if (userStore.user) {
-      console.log('User already loaded:', to.name)
-      next()
-      return
-    }
-
-    try {
-      const res = await zyos.fetch(`${import.meta.env.VITE_SERVER_URL}/token/validate`)
-      
-      if (res.status === 'error') {
-        localStorage.removeItem('itbkk_access_token')
-        throw new Error('Invalid token')
+      // ? Load user data after re-validation token.
+      try {
+        // ? If access token is valid, load user data. Otherwise, try to refresh access token.
+        const isAccessTokenValid = await validateAccessToken(accessToken)
+        if (isAccessTokenValid) {
+          userStore.loadUserData()
+          return
+        } else {
+          throw new Error('Access token is invalid')
+        }
+      } catch (error) {
+        console.error(error)
       }
-
-      // Load user data after validation
-      console.log('User loaded:', to.name)
-      userStore.loadUserData();
-      console.log('User:', userStore.user)
-      next()
-
-    } catch (error) {
-      console.error(error)
-      userStore.clearUserData()
-      toastStore.createToast({
-        title: 'Error',
-        description: 'Cannot enter the page. Please login and try again.',
-        status: 'error',
-      });
-      next({ name: 'login' })
     }
 
-    return
-  }
+    // ? If refresh token exists, try to refresh access token.
+    if (refreshToken) {
+      try {
+        // ? If refresh token is valid, refresh access token and run user validation again.
+        const res = await refreshAccessToken(refreshToken)
+        
+        if (res.ok) {
+          localStorage.setItem('itbkk_access_token', res.data.access_token)
+          return await handleUserValidation()
+        } else {
+          throw new Error('Failed to refresh access token')
+        }
 
-  // No access token, check for refresh token
-  console.log('No access token:', to.name)
-  const refreshToken = localStorage.getItem('itbkk_refresh_token')
-
-  if (refreshToken) {
-    try {
-      const res = await refreshAccessToken()
-      
-      if (res.status === 'success') {
-        localStorage.setItem('itbkk_access_token', res.data.access_token)
-        next()
-        return
+      } catch (error) {
+        console.error(error)
       }
-
-    } catch (error) {
-      console.error('Failed to refresh access token:', error)
     }
+
+    // ? If user is not logged in, redirect to login page.
+    if ([ 'all-task', 'status-manage', 'collab-manage' ].includes(to.name)) return
+
+    // ? Clear all data and redirect to login
+    localStorage.removeItem('itbkk_access_token')
+    localStorage.removeItem('itbkk_refresh_token')
+    boardStore.clearBoardData()
+    userStore.clearUserData()
+
+    toastStore.createToast({
+      title: 'Error',
+      description: 'Cannot enter the page. Please login and try again later.',
+      status: 'error',
+    })
+
+    return { name: 'login' } 
   }
 
-  // Handle routes that don't require login or show error
-  if (['all-task', 'status-manage', 'task-view'].includes(to.name)) {
-    next()
-    return
-  }
+  const nextRoute = await handleUserValidation()
+  return nextRoute
+})
 
-  toastStore.createToast({
-    title: 'Error',
-    description: 'Cannot enter the page. Please login and try again.',
-    status: 'error',
-  })
-  next({ name: 'login' })
+router.afterEach((to) => {
+  if (to.meta.title) document.title = `ITBKK - ${to.meta.title}`
+  else document.title = 'ITBKK'
 })
 
 export default router

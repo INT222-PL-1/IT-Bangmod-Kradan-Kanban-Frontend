@@ -132,3 +132,22 @@ export function humanReadDate(rawDate) {
 		minute: 'numeric'
 	})
 }
+
+export async function waitForStorage(key, timeout = 5000) {
+  return new Promise((resolve, reject) => {
+    let timeElapsed = 0
+    const interval = 100 // check every 100ms
+    const checkStorage = setInterval(() => {
+      const value = localStorage.getItem(key)
+      if (value) {
+        clearInterval(checkStorage)
+        resolve(value)
+      }
+      timeElapsed += interval
+      if (timeElapsed >= timeout) {
+        clearInterval(checkStorage)
+        reject(new Error(`Timeout: ${key} not found in localStorage`))
+      }
+    }, interval)
+  })
+}

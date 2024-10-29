@@ -2,24 +2,24 @@
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { deleteStatus, deleteStatusAndTransferTasks } from '@/libs/statusManagement'
 import { useToastStore } from '@/stores/toast'
-import BaseModal from '@/components/BaseModal.vue'
 import StatusSelector from '@/components/StatusSelector.vue'
 import BaseMenu from '@/components/BaseMenu.vue'
 import { useBoardStore } from '@/stores/board'
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import { useUserStore } from '@/stores/user'
+import BaseTablePlate from '@/components/BaseTablePlate.vue'
+import MiniModal from '@/components/MiniModal.vue'
+import { HttpStatusCode } from 'zyos'
 
 const route = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
-
-const isBoardOwner = computed(() => boardStore.currentBoard?.owner.oid === userStore.user?.oid)
 
 const statusModalData = ref(null)
 const statusDeleteModalOpenState = ref(false)
@@ -39,10 +39,12 @@ const handleRefreshBtnClick = async () => {
 }
 
 const handleAddBtnClick = () => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   router.push({ name: 'status-add' })
 }
 
 const handleEditBtnClick = (statusId) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   router.push({ name: 'status-edit', params: { statusId } })
 }
 
@@ -52,6 +54,7 @@ const handleOpenTransferModal = (statusData) => {
 }
 
 const handleOpenDeleteModal = (statusData) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   if (statusData.count > 0) {
     handleOpenTransferModal(statusData)
   } else {
@@ -61,107 +64,123 @@ const handleOpenDeleteModal = (statusData) => {
 }
 
 const handleTransferStatus = async (fromStatusId, toStatusId) => {
+  if (boardStore.isLoading.microAction) return
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
-  const res = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\nPlease try again.`,
-      status: 'error'
-    })
-  } else {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'The tasks have been transferred and the status has been deleted.',
-      status: 'success'
-    })
-    await boardStore.loadStatuses()
+
+  try {
+    boardStore.isLoading.microAction = true
+    const res = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
+    if (res.ok) {
+      toastStore.createToast({
+        title: 'Success',
+        description: 'The tasks have been transferred and the status has been deleted.',
+        status: 'success'
+      })
+      await boardStore.loadStatuses()
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+        status: 'error'
+      })
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    statusTransferModalOpenState.value = false
+    boardStore.isLoading.microAction = false
   }
-  statusTransferModalOpenState.value = false
 }
 
 const handleDeleteStatus = async (statusId) => {
+  if (boardStore.isLoading.microAction) return
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
-  const res = await deleteStatus(statusId, boardId)
-  if (res.status === 'error') {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === 401 ? 'Please try again.' : res.message}.`,
-      status: 'error'
-    })
-    await boardStore.loadStatuses()
-  } else {
-    toastStore.createToast({
-      title: 'Success',
-      description: 'The status has been deleted',
-      status: 'success'
-    })
-    await boardStore.loadStatuses()
+
+  try {
+    boardStore.isLoading.microAction = true
+    const res = await deleteStatus(statusId, boardId)
+    if (res.ok) {
+      toastStore.createToast({
+        title: 'Success',
+        description: 'The status has been deleted',
+        status: 'success'
+      })
+      await boardStore.loadStatuses()
+    } else {
+      toastStore.createToast({
+        title: 'Error',
+        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+        status: 'error'
+      })
+      await boardStore.loadStatuses()
+    }
+  } catch (error) {
+    console.error(error)
+  } finally {
+    statusDeleteModalOpenState.value = false
+    boardStore.isLoading.microAction = false
   }
-  statusDeleteModalOpenState.value = false
 }
 
 const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
+  if (userStore.hasWriteAccessOnCurrentBoard === false) return
   await handleTransferStatus(fromStatusId, toStatusId)
 }
 </script>
 
 <template>
-  <Transition>
-    <BaseModal @clickBG="statusDeleteModalOpenState = false" :show="statusDeleteModalOpenState" :mobileCenter="true">
-      <div class="bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto overflow-hidden flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Delete a Status</div>
-        <div class="itbkk-message p-4 break-words">
-          Do you want to delete the <span class="opacity-75 italic">{{ statusModalData.name }}</span> status?
-        </div>
-        <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="statusDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
-            <button @click="handleDeleteStatus(statusModalData.id)"
-              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
-              Confirm
-            </button>
-          </div>
-        </div>
+  <MiniModal @clickBG="statusDeleteModalOpenState = false" :show="statusDeleteModalOpenState" :mobileCenter="true">
+    <template #title>Delete a Status</template>
+    <template #content>
+      <div class="itbkk-message break-words">
+        Do you want to delete the <span class="opacity-75 italic">{{ statusModalData.name }}</span> status?
       </div>
-    </BaseModal>
-  </Transition>
+    </template>
+    <template #actions>
+      <button @click="statusDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+      <button @click="handleDeleteStatus(statusModalData.id)"
+        class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
+        :disabled="boardStore.isLoading.microAction"
+      >
+        Confirm
+      </button>
+    </template>
+  </MiniModal>
 
-  <Transition>
-    <BaseModal @clickBG="statusTransferModalOpenState = false" :show="statusTransferModalOpenState"
-      :mobileCenter="true">
-      <div class="bg-base-300 w-[30rem] max-w-[90vw] rounded-xl h-auto flex flex-col">
-        <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">Transfer a Status</div>
-        <div class="itbkk-message p-4 break-words">
-          <div>
-            <div>There are <span class="font-semibold">{{ statusModalData.count }}</span> task{{
-              statusModalData.count > 1 ? 's' : '' }} in <span class="opacity-75 italic">{{
-                statusModalData.name }}</span> status.
-            </div> In order to delete this status, the system must transfer
-            task{{ statusModalData.count > 1 ? 's' : '' }} in this status to existing status.
-            <div class="flex items-center gap-2 mt-4">
-              Transfer tasks to
-              <StatusSelector v-model="statusIdToTransfer" :excludeStatusId="statusModalData.id" />
-            </div>
-          </div>
-        </div>
-        <div
-          class="flex justify-end items-center flex-none h-14 px-4 rounded-b-xl border-t-2 border-base-100 bg-base-200">
-          <div class="flex gap-2">
-            <button @click="statusTransferModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
-              Cancel
-            </button>
-            <button @click="handleTransferAndDeleteStatus(statusModalData.id, statusIdToTransfer)"
-              class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
-              Transfer and Delete
-            </button>
+  <MiniModal @clickBG="statusTransferModalOpenState = false" :show="statusTransferModalOpenState"
+    :mobileCenter="true">
+    <template #title>Transfer a Status</template>
+    <template #content>
+      <div class="itbkk-message break-words">
+        <div>
+          <div>There are <span class="font-semibold">{{ statusModalData.count }}</span> task{{
+            statusModalData.count > 1 ? 's' : '' }} in <span class="opacity-75 italic">{{
+              statusModalData.name }}</span> status.
+          </div> In order to delete this status, the system must transfer
+          task{{ statusModalData.count > 1 ? 's' : '' }} in this status to existing status.
+          <div class="flex items-center gap-2 mt-4">
+            Transfer tasks to
+            <StatusSelector v-model="statusIdToTransfer" :excludeStatusId="statusModalData.id" />
           </div>
         </div>
       </div>
-    </BaseModal>
-  </Transition>
+    </template>
+    <template #actions>
+      <button @click="statusTransferModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+        Cancel
+      </button>
+      <button @click="handleTransferAndDeleteStatus(statusModalData.id, statusIdToTransfer)"
+        class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
+        :disabled="boardStore.isLoading.microAction"
+      >
+        Transfer and Delete
+      </button>
+    </template>
+  </MiniModal>
 
   <RouterView v-slot="{ Component }">
     <Transition>
@@ -169,52 +188,52 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     </Transition>
   </RouterView>
 
-  <div class="max-w-full pt-10 pb-20">
-    <div class="bg-base-300 rounded-lg shadow-md">
-      <div class="px-4 min-h-8 sticky top-[8rem] z-10 py-3 border-b-base-200 border-b-2 bg-base-300 rounded-t-lg">
-        <div class="flex justify-end py-2">
-          <div class="flex gap-2">
-            <BaseMenu side="left" class="md:hidden">
-              <template #icon>
-                <IconSVG iconName="three-dots" scale="1.25" />
-              </template>
-              <template #menu>
-                <button @click="handleRefreshBtnClick" type="button"
-                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                  <div :class="{ 'animate-spin': boardStore.isLoading.status }">
-                    <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-                  </div>Refresh Statuses
-                </button>
-                <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-                  class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-                  <IconSVG iconName="plus" :scale="1.25" />Add Status
-                </button>
-              </template>
-            </BaseMenu>
-            <button v-if="isBoardOwner" @click="handleAddBtnClick" type="button"
-              class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex">
+  <section class="max-w-full pt-10 pb-20">
+
+    <!-- ? Desktop View -->
+    <BaseTablePlate>
+      <template #right-menu>
+        <BaseMenu side="left" class="md:hidden">
+          <template #icon>
+            <IconSVG iconName="three-dots" scale="1.25" />
+          </template>
+          <template #menu>
+            <button @click="handleRefreshBtnClick" type="button"
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
+              <div :class="{ 'animate-spin': boardStore.isLoading.status }">
+                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+              </div>Refresh Statuses
+            </button>
+            <button v-if="userStore.hasWriteAccessOnCurrentBoard" @click="handleAddBtnClick" type="button"
+              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
               <IconSVG iconName="plus" :scale="1.25" />Add Status
             </button>
-            <BaseTooltip text="Refresh Statuses">
-              <button @click="handleRefreshBtnClick" type="button" class="btn btn-secondary btn-sm btn-square hidden md:flex">
-                <div :class="{ 'animate-spin': boardStore.isLoading.status }">
-                  <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-                </div>
-              </button>
-            </BaseTooltip>
-          </div>
-        </div>
-      </div>
-      <div class="table-overflow-x-scroll p-4">
+          </template>
+        </BaseMenu>
+        <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+          <button @click="handleAddBtnClick" type="button"
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+            <IconSVG iconName="plus" :scale="1.25" />Add Status
+          </button>
+        </BaseTooltip>
+        <BaseTooltip text="Refresh Statuses">
+          <button @click="handleRefreshBtnClick" type="button"
+            class="btn btn-secondary btn-sm btn-square hidden md:flex">
+            <div :class="{ 'animate-spin': boardStore.isLoading.status }">
+              <IconSVG iconName="arrow-clockwise" :scale="1.25" />
+            </div>
+          </button>
+        </BaseTooltip>
+      </template>
+      <template #table>
         <table class="table table-zebra">
           <thead>
             <tr class="select-none">
               <th class="min-w-16 max-w-16"></th>
               <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
-              <th class="min-w-96 max-w-96 sm:min-w-[35vw] sm:max-w-[35vw]">Description</th>
+              <th class="min-w-96 max-w-96 sm:min-w-[20vw] sm:max-w-[30vw]">Description</th>
               <th class="min-w-16 max-w-16">Tasks</th>
-              <th v-if="isBoardOwner" class="min-w-60 max-w-60">Action</th>
-              <th v-else class="min-w-60 max-w-60"></th>
+              <th class="min-w-60 max-w-60">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -234,8 +253,8 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
                 </div>
               </td>
               <td class="overflow-hidden min-w-52 max-w-52">
-                <StatusBadge :statusData="status" textWrapMode="wrap"
-                  class="itbkk-status-name cursor-default" width="100%" />
+                <StatusBadge :statusData="status" textWrapMode="wrap" class="itbkk-status-name cursor-default"
+                  width="100%" />
               </td>
               <td :class="{ 'italic text-[grey]': !status.description }"
                 class="itbkk-status-description min-w-96 max-w-96 break-words">
@@ -256,27 +275,30 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
                   </div>
                 </div>
               </td>
-              <td v-if="isBoardOwner">
-                <div v-if="status.isPredefined === false" class="flex justify-center items-center gap-1 w-full">
-                  <ButtonWithIcon @click="handleEditBtnClick(status.id)"
-                    className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap" iconName="pencil-square">
+              <td>
+                <div v-if="status.isPredefined === false" class="flex justify-start items-center gap-2 w-full">
+                  <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+                    <ButtonWithIcon @click="handleEditBtnClick(status.id)"
+                    className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap"
+                    iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
                     Edit
-                  </ButtonWithIcon>
-                  <ButtonWithIcon @click="handleOpenDeleteModal(status)"
-                    className="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
-                    iconName="trash-fill">
-                    Delete
-                  </ButtonWithIcon>
+                    </ButtonWithIcon>
+                  </BaseTooltip>
+                  <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+                    <ButtonWithIcon @click="handleOpenDeleteModal(status)"
+                      className="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
+                      iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                      Delete
+                    </ButtonWithIcon>
+                  </BaseTooltip>
                 </div>
               </td>
-              <td v-else></td>
             </tr>
           </tbody>
         </table>
-        <div class="h-20"></div>
-      </div>
-    </div>
-  </div>
+      </template>
+    </BaseTablePlate>
+  </section>
 </template>
 
 <style scoped>

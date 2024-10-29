@@ -10,7 +10,7 @@ const props = defineProps({
   },
   size: {
     type: Number,
-    default: 1
+    default: 1.15
   },
   label: {
     type: String,
@@ -37,7 +37,7 @@ const handleCopyBoard = async () => {
 <template>
   <div class="tooltip tooltip-secondary" :class="{ 'tooltip-open': isCopied }" :data-tip="notifyText">
     <button @click="handleCopyBoard" :class="{ 'btn-square': label.length === 0, 'btn-disabled': disabled }" class="btn btn-ghost btn-sm justify-start px-1" :disabled="disabled" :title="disabled ? 'Copy to clipboard is disabled in insecure context' : ''">
-      <IconSVG iconName="copy" :scale="size" :size="`${size}rem`" />
+      <IconSVG iconName="link" :scale="size" :size="`${size}rem`" />
       <div class="text-sm font-thin">Copy Link</div>
     </button>
   </div>
