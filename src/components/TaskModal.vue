@@ -25,6 +25,12 @@ const toastStore = useToastStore()
 
 const taskModalMode = ref('view')
 const taskModalData = ref(null)
+
+const attachedfiles = ref([])
+const attachedfilesSize = computed(() => {
+  return (attachedfiles.value.reduce((acc, cur) => acc + cur.size, 0) / 1_000_000).toFixed(2)
+})
+
 let previousTaskData = null
 const disabledSaveButton = computed(() => {
   return taskModalData.value.title.length < 1 ||
@@ -258,13 +264,16 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <div>
+      <div v-if="['view', 'edit'].includes(taskModalMode)">
         <div>
           <span class="text-lg font-semibold">
             <span>Attachments </span>
             <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm">
               ({{ taskModalData.assignees.length + '/30' }})
             </span> -->
+            <span v-if="taskModalMode === 'edit'" class="text-sm opacity-50">
+              {{ attachedfiles.length + '/10 files' }} <span>{{ attachedfilesSize + '/20MB' }}</span>
+            </span>
           </span>
           <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" v-show="taskModalData.assignees.length > 30"
             class="text-error text-xs text-nowrap">
@@ -273,7 +282,7 @@ const handleClickConfirm = async () => {
         </div>
 
         <!-- ! Attachments Area -->
-        <AttachmentArea />
+        <AttachmentArea v-model="attachedfiles" />
       </div>
     </template>
     <template #actions>
