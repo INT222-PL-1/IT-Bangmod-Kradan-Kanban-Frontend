@@ -9,6 +9,7 @@ import { useToastStore } from '@/stores/toast'
 import { useBoardStore } from '@/stores/board'
 import { HttpStatusCode } from 'zyos'
 import BigModal from './BigModal.vue'
+import AttachmentArea from './AttachmentArea.vue'
 
 defineProps({
   show: {
@@ -256,6 +257,23 @@ const handleClickConfirm = async () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <div>
+          <span class="text-lg font-semibold">
+            <span>Attachments </span>
+            <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm">
+              ({{ taskModalData.assignees.length + '/30' }})
+            </span> -->
+          </span>
+          <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" v-show="taskModalData.assignees.length > 30"
+            class="text-error text-xs text-nowrap">
+            Assignees can not be more than 30 characters
+          </span> -->
+        </div>
+
+        <!-- ! Attachments Area -->
+        <AttachmentArea />
       </div>
     </template>
     <template #actions>
