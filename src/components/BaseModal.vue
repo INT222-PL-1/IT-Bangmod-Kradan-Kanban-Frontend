@@ -1,4 +1,6 @@
 <script setup>
+import { watch } from 'vue';
+
 
 const emits = defineEmits(['clickBG'])
 
@@ -21,6 +23,14 @@ const handleClickBG = (e) => {
   if (props.isLoading) return
   if (e.target === e.currentTarget) emits('clickBG')
 }
+
+watch(() => props.show, (newVal) => {
+  if (newVal) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = 'auto'
+  }
+})
 </script>
 
 <template>

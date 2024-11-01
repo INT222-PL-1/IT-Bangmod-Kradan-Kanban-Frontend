@@ -1,6 +1,5 @@
 <script setup>
 import { getTimezone, formatDateTime } from '@/libs/utils'
-import BaseModal from '@/components/BaseModal.vue'
 import StatusBadge from './StatusBadge.vue'
 import StatusSelector from './StatusSelector.vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -9,6 +8,7 @@ import { createTask, getTaskById, updateTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import { useBoardStore } from '@/stores/board'
 import { HttpStatusCode } from 'zyos'
+import BigModal from './BigModal.vue'
 
 defineProps({
   show: {
@@ -135,14 +135,14 @@ const handleClickConfirm = async () => {
 </script>
 
 <template>
-  <BaseModal :show="taskModalData !== null" @clickBG="handleClickClose">
-    <div class="itbkk-modal-task bg-base-300 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto flex flex-col">
-      <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">
-        <span v-if="taskModalMode === 'view'" class="itbkk-title">{{ taskModalData?.title }}</span>
+  <BigModal :show="taskModalData !== null" @clickBG="handleClickClose" className="itbkk-modal-task">
+    <template #title>
+      <span v-if="taskModalMode === 'view'" class="itbkk-title">{{ taskModalData?.title }}</span>
         <span v-else-if="taskModalMode === 'add'">New Task</span>
         <span v-else-if="taskModalMode === 'edit'">Edit Task</span>
-      </div>
-      <div v-if="['add', 'edit'].includes(taskModalMode)" class="p-4">
+    </template>
+    <template #content>
+      <div v-if="['add', 'edit'].includes(taskModalMode)">
         <div>
           <span class="text-lg font-semibold flex-[0]">
             <span>Title </span>
@@ -161,9 +161,9 @@ const handleClickConfirm = async () => {
             class="itbkk-title break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
         </div>
       </div>
-      <div class="grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 flex-auto">
+      <div class="grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 gap-4 flex-auto">
         <div>
-          <div class="p-4 w-full h-full flex flex-col">
+          <div class="w-full h-full flex flex-col">
             <div class="flex-[0]">
               <span class="text-lg font-semibold ">
                 <span>Description</span>
@@ -191,7 +191,7 @@ const handleClickConfirm = async () => {
         </div>
         <div class="flex flex-col justify-between">
           <div>
-            <div class="p-4">
+            <div>
               <div>
                 <span class="text-lg font-semibold">
                   <span>Assignees </span>
@@ -214,7 +214,7 @@ const handleClickConfirm = async () => {
                 :class="{ 'border border-error animate-shake-x-in': taskModalData.assignees.length > 30 }"
                 class="itbkk-assignees w-[20rem] outline-none focus:placeholder:opacity-50 bg-base-200 px-4 py-2 rounded-lg mt-2" />
             </div>
-            <div class="p-4">
+            <div>
               <div>
                 <span class="text-lg font-semibold">
                   <span>Status </span>
@@ -257,26 +257,20 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <div
-        class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200 rounded-b-lg">
-        <div v-if="taskModalMode === 'view'" class="flex gap-2">
-          <button @click="handleClickClose" class="itbkk-button btn btn-sm btn-neutral">
-            Close
-          </button>
-        </div>
-        <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="flex gap-2">
-          <button @click="handleClickConfirm"
-            :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
-            class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledSaveButton">
-            Save
-          </button>
-          <button @click="handleClickClose" class="itbkk-button-cancel btn btn-sm btn-neutral">
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  </BaseModal>
+    </template>
+    <template #actions>
+      <button
+        v-if="['add', 'edit'].includes(taskModalMode)"
+        @click="handleClickConfirm"
+        :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
+        class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledSaveButton">
+        Save
+      </button>
+      <button v-once @click="handleClickClose" class="itbkk-button itbkk-button-cancel btn btn-sm btn-neutral">
+        {{ taskModalMode === 'view' ? 'Close' : 'Cancel' }}
+      </button>
+    </template>
+  </BigModal>
 </template>
 
 <style scoped></style>
