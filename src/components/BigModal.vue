@@ -33,7 +33,7 @@ const themeStore = useThemeStore()
 
 <template>
   <BaseModal :show="show" @clickBG="clickBG" :mobileCenter="false">
-    <div :class="className" class="absolute bg-base-300 max-w-[100vw] sm:max-w-[90vw] sm:rounded-xl h-auto flex flex-col" :style="{ width }">
+    <div :class="className" class="bg-base-300 max-w-[100vw] sm:max-w-[90vw] sm:rounded-xl h-auto flex flex-col" :style="{ width }">
       <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none flex justify-between">
         <slot name="title">Title</slot>
         <div v-if="themeStore.festivalThemeState && themeStore.festivalName === 'halloween'" class="grid place-items-center -translate-x-10 translate-y-5">
