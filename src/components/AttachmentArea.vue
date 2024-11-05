@@ -1,38 +1,87 @@
 <script setup>
-import { useId } from 'vue';
+import { ref } from 'vue';
 import IconSVG from './IconSVG.vue';
 import AttachmentCard from './AttachmentCard.vue';
 
-const attachedfiles = defineModel()
+defineProps({
+  fileInputId: {
+    type: String,
+    required: true
+  }
+})
 
-const fileInputId = useId()
-
-const handleFileChange = (e) => {
-  const files = e.target.files
-  if (files.length === 0) return
-  attachedfiles.value = [...attachedfiles.value, ...files]
-}
+const attachedFiles = defineModel()
+const showDropArea = ref(false)
 
 const handleRemoveClick = (file) => {
-  attachedfiles.value = attachedfiles.value.filter(f => f !== file)
+  attachedFiles.value = attachedFiles.value.filter(f => f !== file)
+}
+
+const handleDragEnter = (e) => {
+  e.preventDefault()
+  showDropArea.value = true
+}
+
+const handleDragEnd = (e) => {
+  e.preventDefault()
+  showDropArea.value = false
+}
+
+const handleDrop = (e) => {
+  e.preventDefault()
+  showDropArea.value = false
+  const files = e.dataTransfer.files
+  if (files.length === 0) return
+  attachedFiles.value = [...attachedFiles.value, ...files]
+}
+
+const handleDragOver = (e) => {
+  e.preventDefault()
 }
 
 </script>
 
 <template>
-  <input :id="fileInputId" type="file" multiple @change="handleFileChange" class="" />
-  <div class="relative h-60 mt-2 py-4 bg-base-200 rounded-lg overflow-x-auto">
-    <div v-show="attachedfiles.length === 0" class="absolute inset-0 m-4 rounded-md border-base-content border-[6px] border-dashed opacity-40 flex flex-col justify-center items-center">
-      <IconSVG iconName="file-earmark" class="text-base-content m-1" scale="3" size="3rem" />
-      <div class="text-2xl font-bold text-base-content">Drop files here</div>
-      <label :for="fileInputId" class="text-base-content">or <span class="underline cursor-pointer">click to browse</span></label>
+  <div @dragenter="handleDragEnter" class="relative h-60 mt-2 bg-base-200 rounded-lg overflow-x-auto">
+    <div v-show="attachedFiles.length > 0" class="flex gap-4 h-full p-4 w-fit">
+      <AttachmentCard
+        v-for="file in attachedFiles"
+        :key="file.name"
+        :file="file"
+        @removeClick="handleRemoveClick"
+      />
     </div>
-    <div v-show="attachedfiles.length > 0" class="flex gap-4 h-full px-4 w-fit">
-      <AttachmentCard v-for="file in attachedfiles" :key="file.name" :file="file" @removeClick="handleRemoveClick" />
-    </div>
+    <Transition>
+      <label
+      :for="fileInputId"
+      v-show="attachedFiles.length === 0 || showDropArea"
+      @dragleave="handleDragEnd"
+      @dragover="handleDragOver"
+      @drop="handleDrop"
+      :class="{ 'bg-base-200 opacity-80': attachedFiles.length > 0 }"
+      class="absolute inset-0 rounded-md p-4"
+      >
+      <div class="pointer-events-none relative w-full h-full rounded-md border-base-content border-[4px] border-dashed grid place-items-center">
+        <div class="flex flex-col justify-center items-center">
+          <IconSVG iconName="file-earmark" class="text-base-content m-1" scale="3" size="3rem" />
+          <div class="text-2xl font-bold text-base-content">Drop files here</div>
+          <div v-show="attachedFiles.length === 0" class="text-base-content">or <span class="underline">click to browse</span></div>
+        </div>
+      </div>
+    </label>
+  </Transition>
   </div>
 </template>
 
 <style scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 100ms;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
 
 </style>

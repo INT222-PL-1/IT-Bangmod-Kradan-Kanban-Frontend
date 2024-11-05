@@ -3,13 +3,14 @@ import { getTimezone, formatDateTime } from '@/libs/utils'
 import StatusBadge from './StatusBadge.vue'
 import StatusSelector from './StatusSelector.vue'
 import { useRoute, useRouter } from 'vue-router'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, useId } from 'vue'
 import { createTask, getTaskById, updateTask } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import { useBoardStore } from '@/stores/board'
 import { HttpStatusCode } from 'zyos'
 import BigModal from './BigModal.vue'
 import AttachmentArea from './AttachmentArea.vue'
+import IconSVG from './IconSVG.vue'
 
 defineProps({
   show: {
@@ -26,10 +27,21 @@ const toastStore = useToastStore()
 const taskModalMode = ref('view')
 const taskModalData = ref(null)
 
-const attachedfiles = ref([])
-const attachedfilesSize = computed(() => {
-  return (attachedfiles.value.reduce((acc, cur) => acc + cur.size, 0) / 1_000_000).toFixed(2)
+const fileInputId = useId()
+const attachedFiles = ref([])
+const attachedFilesSize = computed(() => {
+  return (attachedFiles.value.reduce((acc, cur) => acc + cur.size, 0) / 1_000_000).toFixed(2)
 })
+
+const handleFileChange = (e) => {
+  const files = e.target.files
+  if (files.length === 0) return
+  attachedFiles.value = [...attachedFiles.value, ...files]
+}
+
+const handleClearAttachment = () => {
+  attachedFiles.value = []
+}
 
 let previousTaskData = null
 const disabledSaveButton = computed(() => {
@@ -168,7 +180,7 @@ const handleClickConfirm = async () => {
             class="itbkk-title break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
         </div>
       </div>
-      <div class="grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 gap-4 flex-auto">
+      <div class="mt-4 grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 gap-8 flex-auto">
         <div>
           <div class="w-full h-full flex flex-col">
             <div class="flex-[0]">
@@ -241,7 +253,7 @@ const handleClickConfirm = async () => {
             </div>
           </div>
           <div v-if="['view', 'edit'].includes(taskModalMode)">
-            <div class="p-4 flex flex-col gap-1">
+            <div class=" flex flex-col gap-1">
               <div class="flex">
                 <div class="flex-[2] font-semibold">Timezone</div>
                 <div class="itbkk-timezone flex-[3] text-sm bg-base-200 rounded-lg px-2">
@@ -264,17 +276,34 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <div v-if="['view', 'edit'].includes(taskModalMode)">
-        <div>
-          <span class="text-lg font-semibold">
+      <div class="mt-4" v-if="['view', 'edit'].includes(taskModalMode)">
+        <input
+          :id="fileInputId"
+          type="file"
+          multiple
+          @change="handleFileChange"
+          class="hidden"
+        />
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-2">
+          <div class="text-lg font-semibold">
             <span>Attachments </span>
             <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm">
               ({{ taskModalData.assignees.length + '/30' }})
             </span> -->
             <span v-if="taskModalMode === 'edit'" class="text-sm opacity-50">
-              {{ attachedfiles.length + '/10 files' }} <span>{{ attachedfilesSize + '/20MB' }}</span>
+              {{ attachedFiles.length + '/10 files' }} <span>{{ attachedFilesSize + '/20MB' }}</span>
             </span>
-          </span>
+          </div>
+          <div class="flex gap-2">
+            <label :for="fileInputId" class="btn btn-sm btn-neutral">
+              <IconSVG iconName="paperclip" scale="1" size="1rem" />
+              <span>Add attachment</span>
+            </label>
+            <button type="button" @click="handleClearAttachment" class="btn btn-sm btn-error btn-outline" :disabled="attachedFiles.length === 0">
+              <IconSVG iconName="trash-fill" scale="1" size="1rem" />
+              <span>Clear attachment</span>
+            </button>
+          </div>
           <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" v-show="taskModalData.assignees.length > 30"
             class="text-error text-xs text-nowrap">
             Assignees can not be more than 30 characters
@@ -282,7 +311,7 @@ const handleClickConfirm = async () => {
         </div>
 
         <!-- ! Attachments Area -->
-        <AttachmentArea v-model="attachedfiles" />
+        <AttachmentArea v-model="attachedFiles" :fileInputId="fileInputId" />
       </div>
     </template>
     <template #actions>
