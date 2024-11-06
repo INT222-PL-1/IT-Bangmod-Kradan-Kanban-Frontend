@@ -9,8 +9,9 @@ import { useToastStore } from '@/stores/toast'
 import { useBoardStore } from '@/stores/board'
 import { HttpStatusCode } from 'zyos'
 import BigModal from './BigModal.vue'
-import AttachmentArea from './AttachmentArea.vue'
+import AttachmentDropArea from './AttachmentDropArea.vue'
 import IconSVG from './IconSVG.vue'
+import AttachmentShowArea from './AttachmentShowArea.vue'
 
 defineProps({
   show: {
@@ -208,48 +209,46 @@ const handleClickConfirm = async () => {
             </div>
           </div>
         </div>
-        <div class="flex flex-col justify-between">
+        <div class="flex flex-col justify-between gap-6">
           <div>
             <div>
-              <div>
-                <span class="text-lg font-semibold">
-                  <span>Assignees </span>
-                  <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm">
-                    ({{ taskModalData.assignees.length + '/30' }})
-                  </span>
+              <span class="text-lg font-semibold">
+                <span>Assignees </span>
+                <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm">
+                  ({{ taskModalData.assignees.length + '/30' }})
                 </span>
-                <span v-if="['add', 'edit'].includes(taskModalMode)" v-show="taskModalData.assignees.length > 30"
-                  class="text-error text-xs text-nowrap">
-                  Assignees can not be more than 30 characters
-                </span>
-              </div>
-              <div v-if="taskModalMode === 'view'" :class="{
-                'italic text-[grey]': !taskModalData?.assignees,
-              }" class="itbkk-assignees">
-                {{ taskModalData?.assignees || 'Unassigned' }}
-              </div>
-              <input v-else-if="['add', 'edit'].includes(taskModalMode)" v-model.trim="taskModalData.assignees"
-                placeholder="Enter Assignees"
-                :class="{ 'border border-error animate-shake-x-in': taskModalData.assignees.length > 30 }"
-                class="itbkk-assignees w-[20rem] outline-none focus:placeholder:opacity-50 bg-base-200 px-4 py-2 rounded-lg mt-2" />
+              </span>
+              <span v-if="['add', 'edit'].includes(taskModalMode)" v-show="taskModalData.assignees.length > 30"
+                class="text-error text-xs text-nowrap">
+                Assignees can not be more than 30 characters
+              </span>
             </div>
+            <div v-if="taskModalMode === 'view'" :class="{
+              'italic text-[grey]': !taskModalData?.assignees,
+            }" class="itbkk-assignees">
+              {{ taskModalData?.assignees || 'Unassigned' }}
+            </div>
+            <input v-else-if="['add', 'edit'].includes(taskModalMode)" v-model.trim="taskModalData.assignees"
+              placeholder="Enter Assignees"
+              :class="{ 'border border-error animate-shake-x-in': taskModalData.assignees.length > 30 }"
+              class="itbkk-assignees w-[20rem] outline-none focus:placeholder:opacity-50 bg-base-200 px-4 py-2 rounded-lg mt-2" />
+          </div>
+          <div>
             <div>
-              <div>
-                <span class="text-lg font-semibold">
-                  <span>Status </span>
-                  <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm"
-                    :class="boardStore.currentBoard?.isTaskLimitEnabled ? 'text-warning' : 'opacity-50'">
-                    (Status limit {{ boardStore.currentBoard?.isTaskLimitEnabled ? 'enabled' : 'disabled' }})
-                  </span>
+              <span class="text-lg font-semibold">
+                <span>Status </span>
+                <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm"
+                  :class="boardStore.currentBoard?.isTaskLimitEnabled ? 'text-warning' : 'opacity-50'">
+                  (Status limit {{ boardStore.currentBoard?.isTaskLimitEnabled ? 'enabled' : 'disabled' }})
                 </span>
-              </div>
-              <div v-if="taskModalMode === 'view'" class="w-full max-w-[16rem]">
-                <StatusBadge :statusData="taskModalData?.status" textWrapMode="wrap" width="100%"
-                  class="itbkk-status" />
-              </div>
-              <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="w-full max-w-[16rem] mt-2">
-                <StatusSelector v-model="taskModalData.status.id" />
-              </div>
+              </span>
+            </div>
+            <div v-if="taskModalMode === 'view'" class="w-full max-w-[16rem]">
+              <StatusBadge :statusData="taskModalData?.status" textWrapMode="wrap" width="100%"
+                class="itbkk-status" />
+            </div>
+            <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="w-full max-w-[16rem] mt-2">
+              <StatusSelector v-model="taskModalData.status.id" />
             </div>
           </div>
           <div v-if="['view', 'edit'].includes(taskModalMode)">
@@ -276,7 +275,7 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <div class="mt-4" v-if="['view', 'edit'].includes(taskModalMode)">
+      <div class="mt-6" v-if="['view', 'edit'].includes(taskModalMode)">
         <input
           :id="fileInputId"
           type="file"
@@ -290,11 +289,11 @@ const handleClickConfirm = async () => {
             <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm">
               ({{ taskModalData.assignees.length + '/30' }})
             </span> -->
-            <span v-if="taskModalMode === 'edit'" class="text-sm opacity-50">
+            <span class="text-sm opacity-50">
               {{ attachedFiles.length + '/10 files' }} <span>{{ attachedFilesSize + '/20MB' }}</span>
             </span>
           </div>
-          <div class="flex gap-2">
+          <div v-if="taskModalMode === 'edit'" class="flex gap-2">
             <label :for="fileInputId" class="btn btn-sm btn-neutral">
               <IconSVG iconName="paperclip" scale="1" size="1rem" />
               <span>Add attachment</span>
@@ -311,7 +310,8 @@ const handleClickConfirm = async () => {
         </div>
 
         <!-- ! Attachments Area -->
-        <AttachmentArea v-model="attachedFiles" :fileInputId="fileInputId" />
+        <AttachmentDropArea v-if="taskModalMode === 'edit'" v-model="attachedFiles" :fileInputId="fileInputId" />
+        <AttachmentShowArea v-else-if="taskModalMode === 'view'" :attachedFiles="attachedFiles" />
       </div>
     </template>
     <template #actions>
@@ -319,10 +319,10 @@ const handleClickConfirm = async () => {
         v-if="['add', 'edit'].includes(taskModalMode)"
         @click="handleClickConfirm"
         :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
-        class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledSaveButton">
+        class="itbkk-button-confirm btn btn-success" :disabled="disabledSaveButton">
         Save
       </button>
-      <button v-once @click="handleClickClose" class="itbkk-button itbkk-button-cancel btn btn-sm btn-neutral">
+      <button v-once @click="handleClickClose" class="itbkk-button itbkk-button-cancel btn btn-neutral">
         {{ taskModalMode === 'view' ? 'Close' : 'Cancel' }}
       </button>
     </template>

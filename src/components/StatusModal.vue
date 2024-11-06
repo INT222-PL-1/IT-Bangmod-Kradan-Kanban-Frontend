@@ -215,10 +215,10 @@ const handleClickConfirm = async () => {
     <template #actions>
       <button @click="handleClickConfirm"
         :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
-        class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledSaveButton">
+        class="itbkk-button-confirm btn btn-success" :disabled="disabledSaveButton">
         Save
       </button>
-      <button @click="handleClickClose" class="itbkk-button-cancel btn btn-sm btn-neutral">
+      <button @click="handleClickClose" class="itbkk-button-cancel btn btn-neutral">
         Cancel
       </button>
     </template>

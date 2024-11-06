@@ -1,0 +1,33 @@
+<script setup>
+import AttachmentCard from './AttachmentCard.vue';
+import IconSVG from './IconSVG.vue';
+
+defineProps({
+  attachedFiles: {
+    type: Array,
+    required: true
+  }
+})
+
+</script>
+
+<template>
+  <div class="relative h-60 mt-2 bg-base-200 rounded-lg overflow-x-auto">
+    <div v-if="attachedFiles.length > 0" class="flex gap-4 h-full p-4 w-fit">
+      <AttachmentCard
+        v-for="file in attachedFiles"
+        :key="file.name"
+        :file="file"
+        @removeClick="handleRemoveClick"
+      />
+    </div>
+    <div v-else class="flex flex-col justify-center items-center h-full opacity-50">
+      <IconSVG iconName="file-earmark" class="text-base-content" scale="3" size="3rem" />
+      <div>No files attached</div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+
+</style>

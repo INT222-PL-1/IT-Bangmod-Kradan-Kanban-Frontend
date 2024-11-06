@@ -43,7 +43,7 @@ const themeStore = useThemeStore()
       <div class="flex gap-2 p-4 break-words" :class="contentFlow === 'column' ? 'flex-col' : 'flex-row'">
         <slot name="content">Content</slot>
       </div>
-      <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200 rounded-b-xl">
+      <div class="flex justify-end items-center flex-none h-[5rem] px-4 border-t-2 border-base-100 bg-base-200 rounded-b-xl">
         <div class="flex gap-2">
           <slot name="actions">
             <button class="itbkk-button-confirm btn btn-sm btn-success">

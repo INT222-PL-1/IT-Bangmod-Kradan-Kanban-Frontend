@@ -159,3 +159,40 @@ export function formatFileSize(size) {
   const i = Math.floor(Math.log(size) / Math.log(k))
   return parseFloat((size / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
+
+export function getBootStrapIconFromMIME(mimeType) {
+  
+  const iconClasses = {
+    // Media
+    image: ['file-earmark-image', 'text-base-content'],
+    audio: ['file-earmark-music', 'text-base-content'],
+    video: ['file-earmark-play', 'text-base-content'],
+    // Documents
+    "application/pdf": ["file-earmark-pdf", "text-red-400"],
+    "application/msword": ["file-earmark-word", "text-blue-400"],
+    "application/vnd.ms-word": ["file-earmark-word", "text-blue-400"],
+    "application/vnd.oasis.opendocument.text": ["file-earmark-word", "text-blue-400"],
+    "application/vnd.openxmlformats-officedocument.wordprocessingml":
+      ["file-earmark-word", "text-blue-400"],
+    "application/vnd.ms-excel": ["file-earmark-excel", "text-green-400"],
+    "application/vnd.openxmlformats-officedocument.spreadsheetml": ["file-earmark-excel", "text-green-400"],
+    "application/vnd.oasis.opendocument.spreadsheet": ["file-earmark-excel", "text-green-400"],
+    "application/vnd.ms-powerpoint": ["file-earmark-ppt", "text-orange-400"],
+    "application/vnd.openxmlformats-officedocument.presentationml": ["file-earmark-ppt", "text-orange-400"],
+    "application/vnd.oasis.opendocument.presentation": ["file-earmark-ppt", "text-orange-400"],
+    "text/plain": ["file-earmark-text", "text-base-content"],
+    "text/html": ["file-earmark-code", "text-base-content"],
+    "application/json": ["file-earmark-code", "text-base-content"],
+    // Archives
+    'zip': ['file-earmark-zip', 'text-base-content'],
+  }
+
+  for (const key in iconClasses) {
+    if (mimeType.includes(key)) {
+      return iconClasses[key]
+    } else {
+      continue
+    }
+  }
+  return ['file-earmark', 'text-base-content']
+}
