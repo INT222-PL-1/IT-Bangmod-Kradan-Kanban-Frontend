@@ -18,11 +18,11 @@ export default {
       {
         'itbkk-light': {
           primary: '#f04c1c',
-          secondary: '#4b5563',
+          secondary: '#e2e2e2',
           accent: '#00cdb7',
           neutral: '#fafafa',
           "base-100": "#ececec",
-          "base-200": "#f4f4f4",
+          "base-200": "#f0f0f0",
           'base-300': '#ffffff',
           'base-content': '#374151',
           info: '#00b5ff',
@@ -34,7 +34,7 @@ export default {
       {
         'itbkk-dark': {
           primary: '#f04c1c',
-          secondary: '#4b5563',
+          secondary: '#4D545D',
           accent: '#00cdb7',
           neutral: '#313842',
           'base-100': '#181E24',

@@ -59,7 +59,7 @@ const handleDragOver = (e) => {
       @dragover="handleDragOver"
       @drop="handleDrop"
       :class="{ 'bg-base-200 opacity-80': attachedFiles.length > 0 }"
-      class="absolute inset-0 rounded-md p-4"
+      class="absolute inset-0 rounded-md p-4 opacity-50"
       >
       <div class="pointer-events-none relative w-full h-full rounded-md border-base-content border-[4px] border-dashed grid place-items-center">
         <div class="flex flex-col justify-center items-center">
