@@ -54,7 +54,6 @@ onMounted(() => {
 
 <template>
   <div class="flex-shrink-0 relative flex flex-col w-40 h-full bg-base-300 rounded-md" :title="file.name">
-    <!-- {{ file.type }} -->
     <div class="absolute top-1 right-1">
       <IconSVG iconName="x" class="text-base-content cursor-pointer" scale="1.5" @click="handleRemoveClick" />
     </div>

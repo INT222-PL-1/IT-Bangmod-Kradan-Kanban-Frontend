@@ -68,7 +68,7 @@ export async function createTask({ title, description, assignees, status, boardI
   }
 }
 
-export async function updateTask({ id: taskId, title, description, assignees, status, boardId }) {
+export async function updateTask({ id: taskId, title, description, assignees, status, attachments, boardId }) {
   const url = `${BASE_URL}/${boardId}/tasks/${taskId}`
 
   try {
@@ -79,6 +79,7 @@ export async function updateTask({ id: taskId, title, description, assignees, st
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
         statusId: status.id,
+        attachments,
         boardId
       }
     })
@@ -95,6 +96,33 @@ export async function deleteTask(taskId, boardId) {
   try {
     const res = await zyos.fetch(url, {
       method: 'DELETE'
+    })
+    return res
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+/**
+ * Upload task attachment
+ * @param {string} taskId - task id
+ * @param {string} boardId - board id
+ * @param {File[]} files - files to upload
+ */
+export async function uploadTaskAttachment(taskId, boardId, files) {
+  const url = `${BASE_URL}/${boardId}/tasks/${taskId}/files`
+
+  const formData = new FormData()
+
+  files.forEach((file) => {
+    formData.append('files', file)
+  })
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData
     })
     return res
   } catch (error) {

@@ -4,7 +4,7 @@ import StatusBadge from './StatusBadge.vue'
 import StatusSelector from './StatusSelector.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref, useId } from 'vue'
-import { createTask, getTaskById, updateTask } from '@/libs/taskManagement'
+import { createTask, getTaskById, updateTask, uploadTaskAttachment } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import { useBoardStore } from '@/stores/board'
 import { HttpStatusCode } from 'zyos'
@@ -56,7 +56,8 @@ const disabledSaveButton = computed(() => {
         taskModalData.value.title === previousTaskData.title &&
         taskModalData.value.description === previousTaskData.description &&
         taskModalData.value.assignees === previousTaskData.assignees &&
-        taskModalData.value.status.id === previousTaskData.status.id
+        taskModalData.value.status.id === previousTaskData.status.id &&
+        attachedFiles.value.length === 0
       )
     ) || boardStore.isLoading.microAction
 })
@@ -76,6 +77,66 @@ async function loadSelectedTaskData() {
       status: 'error'
     })
     router.replace({ name: 'all-task' })
+  }
+}
+
+async function doCreateTask() {
+  const res = await createTask(taskModalData.value)
+  if (res.ok) {
+    const createdTask = res.data
+    toastStore.createToast({
+      title: 'Success',
+      description: `The task "${createdTask.title}" is added successfully.`,
+      status: 'success'
+    })
+    router.push({ name: 'all-task' })
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      status: 'error'
+    })
+  }
+}
+
+async function doUpdateTask() {
+  console.log(taskModalData.value, 'from update task')
+  const res = await updateTask(taskModalData.value)
+  if (res.ok) {
+    const updatedTask = res.data
+    toastStore.createToast({
+      title: 'Success',
+      description: `The task "${updatedTask.title}" is updated successfully`,
+      status: 'success'
+    })
+    router.push({ name: 'all-task' })
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error occurred while updating the task.\nPlease try again later`,
+      status: 'error'
+    })
+  }
+}
+
+async function doUploadAttachments() {
+  const res = await uploadTaskAttachment(taskModalData.value.id, boardStore.currentBoard.id, attachedFiles.value)
+  if (res.ok) {
+    const data = await res.json()
+    const attachedFilenameList = data.map(file => file.name)
+    console.log(attachedFilenameList)
+    if (taskModalData.value.attachments && taskModalData.value.attachments.length > 0) {
+      taskModalData.value.attachments = [...taskModalData.value.attachments, ...attachedFilenameList]
+    } else {
+      taskModalData.value.attachments = attachedFilenameList
+    }
+    console.log(taskModalData.value)
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error occurred while uploading attachments.\nPlease try again later`,
+      status: 'error'
+    })
   }
 }
 
@@ -109,40 +170,13 @@ const handleClickConfirm = async () => {
   try {
     boardStore.isLoading.microAction = true
     if (taskModalMode.value === 'add') {
-      const res = await createTask(taskModalData.value)
-      if (res.ok) {
-        const createdTask = res.data
-        toastStore.createToast({
-          title: 'Success',
-          description: `The task "${createdTask.title}" is added successfully.`,
-          status: 'success'
-        })
-        router.push({ name: 'all-task' })
-      } else {
-        toastStore.createToast({
-          title: 'Error',
-          description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
-          status: 'error'
-        })
-      }
+      await doCreateTask()
       await boardStore.loadTasks()
     } else if (taskModalMode.value === 'edit') {
-      const res = await updateTask(taskModalData.value)
-      if (res.ok) {
-        const updatedTask = res.data
-        toastStore.createToast({
-          title: 'Success',
-          description: `The task "${updatedTask.title}" is updated successfully`,
-          status: 'success'
-        })
-        router.push({ name: 'all-task' })
-      } else {
-        toastStore.createToast({
-          title: 'Error',
-          description: `An error occurred while updating the task.\nPlease try again later`,
-          status: 'error'
-        })
+      if (attachedFiles.value.length > 0) {
+        await doUploadAttachments()
       }
+      await doUpdateTask()
       await boardStore.loadTasks()
     }
   } catch (error) {
@@ -283,7 +317,7 @@ const handleClickConfirm = async () => {
           @change="handleFileChange"
           class="hidden"
         />
-        <div class="flex flex-col sm:flex-row sm:justify-between gap-2">
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-2 relative">
           <div class="text-lg font-semibold">
             <span>Attachments </span>
             <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm">

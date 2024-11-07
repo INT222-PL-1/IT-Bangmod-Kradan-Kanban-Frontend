@@ -45,8 +45,8 @@ onMounted(async () => {
     <div
       v-html="icon"
       :style="{
+        transform: `scale(${scale})`,
         color,
-        transform: `scale(${scale})`
       }"
     ></div>
   </div>

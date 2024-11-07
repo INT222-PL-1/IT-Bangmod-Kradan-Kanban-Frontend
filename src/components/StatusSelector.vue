@@ -35,19 +35,17 @@ const filteredStatusList = computed(() => {
 </script>
 
 <template>
-  <div class="z-[60]">
+  <div>
     <div class="dropdown itbkk-button-action">
       <div tabindex="0" @click="handleClick" role="button">
         <div class="active:scale-90 transition flex bg-base-200 rounded-xl p-2 hover:contrast-75">
-          <div class="bg-base-100 rounded-lg">
-            <StatusBadge class="cursor-pointer" :statusData="statusList.find(status => status.id === model)"
-              textWrapMode="wrap" width="15rem" />
-          </div>
+          <StatusBadge class="cursor-pointer" :statusData="statusList.find(status => status.id === model)"
+            textWrapMode="wrap" width="15rem" />
           <IconSVG iconName="chevron-down" size="2rem" />
         </div>
       </div>
       <div tabindex="0"
-        class="dropdown-content menu mt-1 shadow bg-base-300 rounded-box w-[19rem] gap-1 h-fit border border-base-100">
+        class="dropdown-content menu mt-1 shadow bg-base-300 rounded-box w-[19rem] gap-1 h-fit border border-base-100 z-[60]">
         <div class="flex items-center gap-2">
           <IconSVG iconName="search" size="2rem" />
           <input v-model="searchTerm" type="text" placeholder="Search status name"
