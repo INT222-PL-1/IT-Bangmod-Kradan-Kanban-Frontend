@@ -28,7 +28,7 @@ export async function getTasks(boardId, options) {
   }
 }
 
-export async function getTaskById(taskId, boardId) {
+export async function getTaskById(boardId, taskId) {
   const url = `${BASE_URL}/${boardId}/tasks/${taskId}`
 
   try {
@@ -47,7 +47,7 @@ export async function getTaskById(taskId, boardId) {
   }
 }
 
-export async function createTask({ title, description, assignees, status, boardId }) {
+export async function createTask(boardId, { title, description, assignees, status }) {
   const url = `${BASE_URL}/${boardId}/tasks`
 
   try {
@@ -68,7 +68,7 @@ export async function createTask({ title, description, assignees, status, boardI
   }
 }
 
-export async function updateTask({ id: taskId, title, description, assignees, status, attachments, boardId }) {
+export async function updateTask(boardId, { id: taskId, title, description, assignees, status, attachments }) {
   const url = `${BASE_URL}/${boardId}/tasks/${taskId}`
 
   try {
@@ -79,7 +79,7 @@ export async function updateTask({ id: taskId, title, description, assignees, st
         description: description === '' ? null : description,
         assignees: assignees === '' ? null : assignees,
         statusId: status.id,
-        attachments,
+        attachments: attachments.map((attachment) => attachment.name),
         boardId
       }
     })

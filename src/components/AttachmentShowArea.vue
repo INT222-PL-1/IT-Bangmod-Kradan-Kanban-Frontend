@@ -3,7 +3,7 @@ import AttachmentCard from './AttachmentCard.vue';
 import IconSVG from './IconSVG.vue';
 
 defineProps({
-  attachedFiles: {
+  existingFiles: {
     type: Array,
     required: true
   }
@@ -13,9 +13,9 @@ defineProps({
 
 <template>
   <div class="relative h-60 mt-2 bg-base-200 rounded-lg overflow-x-auto">
-    <div v-if="attachedFiles.length > 0" class="flex gap-4 h-full p-4 w-fit">
+    <div v-if="existingFiles.length > 0" class="flex gap-4 h-full p-4 w-fit">
       <AttachmentCard
-        v-for="file in attachedFiles"
+        v-for="file in existingFiles"
         :key="file.name"
         :file="file"
         @removeClick="handleRemoveClick"

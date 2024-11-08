@@ -25,14 +25,17 @@ const router = useRouter()
 const boardStore = useBoardStore()
 const toastStore = useToastStore()
 
+const { taskId, boardId } = route.params
+
 const taskModalMode = ref('view')
 const taskModalData = ref(null)
 
 const fileInputId = useId()
 const attachedFiles = ref([])
-const attachedFilesSize = computed(() => {
-  return (attachedFiles.value.reduce((acc, cur) => acc + cur.size, 0) / 1_000_000).toFixed(2)
+const allFilesSize = computed(() => {
+  return (attachedFiles.value.reduce((acc, cur) => acc + cur.size, 0) + taskModalData.value.attachments.reduce((acc, cur) => acc + cur.size, 0) / 1_000_000).toFixed(2)
 })
+const allFilesCount = computed(() => attachedFiles.value.length + taskModalData.value.attachments.length)
 
 const handleFileChange = (e) => {
   const files = e.target.files
@@ -42,6 +45,7 @@ const handleFileChange = (e) => {
 
 const handleClearAttachment = () => {
   attachedFiles.value = []
+  taskModalData.value.attachments = []
 }
 
 let previousTaskData = null
@@ -57,18 +61,18 @@ const disabledSaveButton = computed(() => {
         taskModalData.value.description === previousTaskData.description &&
         taskModalData.value.assignees === previousTaskData.assignees &&
         taskModalData.value.status.id === previousTaskData.status.id &&
-        attachedFiles.value.length === 0
+        attachedFiles.value.length === 0 &&
+        taskModalData.value.attachments.length === previousTaskData.attachments.length
       )
     ) || boardStore.isLoading.microAction
 })
 
 async function loadSelectedTaskData() {
-  const { taskId, boardId } = route.params
-  const res = await getTaskById(taskId, boardId)
+  const res = await getTaskById(boardId, taskId)
   if (res.ok) {
     taskModalData.value = res.data
     if (taskModalMode.value === 'edit') {
-      previousTaskData = { ...taskModalData.value, status: { ...taskModalData.value.status } }
+      previousTaskData = JSON.parse(JSON.stringify(taskModalData.value))
     }
   } else {
     toastStore.createToast({
@@ -81,7 +85,7 @@ async function loadSelectedTaskData() {
 }
 
 async function doCreateTask() {
-  const res = await createTask(taskModalData.value)
+  const res = await createTask(boardId, taskModalData.value)
   if (res.ok) {
     const createdTask = res.data
     toastStore.createToast({
@@ -101,7 +105,7 @@ async function doCreateTask() {
 
 async function doUpdateTask() {
   console.log(taskModalData.value, 'from update task')
-  const res = await updateTask(taskModalData.value)
+  const res = await updateTask(boardId, taskModalData.value)
   if (res.ok) {
     const updatedTask = res.data
     toastStore.createToast({
@@ -122,13 +126,15 @@ async function doUpdateTask() {
 async function doUploadAttachments() {
   const res = await uploadTaskAttachment(taskModalData.value.id, boardStore.currentBoard.id, attachedFiles.value)
   if (res.ok) {
-    const data = await res.json()
-    const attachedFilenameList = data.map(file => file.name)
-    console.log(attachedFilenameList)
+    const attachedFileList = await res.json()
+    console.log(attachedFileList)
     if (taskModalData.value.attachments && taskModalData.value.attachments.length > 0) {
-      taskModalData.value.attachments = [...taskModalData.value.attachments, ...attachedFilenameList]
+      console.log('hello world')
+      attachedFiles.value = []
+      taskModalData.value.attachments = [...taskModalData.value.attachments, ...attachedFileList]
     } else {
-      taskModalData.value.attachments = attachedFilenameList
+      attachedFiles.value = []
+      taskModalData.value.attachments = attachedFileList
     }
     console.log(taskModalData.value)
   } else {
@@ -324,7 +330,7 @@ const handleClickConfirm = async () => {
               ({{ taskModalData.assignees.length + '/30' }})
             </span> -->
             <span class="text-sm opacity-50">
-              {{ attachedFiles.length + '/10 files' }} <span>{{ attachedFilesSize + '/20MB' }}</span>
+              {{ allFilesCount + '/10 files' }} <span>{{ allFilesSize + '/20MB' }}</span>
             </span>
           </div>
           <div v-if="taskModalMode === 'edit'" class="flex gap-2">
@@ -332,7 +338,7 @@ const handleClickConfirm = async () => {
               <IconSVG iconName="paperclip" scale="1" size="1rem" />
               <span>Add attachment</span>
             </label>
-            <button type="button" @click="handleClearAttachment" class="btn btn-sm btn-error btn-outline" :disabled="attachedFiles.length === 0">
+            <button type="button" @click="handleClearAttachment" class="btn btn-sm btn-error btn-outline" :disabled="allFilesCount === 0">
               <IconSVG iconName="trash-fill" scale="1" size="1rem" />
               <span>Clear attachment</span>
             </button>
@@ -344,8 +350,8 @@ const handleClickConfirm = async () => {
         </div>
 
         <!-- ! Attachments Area -->
-        <AttachmentDropArea v-if="taskModalMode === 'edit'" v-model="attachedFiles" :fileInputId="fileInputId" />
-        <AttachmentShowArea v-else-if="taskModalMode === 'view'" :attachedFiles="attachedFiles" />
+        <AttachmentDropArea v-if="taskModalMode === 'edit'" v-model:attached-files="attachedFiles" v-model:existing-files="taskModalData.attachments" :fileInputId="fileInputId" />
+        <AttachmentShowArea v-else-if="taskModalMode === 'view'" :existingFiles="taskModalData.attachments" />
       </div>
     </template>
     <template #actions>

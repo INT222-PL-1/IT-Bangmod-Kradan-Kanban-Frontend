@@ -8,8 +8,13 @@ const emits = defineEmits(['removeClick'])
 const image = ref(null)
 
 const props = defineProps({
+  mode: {
+    type: String,
+    default: 'view',
+    validator: (value) => ['view', 'edit'].includes(value)
+  },
   file: {
-    type: File,
+    type: [File, Object],
     required: true
   }
 })
@@ -42,11 +47,15 @@ const handlePreview = () => {
 
 onMounted(() => {
   if (props.file.type.includes('image')) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      image.value = e.target.result
+    if (props.file instanceof File) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        image.value = e.target.result
+      }
+      reader.readAsDataURL(props.file)
+    } else {
+      image.value = props.file.url
     }
-    reader.readAsDataURL(props.file)
   }
 })
 
@@ -54,12 +63,12 @@ onMounted(() => {
 
 <template>
   <div class="flex-shrink-0 relative flex flex-col w-40 h-full bg-base-300 rounded-md" :title="file.name">
-    <div class="absolute top-1 right-1">
+    <div v-if="mode === 'edit'" class="absolute top-1 right-1">
       <IconSVG iconName="x" class="text-base-content cursor-pointer" scale="1.5" @click="handleRemoveClick" />
     </div>
     <div class="h-[50%] bg-secondary rounded-t-md">
       <div class="h-full grid place-items-center">
-        <img v-if="file.type.includes('image')" :src="image" class="object-cover w-[5rem] h-[5rem] bg-white" />
+        <img v-if="image" :src="image" class="object-cover w-[5rem] h-[5rem] bg-white" />
         <IconSVG v-else :iconName="iconName" :class="iconColor" scale="3" size="3rem" />
       </div>
     </div>
