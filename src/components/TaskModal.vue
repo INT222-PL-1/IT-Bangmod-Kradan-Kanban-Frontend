@@ -126,7 +126,7 @@ async function doUpdateTask() {
 async function doUploadAttachments() {
   const res = await uploadTaskAttachment(taskModalData.value.id, boardStore.currentBoard.id, attachedFiles.value)
   if (res.ok) {
-    const attachedFileList = await res.json()
+    const attachedFileList = res.data
     console.log(attachedFileList)
     if (taskModalData.value.attachments && taskModalData.value.attachments.length > 0) {
       console.log('hello world')

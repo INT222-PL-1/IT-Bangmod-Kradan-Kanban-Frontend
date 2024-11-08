@@ -18,7 +18,6 @@ defineProps({
         v-for="file in existingFiles"
         :key="file.name"
         :file="file"
-        @removeClick="handleRemoveClick"
       />
     </div>
     <div v-else class="flex flex-col justify-center items-center h-full opacity-50">

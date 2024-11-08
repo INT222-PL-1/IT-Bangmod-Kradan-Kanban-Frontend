@@ -3,6 +3,7 @@ import { formatFileSize, getBootStrapIconFromMIME } from '@/libs/utils';
 import { computed, onMounted, ref } from 'vue'
 import IconSVG from './IconSVG.vue';
 import BaseTooltip from './BaseTooltip.vue';
+import zyos from 'zyos';
 
 const emits = defineEmits(['removeClick'])
 const image = ref(null)
@@ -26,26 +27,66 @@ const fileSize = computed(() => {
   return formatFileSize(size)
 })
 
-const handleRemoveClick = () => {
-  console.log('removeClick', props.file)
-  emits('removeClick', props.file)
+async function getBlobUrl() {
+  const url = props.file.url
+  const res = await zyos.fetch(url)
+  return URL.createObjectURL(res.data)
 }
 
-const handleDownload = () => {
+function downloadLocalFile() {
   const url = URL.createObjectURL(props.file)
   const a = document.createElement('a')
   a.href = url
   a.download = props.file.name
   a.click()
+  a.remove()
   URL.revokeObjectURL(url)
 }
 
-const handlePreview = () => {
-  const url = URL.createObjectURL(props.file)
-  window.open(url, '_blank')
+async function downloadServerFile() {
+  const blobUrl = await getBlobUrl()
+  const a = document.createElement('a')
+  a.href = blobUrl
+  a.download = props.file.url.split('/').at(-1)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(blobUrl)
 }
 
-onMounted(() => {
+function previewLocalFile() {
+  const url = URL.createObjectURL(props.file)
+  window.open(url, '_blank')
+  URL.revokeObjectURL(url)
+}
+
+async function previewServerFile() {
+  const blobUrl = await getBlobUrl()
+  window.open(blobUrl, '_blank')
+  URL.revokeObjectURL(blobUrl)
+}
+
+const handleRemoveClick = () => {
+  console.log('removeClick', props.file)
+  emits('removeClick', props.file)
+}
+
+const handleDownload = async () => {
+  if (props.file instanceof File) {
+    downloadLocalFile()
+  } else {
+    await downloadServerFile()
+  }
+}
+
+const handlePreview = () => {
+  if (props.file instanceof File) {
+    previewLocalFile()
+  } else {
+    previewServerFile()
+  }
+}
+
+onMounted(async () => {
   if (props.file.type.includes('image')) {
     if (props.file instanceof File) {
       const reader = new FileReader()
@@ -54,7 +95,7 @@ onMounted(() => {
       }
       reader.readAsDataURL(props.file)
     } else {
-      image.value = props.file.url
+      image.value = await getBlobUrl()
     }
   }
 })

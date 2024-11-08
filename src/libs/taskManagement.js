@@ -120,9 +120,10 @@ export async function uploadTaskAttachment(taskId, boardId, files) {
   })
 
   try {
-    const res = await fetch(url, {
+    const res = await zyos.fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
+      timeout: 5000
     })
     return res
   } catch (error) {
