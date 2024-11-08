@@ -196,3 +196,8 @@ export function getBootStrapIconFromMIME(mimeType) {
   }
   return ['file-earmark', 'text-base-content']
 }
+
+export function sumFileSizes(files) {
+  if (!files.length) return 0
+  return files.reduce((acc, file) => acc + file.size, 0)
+}

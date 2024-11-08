@@ -300,6 +300,7 @@ const handleToggleBoardVisibility = async () => {
                     :currentSortDirection="boardStore.options.sortDirection" />
                 </div>
               </th>
+              <th class="min-w-8 max-w-8"></th>
               <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">
                 <div class="flex gap-2">
                   <div>Assignees</div>
@@ -362,6 +363,12 @@ const handleToggleBoardVisibility = async () => {
                 <div :class="{ 'itbkk-title': $route.name === 'all-task' }" class="break-words font-semibold">
                   {{ task.title }}
                 </div>
+              </td>
+              <td class="min-w-8 max-w-8 p-0">
+                <span v-if="task.attachmentsCount > 0" class="inline-flex items-center gap-1 opacity-50">
+                  <IconSVG iconName="paperclip" />
+                  <span>{{ task.attachmentsCount }}</span>
+                </span>
               </td>
               <td :class="{ 'italic text-[grey]': !task.assignees, 'itbkk-assignees': $route.name === 'all-task' }"
                 class="min-w-60 w-60">

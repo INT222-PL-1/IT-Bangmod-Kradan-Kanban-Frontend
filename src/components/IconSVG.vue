@@ -39,7 +39,7 @@ onMounted(async () => {
   <div
     :style="{ width: size, height: size }"
     :class="[className]"
-    class="grid place-items-center icon-svg"
+    class="inline-grid place-items-center icon-svg"
     ref="thisIcon"
   >
     <div

@@ -1,5 +1,5 @@
 <script setup>
-import { getTimezone, formatDateTime } from '@/libs/utils'
+import { getTimezone, formatDateTime, sumFileSizes } from '@/libs/utils'
 import StatusBadge from './StatusBadge.vue'
 import StatusSelector from './StatusSelector.vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -30,17 +30,81 @@ const { taskId, boardId } = route.params
 const taskModalMode = ref('view')
 const taskModalData = ref(null)
 
+const MAX_FILE_COUNT = 10
+const MAX_FILE_SIZE = 20
 const fileInputId = useId()
 const attachedFiles = ref([])
+const rawAllFilesSize = computed(() => sumFileSizes(attachedFiles.value) + sumFileSizes(taskModalData.value.attachments))
 const allFilesSize = computed(() => {
-  return (attachedFiles.value.reduce((acc, cur) => acc + cur.size, 0) + taskModalData.value.attachments.reduce((acc, cur) => acc + cur.size, 0) / 1_000_000).toFixed(2)
+  return (rawAllFilesSize.value / Math.pow(1024, 2)).toFixed(2)
 })
 const allFilesCount = computed(() => attachedFiles.value.length + taskModalData.value.attachments.length)
 
+function filterValidFiles(files) {
+  if (files.length === 0) return []
+  const nonDuplicateFiles = files.filter(f => {
+    return attachedFiles.value.findIndex(af => af.name === f.name) + taskModalData.value.attachments.findIndex(af => af.name === f.name) === -2
+  })
+  const isFileCountExceed = allFilesCount.value + nonDuplicateFiles.length > MAX_FILE_COUNT
+  const isFileSizeExceed = rawAllFilesSize.value + sumFileSizes(nonDuplicateFiles) > MAX_FILE_SIZE * Math.pow(1024, 2)
+
+  if (isFileCountExceed && isFileSizeExceed) {
+    let validFiles = []
+    let totalSize = rawAllFilesSize.value
+    for (const file of nonDuplicateFiles) {
+      if (totalSize + sumFileSizes(validFiles) + file.size <= MAX_FILE_SIZE * Math.pow(1024, 2) && validFiles.length < MAX_FILE_COUNT - allFilesCount.value) {
+        validFiles.push(file)
+      } else {
+        break
+      }
+    }
+    validFiles = validFiles.splice(0, MAX_FILE_COUNT - allFilesCount.value)
+    toastStore.createToast({
+      title: 'Error',
+      description: `Each task can have at most ${MAX_FILE_COUNT} files and ${MAX_FILE_SIZE}MB of files.\nThe following files are not added: ${nonDuplicateFiles.filter(f => !validFiles.includes(f)).map(f => f.name).join(', ')}`,
+      status: 'error'
+    })
+    return validFiles
+  } else if (isFileCountExceed) {
+    const validFiles = nonDuplicateFiles.splice(0, MAX_FILE_COUNT - allFilesCount.value)
+    toastStore.createToast({
+      title: 'Error',
+      description: `Each task can have at most ${MAX_FILE_COUNT} files.\nThe following files are not added: ${nonDuplicateFiles.map(f => f.name).join(', ')}`,
+      status: 'error'
+    })
+    console.log(validFiles)
+    return validFiles
+  } else if (isFileSizeExceed) {
+    const validFiles = []
+    let totalSize = rawAllFilesSize.value
+    for (const file of nonDuplicateFiles) {
+      if (totalSize + sumFileSizes(validFiles) + file.size <= MAX_FILE_SIZE * Math.pow(1024, 2)) {
+        validFiles.push(file)
+      } else {
+        break
+      }
+    }
+    toastStore.createToast({
+      title: 'Error',
+      description: `Each task can have at most ${MAX_FILE_SIZE}MB of files.\nThe following files are not added: ${nonDuplicateFiles.filter(f => !validFiles.includes(f)).map(f => f.name).join(', ')}`,
+      status: 'error'
+    })
+    return validFiles
+  }
+
+  return nonDuplicateFiles
+}
+
 const handleFileChange = (e) => {
-  const files = e.target.files
+  let files = []
+  if (e instanceof FileList) {
+    files = Array.from(e)
+  } else {
+    files = Array.from(e.target.files)
+  }
   if (files.length === 0) return
-  attachedFiles.value = [...attachedFiles.value, ...files]
+  const validFiles = filterValidFiles(files)
+  attachedFiles.value = [...attachedFiles.value, ...validFiles]
 }
 
 const handleClearAttachment = () => {
@@ -350,7 +414,13 @@ const handleClickConfirm = async () => {
         </div>
 
         <!-- ! Attachments Area -->
-        <AttachmentDropArea v-if="taskModalMode === 'edit'" v-model:attached-files="attachedFiles" v-model:existing-files="taskModalData.attachments" :fileInputId="fileInputId" />
+        <AttachmentDropArea
+          v-if="taskModalMode === 'edit'"
+          v-model:attached-files="attachedFiles"
+          v-model:existing-files="taskModalData.attachments"
+          :fileInputId="fileInputId"
+          @dropFiles="handleFileChange"
+        />
         <AttachmentShowArea v-else-if="taskModalMode === 'view'" :existingFiles="taskModalData.attachments" />
       </div>
     </template>

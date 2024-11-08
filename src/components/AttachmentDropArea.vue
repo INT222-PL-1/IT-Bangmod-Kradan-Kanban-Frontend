@@ -3,6 +3,8 @@ import { computed, ref } from 'vue';
 import IconSVG from './IconSVG.vue';
 import AttachmentCard from './AttachmentCard.vue';
 
+const emits = defineEmits(['dropFiles'])
+
 defineProps({
   fileInputId: {
     type: String,
@@ -47,7 +49,8 @@ const handleDrop = (e) => {
   showDropArea.value = false
   const files = e.dataTransfer.files
   if (files.length === 0) return
-  attachedFiles.value = [...attachedFiles.value, ...files]
+  // attachedFiles.value = [...attachedFiles.value, ...files]
+  emits('dropFiles', files)
 }
 
 const handleDragOver = (e) => {
