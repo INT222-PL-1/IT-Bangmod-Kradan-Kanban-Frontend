@@ -319,13 +319,13 @@ const handleToggleBoardVisibility = async () => {
           </thead>
           <tbody>
             <tr v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
-              <td colspan="4" class="text-center h-32">Loading tasks...</td>
+              <td colspan="5" class="text-center h-32">Loading tasks...</td>
             </tr>
             <tr v-else-if="boardStore.tasks === null">
-              <td colspan="4" class="text-center h-32">Error while loading tasks from server. Please try again later.</td>
+              <td colspan="5" class="text-center h-32">Error while loading tasks from server. Please try again later.</td>
             </tr>
             <tr v-else-if="boardStore.tasks.length === 0">
-              <td colspan="4" class="text-center h-32">No task</td>
+              <td colspan="5" class="text-center h-32">No task</td>
             </tr>
             <tr v-else v-for="(task, index) in boardStore.tasks" :key="task.id" class="itbkk-item">
               <td class="min-w-16 max-w-16">

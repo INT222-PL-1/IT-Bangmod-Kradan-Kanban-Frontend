@@ -201,3 +201,24 @@ export function sumFileSizes(files) {
   if (!files.length) return 0
   return files.reduce((acc, file) => acc + file.size, 0)
 }
+
+export function shakeElement(element) {
+  element.animate([
+    { transform: 'translateX(0)' },
+    { transform: 'translateX(-5px)' },
+    { transform: 'translateX(5px)' },
+    { transform: 'translateX(-5px)' },
+    { transform: 'translateX(5px)' },
+    { transform: 'translateX(-5px)' },
+    { transform: 'translateX(5px)' },
+    { transform: 'translateX(-5px)' },
+    { transform: 'translateX(5px)' },
+    { transform: 'translateX(-5px)' },
+    { transform: 'translateX(0)' }
+  ], {
+    duration: 500,
+    iterations: 1,
+    easing: 'cubic-bezier(0.68, -0.55, 0.27, 1.55)',
+    fill: 'both'
+  })
+}

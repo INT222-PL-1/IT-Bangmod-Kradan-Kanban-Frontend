@@ -12,6 +12,8 @@ import BigModal from './BigModal.vue'
 import AttachmentDropArea from './AttachmentDropArea.vue'
 import IconSVG from './IconSVG.vue'
 import AttachmentShowArea from './AttachmentShowArea.vue'
+import HoldButton from './HoldButton.vue'
+import BaseTooltip from './BaseTooltip.vue'
 
 defineProps({
   show: {
@@ -189,6 +191,7 @@ async function doUpdateTask() {
 
 async function doUploadAttachments() {
   const res = await uploadTaskAttachment(taskModalData.value.id, boardStore.currentBoard.id, attachedFiles.value)
+  attachedFiles.value = []
   if (res.ok) {
     const attachedFileList = res.data
     console.log(attachedFileList)
@@ -402,10 +405,16 @@ const handleClickConfirm = async () => {
               <IconSVG iconName="paperclip" scale="1" size="1rem" />
               <span>Add attachment</span>
             </label>
-            <button type="button" @click="handleClearAttachment" class="btn btn-sm btn-error btn-outline" :disabled="allFilesCount === 0">
+            <!-- <button type="button" @click="handleClearAttachment" class="btn btn-sm btn-error btn-outline" :disabled="allFilesCount === 0">
               <IconSVG iconName="trash-fill" scale="1" size="1rem" />
               <span>Clear attachment</span>
-            </button>
+            </button> -->
+            <BaseTooltip text="Hold to clear all attachments" :disabled="allFilesCount === 0">
+              <HoldButton @holdFinish="handleClearAttachment" :duration="2000" color="error" :disabled="allFilesCount === 0">
+                <IconSVG iconName="trash-fill" scale="1" size="1rem" />
+                <span>Clear attachment</span>
+              </HoldButton>
+            </BaseTooltip>
           </div>
           <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" v-show="taskModalData.assignees.length > 30"
             class="text-error text-xs text-nowrap">
