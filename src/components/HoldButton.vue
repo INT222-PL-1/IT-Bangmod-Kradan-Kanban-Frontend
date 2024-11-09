@@ -49,11 +49,12 @@ let holdTimeout = null
 /**
  * @type {MouseEvent}
  */
-let mouseDownEvent = null
+let mouseOrTouchEvent = null
 
 const reset = () => {
   bgWidth.value = '0%'
   holdDuration.value = 1000
+  if (mouseOrTouchEvent instanceof TouchEvent) mouseOrTouchEvent.target.classList.add('btn-outline')
   clearTimeout(holdTimeout)
 }
 
@@ -63,9 +64,10 @@ const shake = () => {
 }
 
 const handleMouseDown = (e) => {
-  mouseDownEvent = e
+  mouseOrTouchEvent = e
   emits('hold')
   console.log('hold')
+  if (e instanceof TouchEvent) e.target.classList.remove('btn-outline')
   bgWidth.value = '100%'
   holdDuration.value = props.duration
   holdTimeout = setTimeout(() => {
@@ -76,21 +78,22 @@ const handleMouseDown = (e) => {
 }
 
 const handleCancel = () => {
-  if (!mouseDownEvent) return
+  if (!mouseOrTouchEvent) return
   emits('release')
+  console.log('release')
   bgWidth.value = '0%'
   reset()
 }
 </script>
 
 <template>
-  <button :id="buttonId" type="button" @mousedown="handleMouseDown" @mouseup="handleCancel" @mouseleave="handleCancel" :class="btnClass" class="group relative btn btn-sm btn-outline overflow-hidden flex justify-start p-0" :disabled="disabled">
+  <button :id="buttonId" type="button" @touchstart="handleMouseDown" @mousedown="handleMouseDown" @touchend="handleCancel" @mouseup="handleCancel" @mouseleave="handleCancel" :class="btnClass" class="group relative btn btn-sm btn-outline overflow-hidden flex justify-start p-0" :disabled="disabled">
     <div
       :class="[ bgClass && !disabled ? bgClass : 'bg-base-content' ]"
-      class="progress-bg absolute bg-opacity-50 group-hover:bg-[#0002] h-full transition-[width]"
+      class="progress-bg absolute bg-opacity-50 group-hover:bg-[#0002] h-full transition-[width] pointer-events-none"
       :style="{ width: bgWidth, transitionDuration: holdDuration + 'ms' }"  
     ></div>
-    <div class="px-3 w-full h-full flex gap-2 justify-center place-items-center z-10">
+    <div class="px-3 w-full h-full flex gap-2 justify-center place-items-center pointer-events-none z-10">
       <slot>Delay Button</slot>
     </div>
   </button>

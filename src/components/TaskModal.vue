@@ -389,6 +389,7 @@ const handleClickConfirm = async () => {
           multiple
           @change="handleFileChange"
           class="hidden"
+          :disabled="allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.microAction"
         />
         <div class="flex flex-col sm:flex-row sm:justify-between gap-2 relative">
           <div class="text-lg font-semibold">
@@ -401,7 +402,7 @@ const handleClickConfirm = async () => {
             </span>
           </div>
           <div v-if="taskModalMode === 'edit'" class="flex gap-2">
-            <label :for="fileInputId" class="btn btn-sm btn-neutral">
+            <label :for="fileInputId" class="btn btn-sm btn-neutral" :class="{ 'btn-disabled': allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.microAction }">
               <IconSVG iconName="paperclip" scale="1" size="1rem" />
               <span>Add attachment</span>
             </label>
@@ -429,6 +430,7 @@ const handleClickConfirm = async () => {
           v-model:existing-files="taskModalData.attachments"
           :fileInputId="fileInputId"
           @dropFiles="handleFileChange"
+          :disabled="allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.microAction"
         />
         <AttachmentShowArea v-else-if="taskModalMode === 'view'" :existingFiles="taskModalData.attachments" />
       </div>

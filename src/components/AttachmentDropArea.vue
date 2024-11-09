@@ -5,10 +5,14 @@ import AttachmentCard from './AttachmentCard.vue';
 
 const emits = defineEmits(['dropFiles'])
 
-defineProps({
+const props = defineProps({
   fileInputId: {
     type: String,
     required: true
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -46,11 +50,17 @@ const handleDragEnd = (e) => {
 
 const handleDrop = (e) => {
   e.preventDefault()
+  if (props.disabled) return
   showDropArea.value = false
   const files = e.dataTransfer.files
   if (files.length === 0) return
   // attachedFiles.value = [...attachedFiles.value, ...files]
   emits('dropFiles', files)
+}
+
+const handleClick = () => {
+  if (props.disabled) return
+  document.getElementById(props.fileInputId).click()
 }
 
 const handleDragOver = (e) => {
@@ -80,14 +90,14 @@ const handleDragOver = (e) => {
       </div>
     </div>
     <Transition>
-      <label
-      :for="fileInputId"
-      v-show="fileCount === 0 || showDropArea"
-      @dragleave="handleDragEnd"
-      @dragover="handleDragOver"
-      @drop="handleDrop"
-      :class="{ 'bg-base-200 opacity-80': fileCount > 0 }"
-      class="absolute inset-0 rounded-md p-4 opacity-50"
+      <div
+        v-show="fileCount === 0 || showDropArea"
+        @dragleave="handleDragEnd"
+        @dragover="handleDragOver"
+        @drop="handleDrop"
+        @click="handleClick"
+        :class="{ 'bg-base-200 opacity-80': fileCount > 0 }"
+        class="absolute inset-0 rounded-md p-4 opacity-50"
       >
         <div class="pointer-events-none relative w-full h-full rounded-md border-base-content border-[4px] border-dashed grid place-items-center">
           <div class="flex flex-col justify-center items-center">
@@ -96,7 +106,7 @@ const handleDragOver = (e) => {
             <div v-show="fileCount === 0" class="text-base-content">or <span class="underline">click to browse</span></div>
           </div>
         </div>
-      </label>
+      </div>
     </Transition>
   </div>
 </template>
