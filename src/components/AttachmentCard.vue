@@ -1,6 +1,6 @@
 <script setup>
-import { formatFileSize, getBootStrapIconFromMIME } from '@/libs/utils';
-import { computed, onMounted, ref } from 'vue'
+import { captureVideoThumbnail, formatFileSize, getBootStrapIconFromMIME } from '@/libs/utils';
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import IconSVG from './IconSVG.vue';
 import BaseTooltip from './BaseTooltip.vue';
 import zyos from 'zyos';
@@ -21,20 +21,35 @@ const props = defineProps({
 })
 
 const [iconName, iconColor] = getBootStrapIconFromMIME(props.file.type)
+const cachedBlobUrls = ref([])
 
 const fileSize = computed(() => {
   const size = props.file.size
   return formatFileSize(size)
 })
 
-async function getBlobUrl() {
-  const url = props.file.url
-  const res = await zyos.fetch(url)
-  return URL.createObjectURL(res.data)
+function getBlobUrl(src) {
+  const cachedBlobUrl = cachedBlobUrls.value.find((item) => item.src === src)
+  if (cachedBlobUrl) return cachedBlobUrl.blobUrl
+
+  let blobUrl = null
+
+  if (src instanceof File) {
+    blobUrl = URL.createObjectURL(src)
+  } else {
+    blobUrl = new Promise((resolve) => {
+      zyos.fetch(src).then((res) => {
+        resolve(URL.createObjectURL(res.data))
+      })
+    })
+  }
+
+  cachedBlobUrls.value.push({ src, blobUrl })
+  return blobUrl
 }
 
 function downloadLocalFile() {
-  const url = URL.createObjectURL(props.file)
+  const url = getBlobUrl(props.file)
   const a = document.createElement('a')
   a.href = url
   a.download = props.file.name
@@ -44,7 +59,7 @@ function downloadLocalFile() {
 }
 
 async function downloadServerFile() {
-  const blobUrl = await getBlobUrl()
+  const blobUrl = await getBlobUrl(props.file.url)
   const a = document.createElement('a')
   a.href = blobUrl
   a.download = props.file.url.split('/').at(-1)
@@ -54,15 +69,15 @@ async function downloadServerFile() {
 }
 
 function previewLocalFile() {
-  const url = URL.createObjectURL(props.file)
+  const url = getBlobUrl(props.file)
   window.open(url, '_blank')
-  URL.revokeObjectURL(url)
+  // URL.revokeObjectURL(url)
 }
 
 async function previewServerFile() {
-  const blobUrl = await getBlobUrl()
+  const blobUrl = await getBlobUrl(props.file.url)
   window.open(blobUrl, '_blank')
-  URL.revokeObjectURL(blobUrl)
+  // URL.revokeObjectURL(blobUrl)
 }
 
 const handleRemoveClick = () => {
@@ -95,8 +110,27 @@ onMounted(async () => {
       }
       reader.readAsDataURL(props.file)
     } else {
-      image.value = await getBlobUrl()
+      // TODO: Use thumbnail url from server instead of downloading the whole image
+      image.value = await getBlobUrl(props.file.url)
     }
+  }
+
+  if (props.file.type.includes('video')) {
+    if (props.file instanceof File) {
+      image.value = await captureVideoThumbnail(props.file)
+    } else {
+      // TODO: Use thumbnail url from server instead of downloading the whole video
+      const res = await zyos.fetch(props.file.url)
+      image.value = await captureVideoThumbnail(res.data)
+    }
+  }
+})
+
+onUnmounted(() => {
+  cachedBlobUrls.value.forEach((item) => URL.revokeObjectURL(item.blobUrl))
+
+  if (image.value) {
+    URL.revokeObjectURL(image.value)
   }
 })
 
@@ -109,7 +143,11 @@ onMounted(async () => {
     </div>
     <div class="h-[50%] bg-secondary rounded-t-md">
       <div class="h-full grid place-items-center">
-        <img v-if="image" :src="image" class="object-cover w-[5rem] h-[5rem] bg-white" />
+        <div v-if="file.type.includes('video') && image" class="relative">
+          <IconSVG iconName="camera-video-fill" className="absolute bottom-[-0.75rem] right-[-0.75rem] drop-shadow-[0px_0px_2px_#1d232a88]" scale="2" size="2rem" />
+          <img v-if="image" :src="image" class="object-contain w-[6rem] h-[4rem] bg-black rounded-sm" />
+        </div>
+        <img v-else-if="file.type.includes('image') && image" :src="image" class="object-cover w-[4rem] h-[5rem] rounded-sm" />
         <IconSVG v-else :iconName="iconName" :class="iconColor" scale="3" size="3rem" />
       </div>
     </div>
@@ -121,7 +159,7 @@ onMounted(async () => {
           <div>{{ fileSize }}</div>
         </div>
       </div>
-      <div v-if="file.type.includes('pdf') || file.type.includes('image')" class="flex gap-2">
+      <div v-if="file.type.includes('pdf') || file.type.includes('image') || file.type.includes('video') || file.type.includes('audio')" class="flex gap-1">
         <BaseTooltip text="Download" className="flex-1">
           <button @click="handleDownload" class="w-full btn btn-sm btn-neutral">
             <IconSVG iconName="download" class="text-base-content" scale="1" />

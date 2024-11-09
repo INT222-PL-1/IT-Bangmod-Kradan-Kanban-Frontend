@@ -222,3 +222,44 @@ export function shakeElement(element) {
     fill: 'both'
   })
 }
+
+export function captureVideoThumbnail(videoFile) {
+  return new Promise((resolve, reject) => {
+      // Create a video element
+      const video = document.createElement('video')
+      video.src = URL.createObjectURL(videoFile)
+      video.crossOrigin = "anonymous"  // Set crossOrigin if needed for external files
+      video.muted = true // Mute video to allow autoplay in some browsers
+
+      // Wait for video metadata to be loaded
+      video.addEventListener('loadeddata', () => {
+          // Play the video for a moment to make sure we get a frame
+          video.currentTime = 1 // Set to 1 second to skip any initial black frames
+          
+          // Wait for video to be ready to play
+          video.addEventListener('seeked', () => {
+              // Create a canvas to capture the video frame
+              const canvas = document.createElement('canvas')
+              canvas.width = video.videoWidth
+              canvas.height = video.videoHeight
+              const context = canvas.getContext('2d')
+
+              // Draw the current video frame on the canvas
+              context.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+              // Convert canvas to a data URL
+              canvas.toBlob((blob) => {
+                  const imageUrl = URL.createObjectURL(blob)
+                  resolve(imageUrl)
+
+                  // Cleanup
+                  URL.revokeObjectURL(video.src)
+              }, 'image/jpeg') // Capture as JPEG format
+          }, { once: true })
+      })
+
+      video.addEventListener('error', (error) => {
+          reject("Error loading video file", error)
+      })
+  })
+}
