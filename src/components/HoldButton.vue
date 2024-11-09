@@ -87,7 +87,7 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <button :id="buttonId" type="button" @touchstart="handleMouseDown" @mousedown="handleMouseDown" @touchend="handleCancel" @mouseup="handleCancel" @mouseleave="handleCancel" :class="btnClass" class="group relative btn btn-sm btn-outline overflow-hidden flex justify-start p-0" :disabled="disabled">
+  <button :id="buttonId" type="button" @touchstart.passive="handleMouseDown" @mousedown="handleMouseDown" @touchend="handleCancel" @mouseup="handleCancel" @mouseleave="handleCancel" :class="btnClass" class="group relative btn btn-sm btn-outline overflow-hidden flex justify-start p-0" :disabled="disabled">
     <div
       :class="[ bgClass && !disabled ? bgClass : 'bg-base-content' ]"
       class="progress-bg absolute bg-opacity-50 group-hover:bg-[#0002] h-full transition-[width] pointer-events-none"
