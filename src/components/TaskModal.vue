@@ -143,7 +143,7 @@ async function loadSelectedTaskData() {
   } else {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
       status: 'error'
     })
     router.replace({ name: 'all-task' })
@@ -163,7 +163,7 @@ async function doCreateTask() {
   } else {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
       status: 'error'
     })
   }
@@ -183,7 +183,7 @@ async function doUpdateTask() {
   } else {
     toastStore.createToast({
       title: 'Error',
-      description: `An error occurred while updating the task.\nPlease try again later`,
+      description: `An error occurred while updating the task.\nPlease try again later.`,
       status: 'error'
     })
   }
@@ -207,7 +207,7 @@ async function doUploadAttachments() {
   } else {
     toastStore.createToast({
       title: 'Error',
-      description: `An error occurred while uploading attachments.\nPlease try again later`,
+      description: `An error occurred while uploading attachments.\nPlease try again later.`,
       status: 'error'
     })
   }

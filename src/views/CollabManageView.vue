@@ -227,7 +227,7 @@ const handleAccessRightCancel = () => {
 
   <!-- ? Add Collaborator Modal -->
   <MiniModal
-    :show="addModalOpenState" @clickBG="addModalOpenState = false" contentFlow="row" :mobileCenter="true">
+    :show="addModalOpenState" @clickBG="handleAddCancel" contentFlow="row" :mobileCenter="true">
     <template #title>Add Collaborator</template>
     <template #content>
       <div class="flex flex-col gap-2 flex-[2]">
@@ -278,7 +278,7 @@ const handleAccessRightCancel = () => {
 
   <!-- ? Remove Collaborator Modal -->
   <MiniModal
-    :show="removeModalOpenState" @clickBG="removeModalOpenState = false" :mobileCenter="true">
+    :show="removeModalOpenState" @clickBG="handleRemoveCancel" :mobileCenter="true">
     <template #title>Remove Collaborator</template>
     <template #content>
       <span>Do you want to remove <span class="italic">{{ selectedCollaborator?.name }}</span> from the board?</span>
@@ -295,7 +295,7 @@ const handleAccessRightCancel = () => {
 
   <!-- ? Change access right modal -->
   <MiniModal
-    :show="changeAccessRightModalOpenState" @clickBG="changeAccessRightModalOpenState = false" :mobileCenter="true">
+    :show="changeAccessRightModalOpenState" @clickBG="handleAccessRightCancel" :mobileCenter="true">
     <template #title>Change Access Right</template>
     <template #content>
       <span>Do you want to change access right of <span class="italic">{{ selectedCollaborator?.name }}</span> to <span class="font-semibold">{{ selectedCollaborator?.accessRight }}</span>?</span>

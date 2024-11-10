@@ -75,7 +75,7 @@ const handleDeleteTask = async (taskId) => {
     } else {
       toastStore.createToast({
         title: 'Error',
-        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
         status: 'error'
       })
       await refreshBoardTasks()
