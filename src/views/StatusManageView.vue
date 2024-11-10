@@ -14,6 +14,7 @@ import { useUserStore } from '@/stores/user'
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import MiniModal from '@/components/MiniModal.vue'
 import { HttpStatusCode } from 'zyos'
+import DynamicTable from '@/components/DynamicTable.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -226,76 +227,76 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
         </BaseTooltip>
       </template>
       <template #table>
-        <table class="table table-zebra">
-          <thead>
-            <tr class="select-none">
-              <th class="min-w-16 max-w-16"></th>
-              <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Name</th>
-              <th class="min-w-96 max-w-96 sm:min-w-[20vw] sm:max-w-[30vw]">Description</th>
-              <th class="min-w-16 max-w-16">Tasks</th>
-              <th class="min-w-60 max-w-60">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="boardStore.isLoading.status && boardStore.statuses.length === 0">
-              <td colspan="5" class="text-center">Loading statuses...</td>
-            </tr>
-            <tr v-else-if="boardStore.statuses === null">
-              <td colspan="5" class="text-center">Error while loading statuses from server. Please try again later.</td>
-            </tr>
-            <tr v-else-if="boardStore.statuses.length === 0">
-              <td colspan="5" class="text-center">No status</td>
-            </tr>
-            <tr v-else v-for="(status, index) in boardStore.statuses" :key="status.id" class="itbkk-item">
-              <td class="min-w-16 max-w-16">
-                <div class="grid place-items-center">
-                  <div>{{ index + 1 }}</div>
-                </div>
-              </td>
-              <td class="overflow-hidden min-w-52 max-w-52">
-                <StatusBadge :statusData="status" textWrapMode="wrap" class="itbkk-status-name cursor-default"
-                  width="100%" />
-              </td>
-              <td :class="{ 'italic text-[grey]': !status.description }"
-                class="itbkk-status-description min-w-96 max-w-96 break-words">
-                {{ status.description || 'No description is provided' }}
-              </td>
-              <td class="min-w-16 max-w-16 p-0">
-                <div class="grid place-items-center">
-                  <div
-                    :class="{ 'text-error': status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isTaskLimitEnabled && !status.isPredefined }"
-                    class="flex items-center gap-1">
-                    <IconSVG
-                      v-show="status.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isTaskLimitEnabled && !status.isPredefined"
-                      iconName="exclamation-diamond"
-                      title="Task limit exceeded! Please transfer some tasks to other statuses or increase the limit." />
-                    {{ status.count }}{{ boardStore.currentBoard?.isTaskLimitEnabled && !status.isPredefined ? '/' +
-                      boardStore.currentBoard?.taskLimitPerStatus : ''
-                    }}
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div v-if="status.isPredefined === false" class="flex justify-start items-center gap-2 w-full">
-                  <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
-                    <ButtonWithIcon @click="handleEditBtnClick(status.id)"
-                    className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap"
-                    iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
-                    Edit
-                    </ButtonWithIcon>
-                  </BaseTooltip>
-                  <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
-                    <ButtonWithIcon @click="handleOpenDeleteModal(status)"
-                      className="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
-                      iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
-                      Delete
-                    </ButtonWithIcon>
-                  </BaseTooltip>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <DynamicTable
+          tableClass="w-[80vw]"
+          :colsCount="5"
+          :colHeadersClass="['w-[5%]', 'w-[25%]', 'w-[30%]', 'w-[10%]', 'w-[20%]']"
+          :colsClass="['w-[5%]', 'w-[25%]', 'w-[30%]', 'w-[10%]', 'w-[20%]']"
+          :items="boardStore.statuses"
+          itemsKey="id"
+          :isLoading="boardStore.isLoading.status && boardStore.statuses.length === 0"
+          :isError="boardStore.statuses === null"
+          
+        >
+          <template #col-header-1>
+            <div class="flex items-center">#</div>
+          </template>
+          <template #col-header-2>
+            <div class="flex items-center">Name</div>
+          </template>
+          <template #col-header-3>
+            <div class="flex items-center">Description</div>
+          </template>
+          <template #col-header-4>
+            <div class="flex w-full items-center justify-center">Tasks</div>
+          </template>
+          <template #col-header-5>
+            <div class="flex items-center">Action</div>
+          </template>
+          <template #col-1="{ index }">
+            <div class="flex items-center">{{ index + 1 }}</div>
+          </template>
+          <template #col-2="{ item }">
+            <StatusBadge :statusData="item" textWrapMode="wrap" class="itbkk-status-name cursor-default" width="100%" />
+          </template>
+          <template #col-3="{ item }">
+            <div :class="{ 'italic text-[grey]': !item.description }" class="itbkk-status-description break-words">
+              {{ item.description || 'No description is provided' }}
+            </div>
+          </template>
+          <template #col-4="{ item }">
+            <div class="flex w-full items-center justify-center">
+              <IconSVG
+                v-show="item.count > boardStore.currentBoard?.taskLimitPerStatus && boardStore.currentBoard?.isTaskLimitEnabled && !item.isPredefined"
+                iconName="exclamation-diamond"
+                title="Task limit exceeded! Please transfer some tasks to other statuses or increase the limit."
+              />
+              {{ item.count }}{{ boardStore.currentBoard?.isTaskLimitEnabled && !item.isPredefined ? '/' + boardStore.currentBoard?.taskLimitPerStatus : '' }}
+            </div>
+          </template>
+          <template #col-5="{ item }">
+            <div v-if="item.isPredefined === false" class="flex justify-start items-center gap-2 w-full">
+              <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+                <ButtonWithIcon @click="handleEditBtnClick(item.id)"
+                  className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap"
+                  iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                  Edit
+                </ButtonWithIcon>
+              </BaseTooltip>
+              <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+                <ButtonWithIcon @click="handleOpenDeleteModal(item)"
+                  className="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
+                  iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                  Delete
+                </ButtonWithIcon>
+              </BaseTooltip>
+            </div>
+            <div v-else></div>
+          </template>
+          <template #loading>Loading statuses...</template>
+          <template #error>Error while loading statuses from server. Please try again later.</template>
+          <template #empty>No status</template>
+        </DynamicTable>
       </template>
     </BaseTablePlate>
   </section>
