@@ -1,5 +1,4 @@
 <script setup>
-import BaseModal from '@/components/BaseModal.vue'
 import { createStatus, getStatusById, updateStatus } from '@/libs/statusManagement';
 import { useToastStore } from '@/stores/toast';
 import { computed, onMounted, ref } from 'vue';
@@ -10,6 +9,7 @@ import { colorValidator, errorArrayToString } from '@/libs/utils';
 import IconSVG from './IconSVG.vue';
 import { useBoardStore } from '@/stores/board';
 import { HttpStatusCode } from 'zyos';
+import BigModal from './BigModal.vue';
 
 const route = useRoute()
 const router = useRouter()
@@ -45,7 +45,7 @@ async function loadSelectedStatusData() {
   } else {
     toastStore.createToast({
       title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
       status: 'error'
     })
     router.replace({ name: 'status-manage' })
@@ -125,14 +125,13 @@ const handleClickConfirm = async () => {
 </script>
 
 <template>
-  <BaseModal :show="statusModalData !== null" @clickBG="handleClickClose">
-    <div
-      class="itbkk-modal-status bg-base-300 w-[65rem] max-w-full sm:max-w-[90vw] sm:rounded-xl h-auto lg:h-[40rem] overflow-hidden flex flex-col">
-      <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none">
-        <span v-if="statusModalMode === 'add'">Add Status</span>
-        <span v-else-if="statusModalMode === 'edit'">Edit Status</span>
-      </div>
-      <div class="p-4 flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-4 flex-auto">
+  <BigModal :show="statusModalData !== null" @clickBG="handleClickClose" className="itbkk-modal-status">
+    <template #title>
+      <span v-if="statusModalMode === 'add'">Add Status</span>
+      <span v-else-if="statusModalMode === 'edit'">Edit Status</span>
+    </template>
+    <template #content>
+      <div class="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-4 flex-auto">
         <div class="flex flex-col gap-2 flex-none">
           <div>
             <div>
@@ -212,20 +211,18 @@ const handleClickConfirm = async () => {
           </div>
         </div>
       </div>
-      <div class="flex justify-end items-center flex-none h-14 px-4 border-t-2 border-base-100 bg-base-200">
-        <div class="flex gap-2">
-          <button @click="handleClickConfirm"
-            :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
-            class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledSaveButton">
-            Save
-          </button>
-          <button @click="handleClickClose" class="itbkk-button-cancel btn btn-sm btn-neutral">
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  </BaseModal>
+    </template>
+    <template #actions>
+      <button @click="handleClickConfirm"
+        :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
+        class="itbkk-button-confirm btn btn-success" :disabled="disabledSaveButton">
+        Save
+      </button>
+      <button @click="handleClickClose" class="itbkk-button-cancel btn btn-neutral">
+        Cancel
+      </button>
+    </template>
+  </BigModal>
 </template>
 
 <style scoped></style>

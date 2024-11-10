@@ -51,6 +51,10 @@ defineProps({
           <div>Status:</div>
           <StatusCapsuleBadge :statusData="task.status" />
         </div>
+        <div v-show="task.attachmentsCount > 0">
+          <span>Attachments: </span>
+          <span class="opacity-60">{{ task.attachmentsCount }} files</span>
+        </div>
       </div>
       <div class="text-xs font-semibold ml-1">Updated {{ humanReadDate(task.updatedOn) }}</div>
     </div>

@@ -75,7 +75,7 @@ const handleDeleteTask = async (taskId) => {
     } else {
       toastStore.createToast({
         title: 'Error',
-        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later' : res.message}.`,
+        description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
         status: 'error'
       })
       await refreshBoardTasks()
@@ -300,6 +300,7 @@ const handleToggleBoardVisibility = async () => {
                     :currentSortDirection="boardStore.options.sortDirection" />
                 </div>
               </th>
+              <th class="min-w-8 max-w-8"></th>
               <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">
                 <div class="flex gap-2">
                   <div>Assignees</div>
@@ -318,13 +319,13 @@ const handleToggleBoardVisibility = async () => {
           </thead>
           <tbody>
             <tr v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
-              <td colspan="4" class="text-center h-32">Loading tasks...</td>
+              <td colspan="5" class="text-center h-32">Loading tasks...</td>
             </tr>
             <tr v-else-if="boardStore.tasks === null">
-              <td colspan="4" class="text-center h-32">Error while loading tasks from server. Please try again later.</td>
+              <td colspan="5" class="text-center h-32">Error while loading tasks from server. Please try again later.</td>
             </tr>
             <tr v-else-if="boardStore.tasks.length === 0">
-              <td colspan="4" class="text-center h-32">No task</td>
+              <td colspan="5" class="text-center h-32">No task</td>
             </tr>
             <tr v-else v-for="(task, index) in boardStore.tasks" :key="task.id" class="itbkk-item">
               <td class="min-w-16 max-w-16">
@@ -362,6 +363,12 @@ const handleToggleBoardVisibility = async () => {
                 <div :class="{ 'itbkk-title': $route.name === 'all-task' }" class="break-words font-semibold">
                   {{ task.title }}
                 </div>
+              </td>
+              <td class="min-w-8 max-w-8 p-0">
+                <span v-if="task.attachmentsCount > 0" class="inline-flex items-center gap-1 opacity-50">
+                  <IconSVG iconName="paperclip" />
+                  <span>{{ task.attachmentsCount }}</span>
+                </span>
               </td>
               <td :class="{ 'italic text-[grey]': !task.assignees, 'itbkk-assignees': $route.name === 'all-task' }"
                 class="min-w-60 w-60">

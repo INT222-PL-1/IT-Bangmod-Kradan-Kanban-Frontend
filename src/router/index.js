@@ -178,7 +178,7 @@ router.beforeEach(async (to) => {
     }
 
     // ? If user is not logged in, redirect to login page.
-    if ([ 'all-task', 'status-manage', 'collab-manage' ].includes(to.name)) return
+    if ([ 'all-task', 'task-view', 'status-manage', 'collab-manage' ].includes(to.name)) return
 
     // ? Clear all data and redirect to login
     localStorage.removeItem('itbkk_access_token')

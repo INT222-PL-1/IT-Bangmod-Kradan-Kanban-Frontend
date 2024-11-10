@@ -7,13 +7,11 @@ import { useRoute } from 'vue-router'
 import { useToastStore } from './toast'
 import { getCollaborators } from '@/libs/collaboratorManagement'
 import Pl1VisibilityType from '@/libs/enum/Pl1VisibilityType'
-import { useUserStore } from './user'
 import { HttpStatusCode } from 'zyos'
 
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
   const toastStore = useToastStore()
-  const userStore = useUserStore()
   const isLoading = ref({
     microAction: false,
     board: false,
@@ -69,7 +67,7 @@ export const useBoardStore = defineStore('board', () => {
     isLoading.value.board = true
     const res = await getBoards()
     if (res.ok) {
-      boards.value = res.data.personalBoards.filter(board => board.owner.oid === userStore.user.oid)
+      boards.value = res.data.personalBoards
       collaborativeBoards.value = res.data.collaborativeBoards
     }
     isLoading.value.board = false    
@@ -80,8 +78,6 @@ export const useBoardStore = defineStore('board', () => {
     const res = await getBoardById(boardId)
     if (res.ok) {
       currentBoard.value = { ...res.data, isPublic: res.data.visibility === Pl1VisibilityType.PUBLIC }
-      // await loadTasks(boardId)
-      // await loadStatuses(boardId)
       await Promise.all([loadTasks(boardId), loadStatuses(boardId), loadCollaborators(boardId)])
     }
     isLoading.value.board = false
