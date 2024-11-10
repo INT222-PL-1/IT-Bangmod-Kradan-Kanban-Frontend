@@ -236,7 +236,6 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
           itemsKey="id"
           :isLoading="boardStore.isLoading.status && boardStore.statuses.length === 0"
           :isError="boardStore.statuses === null"
-          
         >
           <template #col-header-1>
             <div class="flex items-center">#</div>
