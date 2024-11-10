@@ -18,6 +18,7 @@ import TaskCard from '@/components/TaskCard.vue'
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import MiniModal from '@/components/MiniModal.vue'
 import { HttpStatusCode } from 'zyos'
+import DynamicTable from '@/components/DynamicTable.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -289,98 +290,105 @@ const handleToggleBoardVisibility = async () => {
         </BaseTooltip>
       </template>
       <template #table>
-        <table class="table table-zebra">
-          <thead>
-            <tr class="select-none">
-              <th class="min-w-16 max-w-16"></th>
-              <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">
-                <div class="flex gap-2">
-                  <div>Title</div>
-                  <SortButton @clickSortButton="handleSort" sortBy="title" :currentSortBy="boardStore.options.sortBy"
-                    :currentSortDirection="boardStore.options.sortDirection" />
-                </div>
-              </th>
-              <th class="min-w-8 max-w-8"></th>
-              <th class="min-w-60 max-w-60 sm:min-w-[40vw] sm:max-w-[40vw]">
-                <div class="flex gap-2">
-                  <div>Assignees</div>
-                  <SortButton @clickSortButton="handleSort" sortBy="assignees" :currentSortBy="boardStore.options.sortBy"
-                    :currentSortDirection="boardStore.options.sortDirection" />
-                </div>
-              </th>
-              <th class="min-w-44 max-w-44">
-                <div class="flex gap-2">
-                  <div>Status</div>
-                  <SortButton class="itbkk-status-sort" @clickSortButton="handleSort" sortBy="status.name"
-                    :currentSortBy="boardStore.options.sortBy" :currentSortDirection="boardStore.options.sortDirection" />
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
-              <td colspan="5" class="text-center h-32">Loading tasks...</td>
-            </tr>
-            <tr v-else-if="boardStore.tasks === null">
-              <td colspan="5" class="text-center h-32">Error while loading tasks from server. Please try again later.</td>
-            </tr>
-            <tr v-else-if="boardStore.tasks.length === 0">
-              <td colspan="5" class="text-center h-32">No task</td>
-            </tr>
-            <tr v-else v-for="(task, index) in boardStore.tasks" :key="task.id" class="itbkk-item">
-              <td class="min-w-16 max-w-16">
-                <div class="flex items-center justify-between gap-2">
-                  <div>{{ index + 1 }}</div>
-                  <BaseMenu>
-                    <template #icon>
-                      <IconSVG iconName="three-dots-vertical" />
-                    </template>
-                    <template #menu>
-                      <div>
-                        <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" className="w-full">
-                          <ButtonWithIcon @click="handleEditBtnClick(task.id)"
-                            className="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap w-full"
-                            iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
-                            Edit
-                          </ButtonWithIcon>
-                        </BaseTooltip>
-                      </div>
-                      <div>
-                        <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" className="w-full">
-                          <ButtonWithIcon @click="handleOpenDeleteModal(task)"
-                            className="itbkk-button-delete btn btn-sm btn-ghost justify-start text-error flex flex-nowrap w-full"
-                            iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
-                            Delete
-                          </ButtonWithIcon>
-                        </BaseTooltip>
-                      </div>
-                    </template>
-                  </BaseMenu>
-                </div>
-              </td>
-              <td @click="handleTaskClick(task.id)"
-                class="overflow-hidden min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw] hover:underline hover:cursor-pointer">
-                <div :class="{ 'itbkk-title': $route.name === 'all-task' }" class="break-words font-semibold">
-                  {{ task.title }}
-                </div>
-              </td>
-              <td class="min-w-8 max-w-8 p-0">
-                <span v-if="task.attachmentsCount > 0" class="inline-flex items-center gap-1 opacity-50">
-                  <IconSVG iconName="paperclip" />
-                  <span>{{ task.attachmentsCount }}</span>
-                </span>
-              </td>
-              <td :class="{ 'italic text-[grey]': !task.assignees, 'itbkk-assignees': $route.name === 'all-task' }"
-                class="min-w-60 w-60">
-                {{ task.assignees || 'Unassigned' }}
-              </td>
-              <td class="min-w-44 max-w-44">
-                <StatusBadge :statusData="task.status" textWrapMode="truncate" width="100%"
-                  :class="{ 'itbkk-status': $route.name === 'all-task' }" />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <DynamicTable
+          tableClass="w-[80vw]"
+          :colsCount="4"
+          :colHeadersClass="['w-1/12', 'w-5/12', 'w-4/12', 'w-2/12']"
+          :colsClass="['w-1/12', 'w-5/12', 'w-4/12', 'w-2/12']"
+          :items="boardStore.tasks"
+          itemsKey="id"
+          :isLoading="boardStore.isLoading.task && boardStore.tasks.length === 0"
+          :isError="boardStore.tasks === null"
+        >
+          <template #col-header-1>#</template>
+          <template #col-header-2>
+            <div class="flex gap-2">
+              <div>Title</div>
+              <SortButton
+                @clickSortButton="handleSort"
+                sortBy="title"
+                :currentSortBy="boardStore.options.sortBy"
+                :currentSortDirection="boardStore.options.sortDirection"
+              />
+            </div>
+          </template>
+          <template #col-header-3>
+            <div class="flex gap-2">
+              <div>Assignees</div>
+              <SortButton
+                @clickSortButton="handleSort"
+                sortBy="assignees"
+                :currentSortBy="boardStore.options.sortBy"
+                :currentSortDirection="boardStore.options.sortDirection"
+              />
+            </div>
+          </template>
+          <template #col-header-4>
+            <div class="flex gap-2">
+              <div>Status</div>
+              <SortButton
+                class="itbkk-status-sort"
+                @clickSortButton="handleSort"
+                sortBy="status.name"
+                :currentSortBy="boardStore.options.sortBy"
+                :currentSortDirection="boardStore.options.sortDirection"
+              />
+            </div>
+          </template>
+          <template #col-1="{ item: task, index }">
+            <div class="flex justify-between items-center">
+              <div>{{ index + 1 }}</div>
+              <BaseMenu>
+                <template #icon>
+                  <IconSVG iconName="three-dots-vertical" />
+                </template>
+                <template #menu>
+                  <div>
+                    <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" className="w-full">
+                      <ButtonWithIcon @click="handleEditBtnClick(task.id)"
+                        className="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap w-full"
+                        iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                        Edit
+                      </ButtonWithIcon>
+                    </BaseTooltip>
+                  </div>
+                  <div>
+                    <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" className="w-full">
+                      <ButtonWithIcon @click="handleOpenDeleteModal(task)"
+                        className="itbkk-button-delete btn btn-sm btn-ghost justify-start text-error flex flex-nowrap w-full"
+                        iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                        Delete
+                      </ButtonWithIcon>
+                    </BaseTooltip>
+                  </div>
+                </template>
+              </BaseMenu>
+            </div>
+          </template>
+          <template #col-2="{ item: task }">
+            <div class="inline-flex w-full">
+              <span @click="handleTaskClick(task.id)" class="flex-grow cursor-pointer break-words hover:underline underline-offset-2">{{ task.title }}</span>
+              <span v-if="task.attachmentsCount > 0" class="inline-flex items-center gap-1 opacity-50">
+                <IconSVG iconName="paperclip" />
+                <span>{{ task.attachmentsCount }}</span>
+              </span>
+            </div>
+          </template>
+          <template #col-3="{ item: task }">
+            <span
+              :class="{ 'italic text-[grey]': !task.assignees }"
+              class="itbkk-assignees"
+            >
+              {{ task.assignees || 'Unassigned' }}
+            </span>
+          </template>
+          <template #col-4="{ item: task }">
+            <StatusBadge :statusData="task.status" textWrapMode="truncate" width="100%" />
+          </template>
+          <template #loading>Loading tasks...</template>
+          <template #error>Error while loading tasks from server. Please try again later.</template>
+          <template #empty>No task</template>
+        </DynamicTable>
       </template>
     </BaseTablePlate>
   </section>

@@ -2,6 +2,7 @@
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
+import DynamicTable from '@/components/DynamicTable.vue'
 import IconSVG from '@/components/IconSVG.vue'
 import MiniModal from '@/components/MiniModal.vue'
 import { addCollaborator, patchCollaborator, removeCollaborator } from '@/libs/collaboratorManagement'
@@ -331,7 +332,46 @@ const handleAccessRightCancel = () => {
 
       </template>
       <template #table>
-        <table class="table table-zebra">
+        <DynamicTable
+          :colsCount="4"
+          :colHeadersClass="['w-1/12', 'w-5/12', 'w-4/12', 'w-2/12']"
+          :colsClass="['w-1/12', 'w-5/12', 'w-4/12', 'w-2/12']"
+          :items="boardStore.collaborators"
+          itemsKey="oid"
+          :isLoading="boardStore.isLoading.collaborator && boardStore.isLoading.collaborator === 0"
+          :isError="boardStore.collaborators === null"
+        >
+          <template #col-header-1>#</template>
+          <template #col-header-2>Members</template>
+          <template #col-header-3>Access Right</template>
+          <template #col-header-4>Action</template>
+
+          <template #loading>Loading collaborators...</template>
+          <template #error>Error while loading collaborators from server. Please try again later.</template>
+          <template #empty>No collaborator</template>
+
+          <template #col-1="{ index }">{{ index + 1 }}</template>
+          <template #col-2="{ item }">
+            <div>
+              <div class="itbkk-name text-md font-bold">{{ item.name }}</div>
+              <div class="itbkk-email text-sm text-gray-500 itbkk-email">{{ item.email }}</div>
+            </div>
+          </template>
+          <template #col-3="{ item }">
+            <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
+              <select @change="handleAccessRightChange(item)" v-model="item.accessRight" class="itbkk-access-right transition flex bg-base-100 select select-ghost select-sm"  :disabled="userStore.isOwnerOfCurrentBoard === false">
+                <option value="READ">Read</option>
+                <option value="WRITE">Write</option>
+              </select>
+            </BaseTooltip>
+          </template>
+          <template #col-4="{ item }">
+            <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
+              <button @click="handleRemoveButtonClick(item)" class="itbkk-collab-remove btn btn-sm btn-error btn-outline min-w-35 max-w-35"  :disabled="userStore.isOwnerOfCurrentBoard === false">Remove</button>
+            </BaseTooltip>
+          </template>
+        </DynamicTable>
+        <!-- <table class="table table-zebra">
 
           <thead>
             <tr class="select-none">
@@ -369,7 +409,6 @@ const handleAccessRightCancel = () => {
                   <select @change="handleAccessRightChange(collaborator)" v-model="collaborator.accessRight" class="itbkk-access-right transition flex bg-base-100 select select-ghost select-sm"  :disabled="userStore.isOwnerOfCurrentBoard === false">
                     <option value="READ">Read</option>
                     <option value="WRITE">Write</option>
-                    <!-- <IconSVG iconName="chevron-down" size="1rem" /> -->
                   </select>
                 </BaseTooltip>
               </td>
@@ -381,7 +420,7 @@ const handleAccessRightCancel = () => {
               </td>
             </tr>
           </tbody>
-        </table>
+        </table> -->
       </template>
     </BaseTablePlate>
   </section>

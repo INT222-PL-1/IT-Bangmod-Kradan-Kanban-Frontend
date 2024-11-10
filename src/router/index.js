@@ -31,10 +31,7 @@ const router = createRouter({
             if (boardStore.boards.length > 0 && to.name === 'board-add') {
               return { name: 'all-board' }
             }
-            if (['all-task', 'status-manage', 'collab-manage'].includes(from.name)) {
-              return
-            }
-            if (boardStore.boards.length === 1 && boardStore.collaborativeBoards.length === 0) {
+            if (from.name === 'login' && boardStore.boards.length === 1 && boardStore.collaborativeBoards.length === 0) {
               return { name: 'all-task', params: { boardId: boardStore.boards[0].id } }
             }
             else return
