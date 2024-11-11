@@ -353,7 +353,7 @@ const handleAccessRightCancel = () => {
           <template #col-1="{ index }">{{ index + 1 }}</template>
           <template #col-2="{ item }">
             <div>
-              <div :class="{ 'opacity-75': item.inviteStatus === 'PENDING' }" class="itbkk-name text-md font-bold">{{ item.name }} <span class="text-sm font-normal">({{ item.inviteStatus === 'PENDING' ? 'Pending invite' : '' }})</span></div>
+              <div :class="{ 'opacity-75': item.inviteStatus === 'PENDING' }" class="itbkk-name text-md font-bold">{{ item.name }} <span class="text-sm font-normal">{{ item.inviteStatus === 'PENDING' ? '(Pending invite)' : '' }}</span></div>
               <div class="itbkk-email text-sm text-gray-500 itbkk-email">{{ item.email }}</div>
             </div>
           </template>
