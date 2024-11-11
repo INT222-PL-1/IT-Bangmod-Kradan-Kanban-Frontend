@@ -73,6 +73,10 @@ const handleLeaveCancel = () => {
   leaveModalOpenState.value = false
 }
 
+const handleAcceptDeclineClick = (board) => {
+  router.push({ name: 'collab-invitations', params: { boardId: board.id } })
+}
+
 </script>
 
 <template>
@@ -161,7 +165,7 @@ const handleLeaveCancel = () => {
               <div>You have no collaborative board yet.</div>
               <div>Accept invitations and join other boards.</div>
             </div>
-            <BoardListItem v-else v-for="board in boardStore.collaborativeBoards" :key="board" :board="board" @boardClick="handleBoardClick" @leaveBoardClick="handleLeaveBoardClick($event)" />
+            <BoardListItem v-else v-for="board in boardStore.collaborativeBoards" :key="board" :board="board" @boardClick="handleBoardClick" @leaveBoardClick="handleLeaveBoardClick($event)" @acceptDeclineInviteClick="handleAcceptDeclineClick($event)" />
             <!-- <BoardListItem v-else v-for="board in boardStore.boards" :key="board" :board="board" @boardClick="handleBoardClick" /> -->
           </div>
         </div>

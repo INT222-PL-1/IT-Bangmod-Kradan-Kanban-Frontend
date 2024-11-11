@@ -105,6 +105,26 @@ const router = createRouter({
       ]
     },
     {
+      path: '/board/:boardId/collab/invitations',
+      name: 'collab-invitations',
+      meta: { title: 'Invitations' },
+      component: () => import('@/views/CollabInvitationView.vue'),
+      beforeEnter: (to) => {
+        const userStore = useUserStore()
+        const toastStore = useToastStore()
+        if (userStore.user === null) {
+          toastStore.createToast({
+            title: 'Need to login',
+            description: 'Please login to join the board as a collaborator.',
+            status: 'info',
+          })
+          return { name: 'login', query: { redirect: to.fullPath } }
+        } else {
+          return
+        }
+      }
+    },
+    {
       path: '/login',      
       name: 'login',
       meta: { title: 'Login' },
@@ -175,7 +195,7 @@ router.beforeEach(async (to) => {
     }
 
     // ? If user is not logged in, redirect to login page.
-    if ([ 'all-task', 'task-view', 'status-manage', 'collab-manage' ].includes(to.name)) return
+    if ([ 'all-task', 'task-view', 'status-manage', 'collab-manage', 'collab-invitations' ].includes(to.name)) return
 
     // ? Clear all data and redirect to login
     localStorage.removeItem('itbkk_access_token')

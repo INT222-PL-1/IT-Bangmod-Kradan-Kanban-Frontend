@@ -62,3 +62,39 @@ export async function patchCollaborator(boardId, collaboratorId, patchData, zyos
     return null
   }
 }
+
+export async function getInvitation(boardId, collaboratorId) {
+  const url = `${BASE_URL}/${boardId}/collabs/${collaboratorId}`
+
+  try {
+    const res = await zyos.fetch(url)
+    return res
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export async function acceptInvitation(boardId, collaboratorId) {
+  const url = `${BASE_URL}/${boardId}/collabs/${collaboratorId}/accept`
+
+  try {
+    const res = await zyos.fetch(url, { method: 'PATCH' })
+    return res
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export async function declineInvitation(boardId, collaboratorId) {
+  const url = `${BASE_URL}/${boardId}/collabs/${collaboratorId}`
+
+  try {
+    const res = await zyos.fetch(url, { method: 'DELETE' })
+    return res
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
