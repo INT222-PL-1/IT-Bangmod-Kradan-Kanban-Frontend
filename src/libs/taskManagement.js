@@ -1,4 +1,4 @@
-import zyos from 'zyos'
+import zyos, { ZyosResponse } from 'zyos'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 const VERSION = 'v3'
@@ -113,21 +113,45 @@ export async function deleteTask(taskId, boardId) {
 export async function uploadTaskAttachment(taskId, boardId, files) {
   const url = `${BASE_URL}/${boardId}/tasks/${taskId}/files`
 
-  const formData = new FormData()
+  const uploadSuccessFile = []
 
-  files.forEach((file) => {
+  const uploadPromises = files.map(async (file) => {
+    const formData = new FormData()
     formData.append('files', file)
+
+    try {
+      const res = await zyos.fetch(url, {
+        method: 'POST',
+        body: formData,
+        timeout: 60 * 1000
+      })
+      uploadSuccessFile.push(...res.data)
+    } catch (error) {
+      console.error(error)
+    }
   })
 
-  try {
-    const res = await zyos.fetch(url, {
-      method: 'POST',
-      body: formData,
-      timeout: 5000
-    })
-    return res
-  } catch (error) {
-    console.error(error)
-    return null
-  }
+  await Promise.all(uploadPromises)
+
+  console.log(uploadSuccessFile)
+
+  return ZyosResponse.success(uploadSuccessFile)
+
+  // const formData = new FormData()
+
+  // files.forEach((file) => {
+  //   formData.append('files', file)
+  // })
+
+  // try {
+  //   const res = await zyos.fetch(url, {
+  //     method: 'POST',
+  //     body: formData,
+  //     timeout: 60 * 1000
+  //   })
+  //   return res
+  // } catch (error) {
+  //   console.error(error)
+  //   return null
+  // }
 }

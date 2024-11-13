@@ -39,7 +39,12 @@ function getBlobUrl(src) {
   } else {
     blobUrl = new Promise((resolve) => {
       zyos.fetch(src).then((res) => {
-        resolve(URL.createObjectURL(res.data))
+        try {
+          resolve(URL.createObjectURL(res.data))
+        } catch (error) {
+          console.error(error)
+          resolve(null)
+        }
       })
     })
   }
