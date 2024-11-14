@@ -109,49 +109,64 @@ export async function deleteTask(taskId, boardId) {
  * @param {string} taskId - task id
  * @param {string} boardId - board id
  * @param {File[]} files - files to upload
+ * @param {function} onUploadProgress - callback function for upload progress
  */
-export async function uploadTaskAttachment(taskId, boardId, files) {
+export async function uploadTaskAttachments(taskId, boardId, files, onFileProgress) {
   const url = `${BASE_URL}/${boardId}/tasks/${taskId}/files`
 
   const uploadSuccessFile = []
 
   const uploadPromises = files.map(async (file) => {
-    const formData = new FormData()
-    formData.append('files', file)
+    return new Promise(resolve => {
+      const formData = new FormData()
+      formData.append('files', file)
 
-    try {
-      const res = await zyos.fetch(url, {
+      zyos.xhr(url, {
         method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('itbkk_access_token')
+        },
         body: formData,
-        timeout: 60 * 1000
+        onUploadProgress: (progressEvent) => {
+          onFileProgress(progressEvent, file)
+        }
+      }).then((res) => {
+        const data = JSON.parse(res)
+        console.log('data', data)
+        uploadSuccessFile.push(...data)
+        resolve(data)
+      }).catch((error) => {
+        console.error(error)
+        resolve(null)
       })
-      uploadSuccessFile.push(...res.data)
-    } catch (error) {
-      console.error(error)
-    }
+    })
   })
 
   await Promise.all(uploadPromises)
 
-  console.log(uploadSuccessFile)
-
   return ZyosResponse.success(uploadSuccessFile)
+}
 
-  // const formData = new FormData()
+export async function uploadTaskAttachment(taskId, boardId, file, onProgress) {
+  const url = `${BASE_URL}/${boardId}/tasks/${taskId}/files`
 
-  // files.forEach((file) => {
-  //   formData.append('files', file)
-  // })
+  const formData = new FormData()
+  formData.append('files', file)
 
-  // try {
-  //   const res = await zyos.fetch(url, {
-  //     method: 'POST',
-  //     body: formData,
-  //     timeout: 60 * 1000
-  //   })
-  //   return res
-  // } catch (error) {
-  //   console.error(error)
-  //   return null
-  // }
+  try {
+    const res = await zyos.xhr(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('itbkk_access_token')
+      },
+      body: formData,
+      onUploadProgress: (progressEvent) => {
+        onProgress(progressEvent)
+      }
+    })
+    return res
+  } catch (error) {
+    console.error(error)
+    return null
+  }
 }

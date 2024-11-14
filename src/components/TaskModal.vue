@@ -4,7 +4,7 @@ import StatusBadge from './StatusBadge.vue'
 import StatusSelector from './StatusSelector.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref, useId } from 'vue'
-import { createTask, getTaskById, updateTask, uploadTaskAttachment } from '@/libs/taskManagement'
+import { createTask, getTaskById, updateTask, uploadTaskAttachments } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import { useBoardStore } from '@/stores/board'
 import { HttpStatusCode } from 'zyos'
@@ -36,6 +36,7 @@ const MAX_FILE_COUNT = 10
 const MAX_FILE_SIZE = 20
 const fileInputId = useId()
 const attachedFiles = ref([])
+const eachFileUploadProgress = ref([])
 const rawAllFilesSize = computed(() => sumFileSizes(attachedFiles.value) + sumFileSizes(taskModalData.value.attachments))
 const allFilesSize = computed(() => {
   return (rawAllFilesSize.value / Math.pow(1024, 2)).toFixed(2)
@@ -234,7 +235,19 @@ async function doUpdateTask() {
 }
 
 async function doUploadAttachments() {
-  const res = await uploadTaskAttachment(taskModalData.value.id, boardStore.currentBoard.id, attachedFiles.value)
+  const res = await uploadTaskAttachments(
+    taskModalData.value.id,
+    boardStore.currentBoard.id,
+    attachedFiles.value,
+    (e, file) => {
+      if (e.lengthComputable) {
+        const percentComplete = e.loaded / e.total * 100
+        const fileIndex = attachedFiles.value.indexOf(file)
+        eachFileUploadProgress.value[fileIndex] = percentComplete
+        // console.log(eachFileUploadProgress.value)
+      }
+    }
+  )
   attachedFiles.value = []
   if (res.ok) {
     const attachedFileList = res.data
@@ -442,7 +455,7 @@ const handleClickConfirm = async () => {
               ({{ taskModalData.assignees.length + '/30' }})
             </span> -->
             <span class="text-sm opacity-50">
-              {{ allFilesCount + '/10 files' }} <span>{{ allFilesSize + '/20MB' }}</span>
+              {{ allFilesCount + '/10 files' }} <span>{{ allFilesSize + '/200MB (20MB/file)' }}</span>
             </span>
           </div>
           <div v-if="taskModalMode === 'edit'" class="flex gap-2">
@@ -475,6 +488,7 @@ const handleClickConfirm = async () => {
           :fileInputId="fileInputId"
           @dropFiles="handleFileChange"
           :disabled="allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.microAction"
+          :eachFileUploadProgress="eachFileUploadProgress"
         />
         <AttachmentShowArea v-else-if="taskModalMode === 'view'" :existingFiles="taskModalData.attachments" />
       </div>

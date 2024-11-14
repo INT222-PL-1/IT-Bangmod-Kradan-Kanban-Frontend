@@ -21,8 +21,10 @@ export const useToastStore = defineStore('toast', () => {
   function createToast(toastData) {
     const id = nextId++
 
-    const delay = toastData.delay || 0
-    const duration = toastData.duration || 5000
+    if (!toastData.duration) toastData.duration = 5000
+    if (!toastData.delay) toastData.delay = 0
+
+    const { duration, delay } = toastData
 
     setTimeout(() => {
       toasts.value.push({
