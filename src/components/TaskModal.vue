@@ -467,7 +467,7 @@ const handleClickConfirm = async () => {
               <IconSVG iconName="trash-fill" scale="1" size="1rem" />
               <span>Clear attachment</span>
             </button> -->
-            <BaseTooltip text="Hold to clear all attachments" :disabled="allFilesCount === 0">
+            <BaseTooltip text="Click/press and hold to clear all attachments" :disabled="allFilesCount === 0">
               <HoldButton @holdFinish="handleClearAttachment" :duration="2000" color="error" :disabled="allFilesCount === 0">
                 <IconSVG iconName="trash-fill" scale="1" size="1rem" />
                 <span>Clear attachment</span>

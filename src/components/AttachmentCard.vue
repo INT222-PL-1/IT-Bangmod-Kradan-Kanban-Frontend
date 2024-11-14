@@ -148,12 +148,12 @@ onUnmounted(() => {
 
 <template>
   <div class="flex-shrink-0 relative flex flex-col w-40 h-full bg-base-300 rounded-md" :title="file.name">
-    <div v-if="mode === 'edit'" class="absolute top-1 right-1">
+    <div v-if="mode === 'edit'" class="absolute top-1 right-1 z-10">
       <IconSVG iconName="x" class="text-base-content cursor-pointer" scale="1.5" @click="handleRemoveClick" />
     </div>
     <div class="h-[50%] bg-secondary rounded-t-md relative">
       <Transition name="fade">
-        <div v-if="uploadProgress" class="absolute bg-[#0005] inset-0 grid place-items-center rounded-t-md z-10 opacity-80">
+        <div v-if="uploadProgress" class="absolute bg-[#0005] inset-0 grid place-items-center rounded-t-md z-20 opacity-80">
           <div class="radial-progress transition-transform duration-500" :style="`--value:${uploadProgress}`" role="progressbar">
             {{ Math.round(uploadProgress) }}%
           </div>
