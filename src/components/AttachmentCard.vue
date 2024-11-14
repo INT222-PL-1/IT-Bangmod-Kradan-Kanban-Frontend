@@ -91,7 +91,6 @@ async function previewServerFile() {
 }
 
 const handleRemoveClick = () => {
-  console.log('removeClick', props.file)
   emits('removeClick', props.file)
 }
 

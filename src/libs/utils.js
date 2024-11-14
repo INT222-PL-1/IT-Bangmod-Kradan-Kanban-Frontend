@@ -100,7 +100,6 @@ export function errorArrayToString(errors) {
 export async function copyToClipboard(text) {
   try {
     await navigator.clipboard.writeText(text);
-    console.log('success');
   } catch (err) {
     console.error('Failed to copy!', err);
   }

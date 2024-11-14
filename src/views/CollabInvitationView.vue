@@ -26,7 +26,6 @@ async function loadCollaborator() {
 const handleAcceptInvitation = async () => {
   const res = await acceptInvitation(route.params.boardId, userStore.user.oid)
   if (res.ok) {
-    console.log('Accept invitation success')
     toastStore.createToast({
       title: 'Accept invitation success',
       description: `You have joined the "${invitation.value.boardName}" board.`,
@@ -34,7 +33,6 @@ const handleAcceptInvitation = async () => {
     })
     router.push({ name: 'all-task' })
   } else {
-    console.error('Accept invitation failed')
     toastStore.createToast({
       title: 'Accept invitation failed',
       description: `Failed to join the "${invitation.value.boardName}" board.`,
@@ -46,7 +44,6 @@ const handleAcceptInvitation = async () => {
 const handleDeclineInvitation = async () => {
   const res = await declineInvitation(route.params.boardId, userStore.user.oid)
   if (res.ok) {
-    console.log('Decline invitation success')
     toastStore.createToast({
       title: 'Decline invitation success',
       description: `You have declined the invitation to join the "${invitation.value.boardName}" board.`,
@@ -54,7 +51,6 @@ const handleDeclineInvitation = async () => {
     })
     router.push({ name: 'all-board' })
   } else {
-    console.error('Decline invitation failed')
     toastStore.createToast({
       title: 'Decline invitation failed',
       description: `Failed to decline the invitation to join the "${invitation.value.boardName}" board.`,
@@ -64,7 +60,6 @@ const handleDeclineInvitation = async () => {
 }
 
 onMounted(async () => {
-  console.log('CollabInvitationView mounted');
   await loadCollaborator()
 })
 

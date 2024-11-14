@@ -92,54 +92,6 @@ function filterValidFiles(files) {
   }
 
   return validFiles
-
-  // const isFileSizeExceed = rawAllFilesSize.value + sumFileSizes(nonDuplicateFiles) > MAX_FILE_SIZE * Math.pow(1024, 2)
-
-  // if (isFileCountExceed && isFileSizeExceed) {
-  //   let validFiles = []
-  //   let totalSize = rawAllFilesSize.value
-  //   for (const file of nonDuplicateFiles) {
-  //     if (totalSize + sumFileSizes(validFiles) + file.size <= MAX_FILE_SIZE * Math.pow(1024, 2) && validFiles.length < MAX_FILE_COUNT - allFilesCount.value) {
-  //       validFiles.push(file)
-  //     } else {
-  //       break
-  //     }
-  //   }
-  //   validFiles = validFiles.splice(0, MAX_FILE_COUNT - allFilesCount.value)
-  //   toastStore.createToast({
-  //     title: 'Error',
-  //     description: `Each task can have at most ${MAX_FILE_COUNT} files and ${MAX_FILE_SIZE}MB of files.\nThe following files are not added: ${nonDuplicateFiles.filter(f => !validFiles.includes(f)).map(f => f.name).join(', ')}`,
-  //     status: 'error'
-  //   })
-  //   return validFiles
-  // } else if (isFileCountExceed) {
-  //   const validFiles = nonDuplicateFiles.splice(0, MAX_FILE_COUNT - allFilesCount.value)
-  //   toastStore.createToast({
-  //     title: 'Error',
-  //     description: `Each task can have at most ${MAX_FILE_COUNT} files.\nThe following files are not added: ${nonDuplicateFiles.map(f => f.name).join(', ')}`,
-  //     status: 'error'
-  //   })
-  //   console.log(validFiles)
-  //   return validFiles
-  // } else if (isFileSizeExceed) {
-  //   const validFiles = []
-  //   let totalSize = rawAllFilesSize.value
-  //   for (const file of nonDuplicateFiles) {
-  //     if (totalSize + sumFileSizes(validFiles) + file.size <= MAX_FILE_SIZE * Math.pow(1024, 2)) {
-  //       validFiles.push(file)
-  //     } else {
-  //       break
-  //     }
-  //   }
-  //   toastStore.createToast({
-  //     title: 'Error',
-  //     description: `Each task can have at most ${MAX_FILE_SIZE}MB of files.\nThe following files are not added: ${nonDuplicateFiles.filter(f => !validFiles.includes(f)).map(f => f.name).join(', ')}`,
-  //     status: 'error'
-  //   })
-  //   return validFiles
-  // }
-
-  // return nonDuplicateFiles
 }
 
 const handleFileChange = (e) => {
@@ -215,7 +167,6 @@ async function doCreateTask() {
 }
 
 async function doUpdateTask() {
-  console.log(taskModalData.value, 'from update task')
   const res = await updateTask(boardId, taskModalData.value)
   if (res.ok) {
     const updatedTask = res.data
@@ -244,23 +195,19 @@ async function doUploadAttachments() {
         const percentComplete = e.loaded / e.total * 100
         const fileIndex = attachedFiles.value.indexOf(file)
         eachFileUploadProgress.value[fileIndex] = percentComplete
-        // console.log(eachFileUploadProgress.value)
       }
     }
   )
   attachedFiles.value = []
   if (res.ok) {
     const attachedFileList = res.data
-    console.log(attachedFileList)
     if (taskModalData.value.attachments && taskModalData.value.attachments.length > 0) {
-      console.log('hello world')
       attachedFiles.value = []
       taskModalData.value.attachments = [...taskModalData.value.attachments, ...attachedFileList]
     } else {
       attachedFiles.value = []
       taskModalData.value.attachments = attachedFileList
     }
-    console.log(taskModalData.value)
   } else {
     toastStore.createToast({
       title: 'Error',

@@ -132,7 +132,6 @@ export async function uploadTaskAttachments(taskId, boardId, files, onFileProgre
         }
       }).then((res) => {
         const data = JSON.parse(res)
-        console.log('data', data)
         uploadSuccessFile.push(...data)
         resolve(data)
       }).catch((error) => {

@@ -23,8 +23,6 @@ export async function login(username, password) {
 export async function refreshAccessToken(refreshToken) {
     const url = `${SERVER_URL}/token`
 
-    console.log('Refreshing access token')
-    
     try {
         const res = await zyos.fetch(url, {
             method: 'POST',
@@ -46,11 +44,8 @@ export async function refreshAccessToken(refreshToken) {
  * @returns {Promise<boolean>} Returns true if the access token is valid, otherwise false.
  */
 export async function validateAccessToken(accessToken) {
-    console.log('Validating access token', accessToken)
     try {
         const res = await zyos.fetch(`${SERVER_URL}/token/validate`, { retry: 5, timeout: 1000, noGlobalResponseHandling: true, token: `Bearer ${accessToken}` })
-
-        console.log(res)
 
         if (res.ok) {
             return true

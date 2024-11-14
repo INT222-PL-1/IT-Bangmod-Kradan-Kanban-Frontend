@@ -50,7 +50,6 @@ const handleRefreshBtnClick = async () => {
 const handleAddButtonClick = () => {
   if (userStore.isOwnerOfCurrentBoard === false) return
 
-  console.log('Add Collaborator button clicked')
   collaboratorModalData.value = { ...defaultCollaboratorModalData }
   addModalOpenState.value = true
 }
@@ -105,7 +104,6 @@ const handleAddConfirm = async () => {
 }
 
 const handleAddCancel = () => {
-  console.log('Cancel button clicked')
   addModalOpenState.value = false
 }
 
@@ -161,7 +159,6 @@ const handleRemoveConfirm = async () => {
 }
 
 const handleRemoveCancel = () => {
-  console.log('Remove Cancel button clicked')
   removeModalOpenState.value = false
 }
 
@@ -217,7 +214,6 @@ const handleAccessRightConfirm = async () => {
 }
 
 const handleAccessRightCancel = () => {
-  console.log('Access Right Cancel button clicked')
   selectedCollaborator.value.accessRight = selectedCollaborator.value.accessRight === 'READ' ? 'WRITE' : 'READ'
   changeAccessRightModalOpenState.value = false
 }
