@@ -1,5 +1,5 @@
-name: Auto Redeploy
-run-name: "@${{ github.actor }} was pushed up a new update. Auto-Redeploy START!"
+name: Auto Redeploy [Development]
+run-name: "Auto-redeploy development called by @${{ github.actor }}. Auto-Redeploy START!"
 on: 
   workflow_dispatch: 
   push:
