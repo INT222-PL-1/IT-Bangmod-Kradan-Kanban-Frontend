@@ -13,6 +13,10 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false
+  },
+  eachFileUploadProgress: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -81,10 +85,11 @@ const handleDragOver = (e) => {
           @removeClick="handleRemoveClick(file)"
         />
         <AttachmentCard
-          v-for="file in attachedFiles"
+          v-for="(file, index) in attachedFiles"
           :key="file.name"
           :file="file"
           mode="edit"
+          :uploadProgress="eachFileUploadProgress[index]"
           @removeClick="handleRemoveClick(file)"
         />
       </div>

@@ -4,7 +4,7 @@ import StatusBadge from './StatusBadge.vue'
 import StatusSelector from './StatusSelector.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref, useId } from 'vue'
-import { createTask, getTaskById, updateTask, uploadTaskAttachment } from '@/libs/taskManagement'
+import { createTask, getTaskById, updateTask, uploadTaskAttachments } from '@/libs/taskManagement'
 import { useToastStore } from '@/stores/toast'
 import { useBoardStore } from '@/stores/board'
 import { HttpStatusCode } from 'zyos'
@@ -36,65 +36,62 @@ const MAX_FILE_COUNT = 10
 const MAX_FILE_SIZE = 20
 const fileInputId = useId()
 const attachedFiles = ref([])
+const eachFileUploadProgress = ref([])
 const rawAllFilesSize = computed(() => sumFileSizes(attachedFiles.value) + sumFileSizes(taskModalData.value.attachments))
 const allFilesSize = computed(() => {
   return (rawAllFilesSize.value / Math.pow(1024, 2)).toFixed(2)
 })
 const allFilesCount = computed(() => attachedFiles.value.length + taskModalData.value.attachments.length)
 
+function removeLargeFiles(files) {
+  const validFiles = []
+  for (const file of files) {
+    if (file.size <= MAX_FILE_SIZE * Math.pow(1024, 2)) {
+      validFiles.push(file)
+    } else {
+      continue
+    }
+  }
+  return [validFiles, files.filter(f => !validFiles.includes(f))]
+}
+
 function filterValidFiles(files) {
   if (files.length === 0) return []
   const nonDuplicateFiles = files.filter(f => {
     return attachedFiles.value.findIndex(af => af.name === f.name) + taskModalData.value.attachments.findIndex(af => af.name === f.name) === -2
   })
-  const isFileCountExceed = allFilesCount.value + nonDuplicateFiles.length > MAX_FILE_COUNT
-  const isFileSizeExceed = rawAllFilesSize.value + sumFileSizes(nonDuplicateFiles) > MAX_FILE_SIZE * Math.pow(1024, 2)
 
-  if (isFileCountExceed && isFileSizeExceed) {
-    let validFiles = []
-    let totalSize = rawAllFilesSize.value
-    for (const file of nonDuplicateFiles) {
-      if (totalSize + sumFileSizes(validFiles) + file.size <= MAX_FILE_SIZE * Math.pow(1024, 2) && validFiles.length < MAX_FILE_COUNT - allFilesCount.value) {
-        validFiles.push(file)
-      } else {
-        break
-      }
-    }
-    validFiles = validFiles.splice(0, MAX_FILE_COUNT - allFilesCount.value)
+  const [nonLargeFiles, largeFiles] = removeLargeFiles(nonDuplicateFiles)
+
+  const hasLargeFiles = largeFiles.length > 0
+  const isFileCountExceed = allFilesCount.value + nonDuplicateFiles.length > MAX_FILE_COUNT
+
+  const validFiles = nonLargeFiles.splice(0, MAX_FILE_COUNT - allFilesCount.value)
+
+  if (isFileCountExceed && !hasLargeFiles) {
+    toastStore.createToast({
+      title: 'Error',
+      description: `Each task can have at most ${MAX_FILE_COUNT} files.\nThe following files are not added: ${nonLargeFiles.map(f => f.name).join(', ')}`,
+      status: 'error',
+      duration: 10000
+    })
+  } else if (!isFileCountExceed && hasLargeFiles) {
+    toastStore.createToast({
+      title: 'Error',
+      description: `Each task can have at most ${MAX_FILE_SIZE}MB of files.\nThe following files are not added: ${largeFiles.map(f => f.name).join(', ')}`,
+      status: 'error',
+      duration: 10000
+    })
+  } else if (isFileCountExceed && hasLargeFiles) {
     toastStore.createToast({
       title: 'Error',
       description: `Each task can have at most ${MAX_FILE_COUNT} files and ${MAX_FILE_SIZE}MB of files.\nThe following files are not added: ${nonDuplicateFiles.filter(f => !validFiles.includes(f)).map(f => f.name).join(', ')}`,
-      status: 'error'
+      status: 'error',
+      duration: 10000
     })
-    return validFiles
-  } else if (isFileCountExceed) {
-    const validFiles = nonDuplicateFiles.splice(0, MAX_FILE_COUNT - allFilesCount.value)
-    toastStore.createToast({
-      title: 'Error',
-      description: `Each task can have at most ${MAX_FILE_COUNT} files.\nThe following files are not added: ${nonDuplicateFiles.map(f => f.name).join(', ')}`,
-      status: 'error'
-    })
-    console.log(validFiles)
-    return validFiles
-  } else if (isFileSizeExceed) {
-    const validFiles = []
-    let totalSize = rawAllFilesSize.value
-    for (const file of nonDuplicateFiles) {
-      if (totalSize + sumFileSizes(validFiles) + file.size <= MAX_FILE_SIZE * Math.pow(1024, 2)) {
-        validFiles.push(file)
-      } else {
-        break
-      }
-    }
-    toastStore.createToast({
-      title: 'Error',
-      description: `Each task can have at most ${MAX_FILE_SIZE}MB of files.\nThe following files are not added: ${nonDuplicateFiles.filter(f => !validFiles.includes(f)).map(f => f.name).join(', ')}`,
-      status: 'error'
-    })
-    return validFiles
   }
 
-  return nonDuplicateFiles
+  return validFiles
 }
 
 const handleFileChange = (e) => {
@@ -170,7 +167,6 @@ async function doCreateTask() {
 }
 
 async function doUpdateTask() {
-  console.log(taskModalData.value, 'from update task')
   const res = await updateTask(boardId, taskModalData.value)
   if (res.ok) {
     const updatedTask = res.data
@@ -190,20 +186,28 @@ async function doUpdateTask() {
 }
 
 async function doUploadAttachments() {
-  const res = await uploadTaskAttachment(taskModalData.value.id, boardStore.currentBoard.id, attachedFiles.value)
+  const res = await uploadTaskAttachments(
+    taskModalData.value.id,
+    boardStore.currentBoard.id,
+    attachedFiles.value,
+    (e, file) => {
+      if (e.lengthComputable) {
+        const percentComplete = e.loaded / e.total * 100
+        const fileIndex = attachedFiles.value.indexOf(file)
+        eachFileUploadProgress.value[fileIndex] = percentComplete
+      }
+    }
+  )
   attachedFiles.value = []
   if (res.ok) {
     const attachedFileList = res.data
-    console.log(attachedFileList)
     if (taskModalData.value.attachments && taskModalData.value.attachments.length > 0) {
-      console.log('hello world')
       attachedFiles.value = []
       taskModalData.value.attachments = [...taskModalData.value.attachments, ...attachedFileList]
     } else {
       attachedFiles.value = []
       taskModalData.value.attachments = attachedFileList
     }
-    console.log(taskModalData.value)
   } else {
     toastStore.createToast({
       title: 'Error',
@@ -398,7 +402,7 @@ const handleClickConfirm = async () => {
               ({{ taskModalData.assignees.length + '/30' }})
             </span> -->
             <span class="text-sm opacity-50">
-              {{ allFilesCount + '/10 files' }} <span>{{ allFilesSize + '/20MB' }}</span>
+              {{ allFilesCount + '/10 files' }} <span>{{ allFilesSize + '/200MB (20MB/file)' }}</span>
             </span>
           </div>
           <div v-if="taskModalMode === 'edit'" class="flex gap-2">
@@ -410,7 +414,7 @@ const handleClickConfirm = async () => {
               <IconSVG iconName="trash-fill" scale="1" size="1rem" />
               <span>Clear attachment</span>
             </button> -->
-            <BaseTooltip text="Hold to clear all attachments" :disabled="allFilesCount === 0">
+            <BaseTooltip text="Click/press and hold to clear all attachments" :disabled="allFilesCount === 0">
               <HoldButton @holdFinish="handleClearAttachment" :duration="2000" color="error" :disabled="allFilesCount === 0">
                 <IconSVG iconName="trash-fill" scale="1" size="1rem" />
                 <span>Clear attachment</span>
@@ -431,6 +435,7 @@ const handleClickConfirm = async () => {
           :fileInputId="fileInputId"
           @dropFiles="handleFileChange"
           :disabled="allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.microAction"
+          :eachFileUploadProgress="eachFileUploadProgress"
         />
         <AttachmentShowArea v-else-if="taskModalMode === 'view'" :existingFiles="taskModalData.attachments" />
       </div>

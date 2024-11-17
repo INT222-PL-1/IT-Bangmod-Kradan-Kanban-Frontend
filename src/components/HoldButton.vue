@@ -66,7 +66,6 @@ const shake = () => {
 const handleMouseDown = (e) => {
   mouseOrTouchEvent = e
   emits('hold')
-  console.log('hold')
   if (e instanceof TouchEvent) e.target.classList.remove('btn-outline')
   bgWidth.value = '100%'
   holdDuration.value = props.duration

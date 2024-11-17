@@ -18,8 +18,6 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function clearUserData() {
-    // console.log('Clearing user data')
-    // alert('Clearing user data')
     boardStore.clearBoardData()
     localStorage.removeItem('itbkk_access_token')
     localStorage.removeItem('itbkk_refresh_token')

@@ -1,4 +1,4 @@
-import zyos from 'zyos'
+import zyos, { ZyosResponse } from 'zyos'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 const VERSION = 'v3'
@@ -109,21 +109,59 @@ export async function deleteTask(taskId, boardId) {
  * @param {string} taskId - task id
  * @param {string} boardId - board id
  * @param {File[]} files - files to upload
+ * @param {function} onUploadProgress - callback function for upload progress
  */
-export async function uploadTaskAttachment(taskId, boardId, files) {
+export async function uploadTaskAttachments(taskId, boardId, files, onFileProgress) {
+  const url = `${BASE_URL}/${boardId}/tasks/${taskId}/files`
+
+  const uploadSuccessFile = []
+
+  const uploadPromises = files.map(async (file) => {
+    return new Promise(resolve => {
+      const formData = new FormData()
+      formData.append('files', file)
+
+      zyos.xhr(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('itbkk_access_token')
+        },
+        body: formData,
+        onUploadProgress: (progressEvent) => {
+          onFileProgress(progressEvent, file)
+        }
+      }).then((res) => {
+        const data = JSON.parse(res)
+        uploadSuccessFile.push(...data)
+        resolve(data)
+      }).catch((error) => {
+        console.error(error)
+        resolve(null)
+      })
+    })
+  })
+
+  await Promise.all(uploadPromises)
+
+  return ZyosResponse.success(uploadSuccessFile)
+}
+
+export async function uploadTaskAttachment(taskId, boardId, file, onProgress) {
   const url = `${BASE_URL}/${boardId}/tasks/${taskId}/files`
 
   const formData = new FormData()
-
-  files.forEach((file) => {
-    formData.append('files', file)
-  })
+  formData.append('files', file)
 
   try {
-    const res = await zyos.fetch(url, {
+    const res = await zyos.xhr(url, {
       method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('itbkk_access_token')
+      },
       body: formData,
-      timeout: 5000
+      onUploadProgress: (progressEvent) => {
+        onProgress(progressEvent)
+      }
     })
     return res
   } catch (error) {

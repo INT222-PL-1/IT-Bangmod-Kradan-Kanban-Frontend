@@ -53,10 +53,8 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   async function loadCollaborators(boardId = route.params.boardId) {
-    console.log('loadCollaborators', boardId)
     isLoading.value.collaborator = true
     const res = await getCollaborators(boardId)
-    // console.log(res.data)
     if (res.ok) {
       collaborators.value = res.data
     }

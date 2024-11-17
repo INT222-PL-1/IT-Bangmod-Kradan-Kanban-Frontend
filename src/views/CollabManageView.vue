@@ -50,7 +50,6 @@ const handleRefreshBtnClick = async () => {
 const handleAddButtonClick = () => {
   if (userStore.isOwnerOfCurrentBoard === false) return
 
-  console.log('Add Collaborator button clicked')
   collaboratorModalData.value = { ...defaultCollaboratorModalData }
   addModalOpenState.value = true
 }
@@ -61,7 +60,7 @@ const handleAddConfirm = async () => {
 
   try {
     boardStore.isLoading.microAction = true
-    const res = await addCollaborator(route.params.boardId, collaboratorModalData.value)
+    const res = await addCollaborator(route.params.boardId, collaboratorModalData.value, { noGlobalResponseHandling: true })
     if (res.ok) {
       toastStore.createToast({
         title: 'Success',
@@ -105,7 +104,6 @@ const handleAddConfirm = async () => {
 }
 
 const handleAddCancel = () => {
-  console.log('Cancel button clicked')
   addModalOpenState.value = false
 }
 
@@ -161,7 +159,6 @@ const handleRemoveConfirm = async () => {
 }
 
 const handleRemoveCancel = () => {
-  console.log('Remove Cancel button clicked')
   removeModalOpenState.value = false
 }
 
@@ -217,7 +214,6 @@ const handleAccessRightConfirm = async () => {
 }
 
 const handleAccessRightCancel = () => {
-  console.log('Access Right Cancel button clicked')
   selectedCollaborator.value.accessRight = selectedCollaborator.value.accessRight === 'READ' ? 'WRITE' : 'READ'
   changeAccessRightModalOpenState.value = false
 }
@@ -353,7 +349,7 @@ const handleAccessRightCancel = () => {
           <template #col-1="{ index }">{{ index + 1 }}</template>
           <template #col-2="{ item }">
             <div>
-              <div class="itbkk-name text-md font-bold">{{ item.name }}</div>
+              <div :class="{ 'opacity-75': item.inviteStatus === 'PENDING' }" class="itbkk-name text-md font-bold">{{ item.name }} <span class="text-sm font-normal">{{ item.inviteStatus === 'PENDING' ? '(Pending invite)' : '' }}</span></div>
               <div class="itbkk-email text-sm text-gray-500 itbkk-email">{{ item.email }}</div>
             </div>
           </template>

@@ -1,6 +1,7 @@
 <script setup>
 import { useToastStore } from '@/stores/toast';
 import IconSVG from './IconSVG.vue';
+import { onMounted, ref } from 'vue';
 
 const props = defineProps({
   toastData: {
@@ -10,6 +11,7 @@ const props = defineProps({
 })
 
 const toastStore = useToastStore()
+const timeIndicator = ref(null)
 
 const toastColor = {
   success: 'bg-success',
@@ -21,6 +23,14 @@ const toastColor = {
 const handleCloseToast = () => {
   toastStore.removeToast(props.toastData.id)
 }
+
+onMounted(() => {
+  timeIndicator.value.animate([{ width: '100%' }, { width: '0%' }], {
+    duration: props.toastData.duration,
+    easing: 'linear',
+    fill: 'forwards'
+  })
+})
 
 </script>
 
@@ -36,20 +46,20 @@ const handleCloseToast = () => {
         <div v-for="(description, index) of toastData.description.split('\n')" :key="index">{{ description }}</div>
       </div>
     </div>
-    <div class="h-2 bg-white animate-time-indicator opacity-50"></div>
+    <div ref="timeIndicator" class="h-2 bg-white opacity-50"></div>
   </div>
 </template>
 
 <style scoped>
-.animate-time-indicator {
+/* .animate-time-indicator {
   animation: time-indicator 5s linear forwards;
-}
+} */
 
 /* .animate-pop-in {
   animation: pop-in 0.3s ease;
 } */
 
-@keyframes time-indicator {
+/* @keyframes time-indicator {
   from {
     width: 100%;
   }
@@ -57,8 +67,7 @@ const handleCloseToast = () => {
   to {
     width: 0%;
   }
-
-}
+} */
 
 @keyframes pop-in {
   0% {

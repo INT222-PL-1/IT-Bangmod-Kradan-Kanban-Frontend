@@ -4,8 +4,9 @@ import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import { login } from '@/libs/userManagement'
 import { useToastStore } from '@/stores/toast'
 import { ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+const { query: { redirect } } = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
 
@@ -36,7 +37,11 @@ const handleLoginSubmit = async () => {
     if (res.ok) {
         localStorage.setItem('itbkk_access_token', res.data.access_token)
         localStorage.setItem('itbkk_refresh_token', res.data.refresh_token)
-        router.push({ name: 'all-board' })
+        if (redirect) {
+            router.push(redirect)
+        } else {
+            router.push({ name: 'all-board' })
+        }
     } else {
         toastStore.createToast({
             status: 'error',

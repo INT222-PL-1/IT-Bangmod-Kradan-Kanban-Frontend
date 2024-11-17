@@ -1,10 +1,11 @@
-name: Auto Redeploy
-run-name: "@${{ github.actor }} was pushed up a new update. Auto-Redeploy START!"
+name: Auto Redeploy [Development]
+run-name: "Auto-redeploy development called by @${{ github.actor }}. Auto-Redeploy START!"
 on: 
   workflow_dispatch: 
   push:
     branches:
     - 'main'
+    - 'develop/**'
   
 jobs:     
   Automate-Deploy:
@@ -23,6 +24,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: wanassanan/itb-kk-frontend:latest
+          tags: wanassanan/itb-kk-frontend:development
       - name: Trigger redeploy
-        run: 'curl -H "Authorization: Bearer ${{ secrets.WATCHTOWER_TOKEN }}" https://intproj23.sit.kmutt.ac.th/pl1/watchtower/v1/update'
+        run: 'curl -H "Authorization: Bearer ${{ secrets.WATCHTOWER_TOKEN }}" http://20.243.133.115/pl1/watchtower/v1/update'

@@ -17,6 +17,11 @@ const props = defineProps({
   file: {
     type: [File, Object],
     required: true
+  },
+  uploadProgress: {
+    type: Number,
+    default: 0,
+    validator: (value) => value >= 0 && value <= 100
   }
 })
 
@@ -39,7 +44,12 @@ function getBlobUrl(src) {
   } else {
     blobUrl = new Promise((resolve) => {
       zyos.fetch(src).then((res) => {
-        resolve(URL.createObjectURL(res.data))
+        try {
+          resolve(URL.createObjectURL(res.data))
+        } catch (error) {
+          console.error(error)
+          resolve(null)
+        }
       })
     })
   }
@@ -81,7 +91,6 @@ async function previewServerFile() {
 }
 
 const handleRemoveClick = () => {
-  console.log('removeClick', props.file)
   emits('removeClick', props.file)
 }
 
@@ -138,10 +147,17 @@ onUnmounted(() => {
 
 <template>
   <div class="flex-shrink-0 relative flex flex-col w-40 h-full bg-base-300 rounded-md" :title="file.name">
-    <div v-if="mode === 'edit'" class="absolute top-1 right-1">
+    <div v-if="mode === 'edit'" class="absolute top-1 right-1 z-10">
       <IconSVG iconName="x" class="text-base-content cursor-pointer" scale="1.5" @click="handleRemoveClick" />
     </div>
-    <div class="h-[50%] bg-secondary rounded-t-md">
+    <div class="h-[50%] bg-secondary rounded-t-md relative">
+      <Transition name="fade">
+        <div v-if="uploadProgress" class="absolute bg-[#0005] inset-0 grid place-items-center rounded-t-md z-20 opacity-80">
+          <div class="radial-progress transition-transform duration-500" :style="`--value:${uploadProgress}`" role="progressbar">
+            {{ Math.round(uploadProgress) }}%
+          </div>
+        </div>
+      </Transition>
       <div class="h-full grid place-items-center">
         <div v-if="file.type.includes('video') && image" class="relative">
           <IconSVG iconName="camera-video-fill" className="absolute bottom-[-0.75rem] right-[-0.75rem] drop-shadow-[0px_0px_2px_#1d232a88]" scale="2" size="2rem" />
@@ -159,26 +175,36 @@ onUnmounted(() => {
           <div>{{ fileSize }}</div>
         </div>
       </div>
-      <div v-if="file.type.includes('pdf') || file.type.includes('image') || file.type.includes('video') || file.type.includes('audio')" class="flex gap-1">
-        <BaseTooltip text="Download" className="flex-1">
-          <button @click="handleDownload" class="w-full btn btn-sm btn-neutral">
-            <IconSVG iconName="download" class="text-base-content" scale="1" />
-          </button>
-        </BaseTooltip>
-        <BaseTooltip text="Open in new tab" className="flex-1">
-          <button @click="handlePreview" class="w-full btn btn-sm btn-neutral">
-            <IconSVG iconName="box-arrow-up-right" class="text-base-content" scale="1" />
-          </button>
-        </BaseTooltip>
+      <div>
+        <div v-if="file.type.includes('pdf') || file.type.includes('image') || file.type.includes('video') || file.type.includes('audio')" class="flex gap-1">
+          <BaseTooltip text="Download" className="flex-1">
+            <button @click="handleDownload" class="w-full btn btn-sm btn-neutral">
+              <IconSVG iconName="download" class="text-base-content" scale="1" />
+            </button>
+          </BaseTooltip>
+          <BaseTooltip text="Open in new tab" className="flex-1">
+            <button @click="handlePreview" class="w-full btn btn-sm btn-neutral">
+              <IconSVG iconName="box-arrow-up-right" class="text-base-content" scale="1" />
+            </button>
+          </BaseTooltip>
+        </div>
+        <button v-else @click="handleDownload" class="w-full btn btn-sm btn-neutral">
+          <IconSVG iconName="download" class="text-base-content" scale="1" />
+          <div class="text-sm">Download</div>
+        </button>
       </div>
-      <button v-else @click="handleDownload" class="w-full btn btn-sm btn-neutral">
-        <IconSVG iconName="download" class="text-base-content" scale="1" />
-        <div class="text-sm">Download</div>
-      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
 
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
