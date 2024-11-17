@@ -1,5 +1,4 @@
 <script setup>
-
 import { ref, onMounted } from 'vue'
 
 const props = defineProps({
@@ -24,15 +23,16 @@ const props = defineProps({
 
 const icon = ref('')
 
-/**
- * @type {HTMLElement}
- */
 const thisIcon = ref(null)
 
 onMounted(async () => {
-  icon.value = (await import(`@/assets/icons/${props.iconName}.svg?raw`)).default
+  try {
+    const iconModule = await import(`@/assets/icons/${props.iconName}.svg?raw`)
+    icon.value = iconModule.default
+  } catch (error) {
+    console.error(`Failed to load icon: ${props.iconName}`, error)
+  }
 })
-
 </script>
 
 <template>
@@ -53,9 +53,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-
 *[disabled] > .icon-svg {
   opacity: 0.5;
 }
-
 </style>

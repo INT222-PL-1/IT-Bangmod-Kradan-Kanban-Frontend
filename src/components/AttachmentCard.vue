@@ -25,13 +25,11 @@ const props = defineProps({
   }
 })
 
+const isOnClient = computed(() => props.file instanceof File)
 const [iconName, iconColor] = getBootStrapIconFromMIME(props.file.type)
 const cachedBlobUrls = ref([])
 
-const fileSize = computed(() => {
-  const size = props.file.size
-  return formatFileSize(size)
-})
+const fileSize = computed(() => formatFileSize(props.file.size))
 
 function getBlobUrl(src) {
   const cachedBlobUrl = cachedBlobUrls.value.find((item) => item.src === src)
@@ -81,54 +79,48 @@ async function downloadServerFile() {
 function previewLocalFile() {
   const url = getBlobUrl(props.file)
   window.open(url, '_blank')
-  // URL.revokeObjectURL(url)
 }
 
 async function previewServerFile() {
   const blobUrl = await getBlobUrl(props.file.url)
   window.open(blobUrl, '_blank')
-  // URL.revokeObjectURL(blobUrl)
 }
 
-const handleRemoveClick = () => {
-  emits('removeClick', props.file)
-}
+const handleRemoveClick = () => emits('removeClick', props.file)
 
 const handleDownload = async () => {
-  if (props.file instanceof File) {
+  if (isOnClient.value) {
     downloadLocalFile()
   } else {
     await downloadServerFile()
   }
 }
 
-const handlePreview = () => {
-  if (props.file instanceof File) {
+const handlePreview = async () => {
+  if (isOnClient.value) {
     previewLocalFile()
   } else {
-    previewServerFile()
+    await previewServerFile()
   }
 }
 
 onMounted(async () => {
   if (props.file.type.includes('image')) {
-    if (props.file instanceof File) {
+    if (isOnClient.value) {
       const reader = new FileReader()
       reader.onload = (e) => {
         image.value = e.target.result
       }
       reader.readAsDataURL(props.file)
     } else {
-      // TODO: Use thumbnail url from server instead of downloading the whole image
       image.value = await getBlobUrl(props.file.url)
     }
   }
 
   if (props.file.type.includes('video')) {
-    if (props.file instanceof File) {
+    if (isOnClient.value) {
       image.value = await captureVideoThumbnail(props.file)
     } else {
-      // TODO: Use thumbnail url from server instead of downloading the whole video
       const res = await zyos.fetch(props.file.url)
       image.value = await captureVideoThumbnail(res.data)
     }
@@ -137,19 +129,17 @@ onMounted(async () => {
 
 onUnmounted(() => {
   cachedBlobUrls.value.forEach((item) => URL.revokeObjectURL(item.blobUrl))
-
   if (image.value) {
     URL.revokeObjectURL(image.value)
   }
 })
-
 </script>
 
 <template>
   <div class="flex-shrink-0 relative flex flex-col w-40 h-full bg-base-300 rounded-md" :title="file.name">
-    <div v-if="mode === 'edit'" class="absolute top-1 right-1 z-10">
-      <IconSVG iconName="x" class="text-base-content cursor-pointer" scale="1.5" @click="handleRemoveClick" />
-    </div>
+    <IconSVG v-if="mode === 'edit'" iconName="x" class="absolute cursor-pointer top-1 right-1 z-10" scale="1.5" @click="handleRemoveClick" />
+    <IconSVG v-if="!isOnClient" iconName="check-circle-fill" className="absolute text-success top-1 left-1 z-10" />
+    <IconSVG v-else iconName="upload" className="absolute top-1 left-1 z-10" />
     <div class="h-[50%] bg-secondary rounded-t-md relative">
       <Transition name="fade">
         <div v-if="uploadProgress" class="absolute bg-[#0005] inset-0 grid place-items-center rounded-t-md z-20 opacity-80">
@@ -160,7 +150,7 @@ onUnmounted(() => {
       </Transition>
       <div class="h-full grid place-items-center">
         <div v-if="file.type.includes('video') && image" class="relative">
-          <IconSVG iconName="camera-video-fill" className="absolute bottom-[-0.75rem] right-[-0.75rem] drop-shadow-[0px_0px_2px_#1d232a88]" scale="2" size="2rem" />
+          <IconSVG iconName="camera-video-fill" class="absolute bottom-[-0.75rem] right-[-0.75rem] drop-shadow-[0px_0px_2px_#1d232a88]" scale="2" size="2rem" />
           <img v-if="image" :src="image" class="object-contain w-[6rem] h-[4rem] bg-black rounded-sm" />
         </div>
         <img v-else-if="file.type.includes('image') && image" :src="image" class="object-cover w-[4rem] h-[5rem] rounded-sm" />
@@ -177,12 +167,12 @@ onUnmounted(() => {
       </div>
       <div>
         <div v-if="file.type.includes('pdf') || file.type.includes('image') || file.type.includes('video') || file.type.includes('audio')" class="flex gap-1">
-          <BaseTooltip text="Download" className="flex-1">
+          <BaseTooltip text="Download" class="flex-1">
             <button @click="handleDownload" class="w-full btn btn-sm btn-neutral">
               <IconSVG iconName="download" class="text-base-content" scale="1" />
             </button>
           </BaseTooltip>
-          <BaseTooltip text="Open in new tab" className="flex-1">
+          <BaseTooltip text="Open in new tab" class="flex-1">
             <button @click="handlePreview" class="w-full btn btn-sm btn-neutral">
               <IconSVG iconName="box-arrow-up-right" class="text-base-content" scale="1" />
             </button>
