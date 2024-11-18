@@ -235,7 +235,6 @@ const handleToggleBoardVisibility = async () => {
             :index="index"
             :hasWritePermission="userStore.hasWriteAccessOnCurrentBoard"
           />
-          <div class="divider"></div>
         </div>
       </div>
     </div>

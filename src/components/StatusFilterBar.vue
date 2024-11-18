@@ -13,6 +13,7 @@ defineProps({
 })
 
 const boardStore = useBoardStore()
+const searchBoxElement = ref(null)
 const searchTerm = ref('')
 
 onMounted(async () => {
@@ -31,6 +32,7 @@ const filteredStatusList = computed(() => {
 
 const handleFilterClick = async () => {
   await boardStore.loadStatuses()
+  searchBoxElement.value.focus()
 }
 
 const handleStatusClick = (statusName) => {
@@ -46,16 +48,16 @@ const handleClearFilterButtonClick = () => {
 </script>
 
 <template>
-  <div @click="handleFilterClick" class="dropdown">
+  <div class="dropdown">
     <NotificationIndicator v-show="boardStore.options.filterStatuses.length > 0" type="warning" class="absolute top-[0.125rem] left-[0.125rem]" />
-    <div class="flex items-center rounded-md overflow-hidden h-full bg-base-200">
+    <div @click="handleFilterClick" class="flex items-center rounded-md overflow-hidden h-full bg-base-200">
       <div class="hover:bg-base-100 h-full">
         <button class="itbkk-status-filter active:scale-90" title="Choose Filter">
           <IconSVG iconName="filter" scale="1.25" size="2rem" />
         </button>
       </div>
       <div v-if="compact === false" tabindex="0" role="button"
-        class="flex gap-1 items-center py-1 px-2 w-36 sm:w-64 lg:w-96 h-full cursor-pointer border-x-2 border-base-100 bg-base-200">
+        class="flex gap-1 items-center py-1 px-2 w-36 sm:w-56 lg:w-96 h-full cursor-pointer border-x-2 border-base-100 bg-base-200">
         <div v-show="boardStore.options.filterStatuses.length === 0" class="text-sm font-semibold opacity-50">
           Filter By Status(es)
         </div>
@@ -78,7 +80,7 @@ const handleClearFilterButtonClick = () => {
       class="dropdown-content menu mt-1 shadow bg-base-300 rounded-box w-[19rem] gap-1 h-fit border border-base-100 z-10">
       <div class="flex items-center gap-2">
         <IconSVG iconName="search" size="2rem" />
-        <input v-model="searchTerm" type="text" placeholder="Search status name"
+        <input ref="searchBoxElement" v-model="searchTerm" type="text" placeholder="Search status name"
           class="rounded-lg w-full bg-base-100 focus:outline-none focus:placeholder:opacity-50 p-2">
       </div>
       <div class="divider m-0"></div>

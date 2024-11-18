@@ -3,7 +3,7 @@ import { humanReadDate } from '@/libs/utils';
 import StatusCapsuleBadge from './StatusCapsuleBadge.vue';
 import IconSVG from './IconSVG.vue';
 
-defineEmits(['titleClick', 'editClick', 'deleteClick'])
+const emits = defineEmits(['titleClick', 'editClick', 'deleteClick'])
 
 defineProps({
   task: {
@@ -20,24 +20,26 @@ defineProps({
   }
 })
 
+const handleEditClick = (e) => {
+  e.stopPropagation()
+  emits('editClick')
+}
+
+const handleDeleteClick = (e) => {
+  e.stopPropagation()
+  emits('deleteClick')
+}
+
 </script>
 
 <template>
-  <div class="w-screen px-4 py-2 flex gap-2">
+  <div @click="$emit('titleClick')" class="w-screen px-4 pt-4 pb-8 flex gap-2 border-b-2 border-base-300 cursor-pointer">
     <div class="flex-none text-xl">•</div>
     <div class="flex-grow flex flex-col gap-2 overflow-hidden">
       <div class="flex items-baseline justify-between gap-2">
         <div class="flex gap-1 overflow-hidden">
-          <div @click="$emit('titleClick')" class="text-xl font-semibold truncate cursor-pointer">{{ task.title }}</div>
+          <div class="text-xl font-semibold truncate">{{ task.title }}</div>
           <div class="text-xl opacity-60">{{ '#' + task.id }}</div>
-        </div>
-        <div v-if="hasWritePermission" class="flex gap-2 bg-base-300 px-2 py-1 rounded-full">
-          <div @click="$emit('editClick')" class="cursor-pointer active:scale-95 transition">
-            <IconSVG iconName="pencil-square" scale="1" />
-          </div>
-          <div @click="$emit('deleteClick')" class="text-error cursor-pointer active:scale-95 transition">
-            <IconSVG iconName="trash-fill" scale="1" />
-          </div>
         </div>
       </div>
 
@@ -57,6 +59,16 @@ defineProps({
         </div>
       </div>
       <div class="text-xs font-semibold ml-1">Updated {{ humanReadDate(task.updatedOn) }}</div>
+      <div v-if="hasWritePermission" class="mt-2 flex gap-2">
+        <button @click="handleEditClick" class="btn btn-outline btn-sm active:scale-95 transition">
+          <IconSVG iconName="pencil-square" scale="1" />
+          Edit
+        </button>
+        <button @click="handleDeleteClick" class="btn btn-outline btn-sm btn-error cursor-pointer active:scale-95 transition">
+          <IconSVG iconName="trash-fill" scale="1" />
+          Delete
+        </button>
+      </div>
     </div>
   </div>
 </template>

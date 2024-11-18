@@ -446,7 +446,7 @@ const handleClickConfirm = async () => {
         @click="handleClickConfirm"
         :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
         class="itbkk-button-confirm btn btn-success" :disabled="disabledSaveButton">
-        Save
+        {{ attachedFiles.length > 0 ? 'Upload & Save' : 'Save' }}
       </button>
       <button v-once @click="handleClickClose" class="itbkk-button itbkk-button-cancel btn btn-neutral">
         {{ taskModalMode === 'view' ? 'Close' : 'Cancel' }}

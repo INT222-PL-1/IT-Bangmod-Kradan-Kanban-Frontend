@@ -30,7 +30,6 @@ const selectedCollaborator = ref(null)
 const removeModalOpenState = ref(false)
 const changeAccessRightModalOpenState = ref(false)
 
-
 async function refreshCollaborators() {
   await boardStore.loadCollaborators()
 }
@@ -273,12 +272,15 @@ const handleAccessRightCancel = () => {
     </template>
   </MiniModal>
 
-  <!-- ? Remove Collaborator Modal -->
+  <!-- ? Remove Collaborator or Cancel Invitation Modal -->
   <MiniModal
     :show="removeModalOpenState" @clickBG="handleRemoveCancel" :mobileCenter="true">
-    <template #title>Remove Collaborator</template>
+    <template #title>
+      {{ selectedCollaborator?.inviteStatus === 'PENDING' ? 'Cancel Invitation' : 'Remove Collaborator' }}
+    </template>
     <template #content>
-      <span>Do you want to remove <span class="italic">{{ selectedCollaborator?.name }}</span> from the board?</span>
+      <span v-if="selectedCollaborator?.inviteStatus === 'PENDING'">Do you want to cancel invitation to <span class="italic">{{ selectedCollaborator?.name }}</span>?</span>
+      <span v-else>Do you want to remove <span class="italic">{{ selectedCollaborator?.name }}</span> from the board?</span>
     </template>
     <template #actions>
       <button @click="handleRemoveConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.action">
@@ -363,7 +365,9 @@ const handleAccessRightCancel = () => {
           </template>
           <template #col-4="{ item }">
             <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
-              <button @click="handleRemoveButtonClick(item)" class="itbkk-collab-remove btn btn-sm btn-error btn-outline min-w-35 max-w-35"  :disabled="userStore.isOwnerOfCurrentBoard === false">Remove</button>
+              <button @click="handleRemoveButtonClick(item)" class="itbkk-collab-remove btn btn-sm btn-outline min-w-35 max-w-35" :class="{ 'btn-error': item.inviteStatus === 'JOINED' }"  :disabled="userStore.isOwnerOfCurrentBoard === false">
+                {{ item.inviteStatus === 'PENDING' ? 'Cancel' : 'Remove' }}
+              </button>
             </BaseTooltip>
           </template>
         </DynamicTable>
