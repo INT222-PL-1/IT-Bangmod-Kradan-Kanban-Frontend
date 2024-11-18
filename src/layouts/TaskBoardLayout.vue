@@ -1,16 +1,17 @@
 <script setup>
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import BackToTopButton from '@/components/BackToTopButton.vue'
 import IconSVG from '@/components/IconSVG.vue'
 import UserMenuButton from '@/components/UserMenuButton.vue'
 import ResponsiveLogo from '@/components/ResponsiveLogo.vue'
 import { useBoardStore } from '@/stores/board'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useThemeStore } from '@/stores/theme'
 import GhostHaunting from '@/components/festival/halloween/GhostHaunting.vue'
 
+const route = useRoute()
 const router = useRouter()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
@@ -21,6 +22,11 @@ const handleSignButtonClick = () => {
   if (userStore.user) userStore.clearUserData()
   router.push({ name: 'login' })
 }
+
+watch(() => route.name, () => {
+  sidebarOpenState.value = false
+})
+
 </script>
 
 <template>
@@ -30,10 +36,10 @@ const handleSignButtonClick = () => {
   <BackToTopButton />
   <aside class="sm:hidden fixed z-50 w-screen" :class="{ 'pointer-events-none': sidebarOpenState === false }">
     <div @click="sidebarOpenState = false"
-      class="absolute w-screen h-screen bg-[#0005] backdrop-blur-sm transition duration-1000"
+      class="absolute w-screen h-screen bg-[#0005] backdrop-blur-sm transition"
       :class="sidebarOpenState ? 'opacity-100' : 'opacity-0'"></div>
     <div
-      class="absolute w-[90vw] max-w-[20rem] h-screen flex flex-col bg-base-300 overflow-hidden transition duration-1000"
+      class="absolute w-[90vw] max-w-[20rem] h-screen flex flex-col bg-base-300 overflow-hidden transition"
       :class="sidebarOpenState ? 'translate-x-[0%]' : 'translate-x-[-100%]'">
       <div class="bg-base-200 p-4 flex flex-col gap-4">
         <!-- <IconSVG iconName="itbkk-logo" scale="3" size="3rem" />
@@ -57,6 +63,10 @@ const handleSignButtonClick = () => {
         <RouterLink :to="{ name: 'status-manage' }" exact-active-class="bg-neutral opacity-100"
           class="btn btn-ghost justify-start gap-4">
           <IconSVG iconName="sliders2-vertical" :scale="1.25" />Manage Status
+        </RouterLink>
+        <RouterLink :to="{ name: 'collab-manage' }" exact-active-class="bg-neutral opacity-100"
+          class="btn btn-ghost justify-start gap-4">
+          <IconSVG iconName="people" :scale="1.25" />Collaborator
         </RouterLink>
         <div class="divider"></div>
         <button @click="handleSignButtonClick" class="btn btn-ghost justify-start gap-4">

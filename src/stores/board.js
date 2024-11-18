@@ -12,21 +12,21 @@ import { HttpStatusCode } from 'zyos'
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
   const toastStore = useToastStore()
-  const isLoading = {
+  const isLoading = ref({
     action: false,
     board: false,
     task: false,
     status: false,
     collaborator: false
-  }
+  })
 
-  const isError = {
+  const isError = ref({
     action: false,
     board: false,
     task: false,
     status: false,
     collaborator: false
-  }
+  })
 
   const boards = ref([])
   const collaborativeBoards = ref([])
@@ -43,16 +43,16 @@ export const useBoardStore = defineStore('board', () => {
   })
 
   async function loadData(loaderFunction, dataKey, ...args) {
-    isLoading[dataKey] = true
-    isError[dataKey] = false
+    isLoading.value[dataKey] = true
+    isError.value[dataKey] = false
 
     const res = await loaderFunction(...args)
 
-    isLoading[dataKey] = false
+    isLoading.value[dataKey] = false
     if (res.ok) {
       return res.data
     } else {
-      isError[dataKey] = true
+      isError.value[dataKey] = true
       return null
     }
   }
@@ -92,8 +92,8 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   async function updateBoard(boardId, boardData) {
-    isLoading.board = true
-    isError.board = false
+    isLoading.value.board = true
+    isError.value.board = false
     const res = await patchBoard(boardId, boardData)
     if (res.ok) {
       currentBoard.value = { ...currentBoard.value, ...res.data }
@@ -124,7 +124,7 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   async function toggleBoardVisibility() {
-    isLoading.action = true
+    isLoading.value.action = true
     const res = await patchBoard(currentBoard.value.id, {
       visibility: currentBoard.value.isPublic ? Pl1VisibilityType.PRIVATE : Pl1VisibilityType.PUBLIC
     }, {
@@ -139,7 +139,7 @@ export const useBoardStore = defineStore('board', () => {
         status: 'error'
       })
     }
-    isLoading.action = false
+    isLoading.value.action = false
   }
 
   function clearCurrentBoardData() {
