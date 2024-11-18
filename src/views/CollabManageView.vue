@@ -24,7 +24,7 @@ const defaultCollaboratorModalData = {
 }
 const collaboratorModalData = ref(defaultCollaboratorModalData)
 const addModalOpenState = ref(false)
-const disabledAddButton = computed(() => !collaboratorModalData.value.email || collaboratorModalData.value.email.length > 50 || boardStore.isLoading.microAction)
+const disabledAddButton = computed(() => !collaboratorModalData.value.email || collaboratorModalData.value.email.length > 50 || boardStore.isLoading.action)
 
 const selectedCollaborator = ref(null)
 const removeModalOpenState = ref(false)
@@ -37,7 +37,7 @@ async function refreshCollaborators() {
 
 onMounted(async () => {
   if (boardStore.currentBoard === null) {
-    await boardStore.loadBoard()
+    await boardStore.loadCurrentBoard()
   } else {
     await refreshCollaborators()
   }
@@ -55,11 +55,11 @@ const handleAddButtonClick = () => {
 }
 
 const handleAddConfirm = async () => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
   if (userStore.isOwnerOfCurrentBoard === false) return
 
   try {
-    boardStore.isLoading.microAction = true
+    boardStore.isLoading.action = true
     const res = await addCollaborator(route.params.boardId, collaboratorModalData.value, { noGlobalResponseHandling: true })
     if (res.ok) {
       toastStore.createToast({
@@ -99,7 +99,7 @@ const handleAddConfirm = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 
@@ -115,11 +115,11 @@ const handleRemoveButtonClick = (collaborator) => {
 }
 
 const handleRemoveConfirm = async () => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
   if (userStore.isOwnerOfCurrentBoard === false) return
 
   try {
-    boardStore.isLoading.microAction = true
+    boardStore.isLoading.action = true
     const res = await removeCollaborator(route.params.boardId, selectedCollaborator.value.oid)
     if (res.ok) {
       toastStore.createToast({
@@ -154,7 +154,7 @@ const handleRemoveConfirm = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 
@@ -170,12 +170,12 @@ const handleAccessRightChange = (collaborator) => {
 }
 
 const handleAccessRightConfirm = async () => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
   if (userStore.isOwnerOfCurrentBoard === false) return
 
   const res = await patchCollaborator(route.params.boardId, selectedCollaborator.value.oid, { accessRight: selectedCollaborator.value.accessRight })
   try {
-    boardStore.isLoading.microAction = true
+    boardStore.isLoading.action = true
     if (res.ok) {
       toastStore.createToast({
         title: 'Success',
@@ -209,7 +209,7 @@ const handleAccessRightConfirm = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 
@@ -281,7 +281,7 @@ const handleAccessRightCancel = () => {
       <span>Do you want to remove <span class="italic">{{ selectedCollaborator?.name }}</span> from the board?</span>
     </template>
     <template #actions>
-      <button @click="handleRemoveConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.microAction">
+      <button @click="handleRemoveConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.action">
         Confirm
       </button>
       <button @click="handleRemoveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
@@ -298,7 +298,7 @@ const handleAccessRightCancel = () => {
       <span>Do you want to change access right of <span class="italic">{{ selectedCollaborator?.name }}</span> to <span class="font-semibold">{{ selectedCollaborator?.accessRight }}</span>?</span>
     </template>
     <template #actions>
-      <button @click="handleAccessRightConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.microAction">
+      <button @click="handleAccessRightConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.action">
         Confirm
       </button>
       <button @click="handleAccessRightCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
@@ -313,7 +313,7 @@ const handleAccessRightCancel = () => {
         <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
           <ButtonWithIcon
             @click="handleAddButtonClick"
-            className="itbkk-collaborator-add btn btn-sm btn-primary text-neutral"
+            class="itbkk-collaborator-add btn btn-sm btn-primary text-neutral"
             iconName="person-plus"  :disabled="userStore.isOwnerOfCurrentBoard === false">
             Add Collaborator
           </ButtonWithIcon>
@@ -334,8 +334,8 @@ const handleAccessRightCancel = () => {
           :colsClass="['w-1/12', 'w-5/12', 'w-4/12', 'w-2/12']"
           :items="boardStore.collaborators"
           itemsKey="oid"
-          :isLoading="boardStore.isLoading.collaborator && boardStore.isLoading.collaborator === 0"
-          :isError="boardStore.collaborators === null"
+          :isLoading="boardStore.isLoading.collaborator && boardStore.collaborators.length === 0"
+          :isError="boardStore.isError.collaborator"
         >
           <template #col-header-1>#</template>
           <template #col-header-2>Members</template>

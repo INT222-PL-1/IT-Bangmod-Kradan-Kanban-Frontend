@@ -2,7 +2,7 @@
 import IconSVG from './IconSVG.vue'
 
 defineProps({
-  className: {
+  class: {
     type: String
   },
   iconName: {
@@ -17,7 +17,7 @@ defineProps({
 </script>
 
 <template>
-  <button :class="className" class="flex" :disabled="disabled">
+  <button :class="$props.class" class="flex" :disabled="disabled">
     <div class="flex-none">
       <IconSVG :iconName="iconName" />
     </div>

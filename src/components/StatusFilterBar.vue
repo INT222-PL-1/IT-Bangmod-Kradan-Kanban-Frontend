@@ -20,6 +20,7 @@ onMounted(async () => {
 })
 
 const statusList = computed(() => {
+  if (boardStore.statuses === null) return []
   const copiedStatuses = [...boardStore.statuses]
   return copiedStatuses
 })

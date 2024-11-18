@@ -16,14 +16,14 @@ const boardModalData = ref({
   name: `${userStore.user.name} personal board`
 })
 const disabledSaveButton = computed(() => {
-  return boardStore.isLoading.microAction ||
+  return boardStore.isLoading.action ||
     boardModalData.value.name.length < 1 ||
     boardModalData.value.name.length > 120
 })
 
 const handleClickConfirm = async () => {
-  if (boardStore.isLoading.microAction) return
-  boardStore.isLoading.microAction = true
+  if (boardStore.isLoading.action) return
+  boardStore.isLoading.action = true
   try {
     const res = await createBoard(boardModalData.value)
     if (res.ok) {
@@ -39,7 +39,7 @@ const handleClickConfirm = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 

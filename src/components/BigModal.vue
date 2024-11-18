@@ -8,7 +8,7 @@ defineProps({
     type: Boolean,
     default: false
   },
-  className: {
+  class: {
     type: String,
     default: ''
   },
@@ -33,7 +33,7 @@ const themeStore = useThemeStore()
 
 <template>
   <BaseModal :show="show" @clickBG="clickBG" :mobileCenter="false">
-    <div :class="className" class="bg-base-300 max-w-[100vw] sm:max-w-[90vw] sm:rounded-xl h-auto flex flex-col" :style="{ width }">
+    <div :class="$props.class" class="bg-base-300 max-w-[100vw] sm:max-w-[90vw] sm:rounded-xl h-auto flex flex-col" :style="{ width }">
       <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none flex justify-between">
         <div class="w-full">
           <slot name="title">Title</slot>

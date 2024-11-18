@@ -28,7 +28,7 @@ const statusTransferModalOpenState = ref(false)
 const statusIdToTransfer = ref(1)
 
 async function refreshBoardStatuses() {
-  await boardStore.loadBoard()
+  await boardStore.loadCurrentBoard()
 }
 
 onMounted(async () => {
@@ -65,12 +65,12 @@ const handleOpenDeleteModal = (statusData) => {
 }
 
 const handleTransferStatus = async (fromStatusId, toStatusId) => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
   if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
 
   try {
-    boardStore.isLoading.microAction = true
+    boardStore.isLoading.action = true
     const res = await deleteStatusAndTransferTasks(fromStatusId, toStatusId, boardId)
     if (res.ok) {
       toastStore.createToast({
@@ -90,17 +90,17 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
     console.error(error)
   } finally {
     statusTransferModalOpenState.value = false
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 
 const handleDeleteStatus = async (statusId) => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
   if (userStore.hasWriteAccessOnCurrentBoard === false) return
   const { boardId } = route.params
 
   try {
-    boardStore.isLoading.microAction = true
+    boardStore.isLoading.action = true
     const res = await deleteStatus(statusId, boardId)
     if (res.ok) {
       toastStore.createToast({
@@ -121,7 +121,7 @@ const handleDeleteStatus = async (statusId) => {
     console.error(error)
   } finally {
     statusDeleteModalOpenState.value = false
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 
@@ -145,7 +145,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
       </button>
       <button @click="handleDeleteStatus(statusModalData.id)"
         class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
-        :disabled="boardStore.isLoading.microAction"
+        :disabled="boardStore.isLoading.action"
       >
         Confirm
       </button>
@@ -176,7 +176,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
       </button>
       <button @click="handleTransferAndDeleteStatus(statusModalData.id, statusIdToTransfer)"
         class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
-        :disabled="boardStore.isLoading.microAction"
+        :disabled="boardStore.isLoading.action"
       >
         Transfer and Delete
       </button>
@@ -235,7 +235,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
           :items="boardStore.statuses"
           itemsKey="id"
           :isLoading="boardStore.isLoading.status && boardStore.statuses.length === 0"
-          :isError="boardStore.statuses === null"
+          :isError="boardStore.isError.status"
         >
           <template #col-header-1>
             <div class="flex items-center">#</div>
@@ -277,14 +277,14 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
             <div v-if="item.isPredefined === false" class="flex justify-start items-center gap-2 w-full">
               <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
                 <ButtonWithIcon @click="handleEditBtnClick(item.id)"
-                  className="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap"
+                  class="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap"
                   iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
                   Edit
                 </ButtonWithIcon>
               </BaseTooltip>
               <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
                 <ButtonWithIcon @click="handleOpenDeleteModal(item)"
-                  className="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
+                  class="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
                   iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
                   Delete
                 </ButtonWithIcon>

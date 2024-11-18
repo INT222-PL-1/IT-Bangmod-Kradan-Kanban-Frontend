@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useRoute, useRouter } from 'vue-router'
 import IconSVG from '@/components/IconSVG.vue'
@@ -33,10 +33,10 @@ const boardSettingsModalOpenState = ref(false)
 const boardVisibilityModalOpenState = ref(false)
 
 async function refreshBoardTasks() {
-  await boardStore.loadBoard()
+  await boardStore.loadCurrentBoard()
 }
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await refreshBoardTasks()
 })
 
@@ -60,10 +60,10 @@ const handleOpenDeleteModal = (taskData) => {
 }
 
 const handleDeleteTask = async (taskId) => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
   if (userStore.hasWriteAccessOnCurrentBoard === false) return
 
-  boardStore.isLoading.microAction = true
+  boardStore.isLoading.action = true
   try {
     const res = await deleteTask(taskId, route.params.boardId)
     if (res.ok) {
@@ -85,7 +85,7 @@ const handleDeleteTask = async (taskId) => {
     console.error(error)
   } finally {
     taskDeleteModalOpenState.value = false
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 
@@ -109,11 +109,11 @@ const handleToggleVisibilityButtonClick = () => {
 }
 
 const handleToggleBoardVisibility = async () => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
   if (userStore.isOwnerOfCurrentBoard === false) return
 
   try {
-    boardStore.isLoading.microAction = true
+    boardStore.isLoading.action = true
     await new Promise(resolve => setTimeout(() => {
       boardVisibilityModalOpenState.value = false
       resolve()
@@ -123,7 +123,7 @@ const handleToggleBoardVisibility = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 </script>
@@ -150,7 +150,7 @@ const handleToggleBoardVisibility = async () => {
       <button @click="boardVisibilityModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
         Cancel
       </button>
-      <button @click="handleToggleBoardVisibility" :disabled="boardStore.isLoading.microAction"
+      <button @click="handleToggleBoardVisibility" :disabled="boardStore.isLoading.action"
         class="itbkk-button-confirm btn btn-sm btn-error btn-outline">
         Confirm
       </button>
@@ -171,7 +171,7 @@ const handleToggleBoardVisibility = async () => {
       </button>
       <button @click="handleDeleteTask(taskDeleteModalData.id)"
         class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
-        :disabled="boardStore.isLoading.microAction"
+        :disabled="boardStore.isLoading.action"
       >
         Confirm
       </button>
@@ -216,7 +216,7 @@ const handleToggleBoardVisibility = async () => {
       <div v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
         <div colspan="4" class="flex justify-center items-center h-32">Loading tasks...</div>
       </div>
-      <div v-else-if="boardStore.tasks === null">
+      <div v-else-if="boardStore.isError.task">
         <div colspan="4" class="flex justify-center items-center h-32">Error while loading tasks from server. Please try again later.</div>
       </div>
       <div v-else-if="boardStore.tasks.length === 0">
@@ -268,7 +268,7 @@ const handleToggleBoardVisibility = async () => {
         </BaseMenu>
         <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
           <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" 
-          className="itbkk-board-visibility" :disabled="userStore.isOwnerOfCurrentBoard === false" />
+          class="itbkk-board-visibility" :disabled="userStore.isOwnerOfCurrentBoard === false" />
         </BaseTooltip>
         <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
           <button @click="handleAddBtnClick" type="button"
@@ -298,7 +298,7 @@ const handleToggleBoardVisibility = async () => {
           :items="boardStore.tasks"
           itemsKey="id"
           :isLoading="boardStore.isLoading.task && boardStore.tasks.length === 0"
-          :isError="boardStore.tasks === null"
+          :isError="boardStore.isError.task"
         >
           <template #col-header-1>#</template>
           <template #col-header-2>
@@ -344,18 +344,18 @@ const handleToggleBoardVisibility = async () => {
                 </template>
                 <template #menu>
                   <div>
-                    <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" className="w-full">
+                    <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" class="w-full">
                       <ButtonWithIcon @click="handleEditBtnClick(task.id)"
-                        className="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap w-full"
+                        class="itbkk-button-edit btn btn-sm btn-ghost justify-start flex flex-nowrap w-full"
                         iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
                         Edit
                       </ButtonWithIcon>
                     </BaseTooltip>
                   </div>
                   <div>
-                    <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" className="w-full">
+                    <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard" class="w-full">
                       <ButtonWithIcon @click="handleOpenDeleteModal(task)"
-                        className="itbkk-button-delete btn btn-sm btn-ghost justify-start text-error flex flex-nowrap w-full"
+                        class="itbkk-button-delete btn btn-sm btn-ghost justify-start text-error flex flex-nowrap w-full"
                         iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
                         Delete
                       </ButtonWithIcon>

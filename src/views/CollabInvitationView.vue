@@ -74,7 +74,7 @@ onMounted(async () => {
     <div class="font-bold text-4xl">ITBKK</div>
   </div>
   <div v-if="invitation && invitation.inviteStatus && invitation.inviteStatus !== 'JOINED'" class="w-[25rem] bg-base-300 mx-auto rounded-lg flex flex-col items-center py-8">
-    <IconSVG iconName="person-fill-add" size="4rem" scale="4" className="mt-8 mb-6" />
+    <IconSVG iconName="person-fill-add" size="4rem" scale="4" class="mt-8 mb-6" />
     <div class="flex flex-col items-center w-full gap-1">
       <!-- <div class="text-lg ">You've been invited to the</div>
       <div class="break-words max-w-[90%] text-lg "><span class="font-semibold">{{ invitation?.boardName }}</span> board.</div>
@@ -91,7 +91,7 @@ onMounted(async () => {
     </div>
   </div>
   <div v-else class="w-[25rem] bg-base-300 mx-auto rounded-lg flex flex-col items-center py-8">
-    <IconSVG iconName="person-fill" size="4rem" scale="4" className="mt-8 mb-6" />
+    <IconSVG iconName="person-fill" size="4rem" scale="4" class="mt-8 mb-6" />
     <div class="flex flex-col items-center w-full gap-1">
       <div class="text-lg">Invitation not found</div>
       <div class="text-sm my-3">Sorry, we couldn't find your active invitation to this board.</div>

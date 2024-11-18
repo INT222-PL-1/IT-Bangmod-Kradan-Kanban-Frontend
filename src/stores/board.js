@@ -12,13 +12,21 @@ import { HttpStatusCode } from 'zyos'
 export const useBoardStore = defineStore('board', () => {
   const route = useRoute()
   const toastStore = useToastStore()
-  const isLoading = ref({
-    microAction: false,
+  const isLoading = {
+    action: false,
     board: false,
     task: false,
     status: false,
     collaborator: false
-  })
+  }
+
+  const isError = {
+    action: false,
+    board: false,
+    task: false,
+    status: false,
+    collaborator: false
+  }
 
   const boards = ref([])
   const collaborativeBoards = ref([])
@@ -33,56 +41,59 @@ export const useBoardStore = defineStore('board', () => {
     sortDirection: null,
     filterStatuses: []
   })
+
+  async function loadData(loaderFunction, dataKey, ...args) {
+    isLoading[dataKey] = true
+    isError[dataKey] = false
+
+    const res = await loaderFunction(...args)
+
+    isLoading[dataKey] = false
+    if (res.ok) {
+      return res.data
+    } else {
+      isError[dataKey] = true
+      return null
+    }
+  }
+  
   
   async function loadTasks(boardId = route.params.boardId) {
-    isLoading.value.task = true
-    const res = await getTasks(boardId, options.value)
-    if (res.ok) {
-      tasks.value = res.data
-    }
-    isLoading.value.task = false
+    tasks.value = await loadData(getTasks, 'task', boardId, options.value)
   }
 
   async function loadStatuses(boardId = route.params.boardId) {
-    isLoading.value.status = true
-    const res = await getStatuses(boardId)
-    if (res.ok) {
-      statuses.value = res.data
-    }
-    isLoading.value.status = false
+    statuses.value = await loadData(getStatuses, 'status', boardId)
   }
 
   async function loadCollaborators(boardId = route.params.boardId) {
-    isLoading.value.collaborator = true
-    const res = await getCollaborators(boardId)
-    if (res.ok) {
-      collaborators.value = res.data
-    }
-    isLoading.value.collaborator = false
+    collaborators.value = await loadData(getCollaborators, 'collaborator', boardId)
   }
 
   async function loadAllBoards() {
-    isLoading.value.board = true
-    const res = await getBoards()
-    if (res.ok) {
-      boards.value = res.data.personalBoards
-      collaborativeBoards.value = res.data.collaborativeBoards
+    const allBoards = await loadData(getBoards, 'board')
+    if (allBoards) {
+      boards.value = allBoards.personalBoards
+      collaborativeBoards.value = allBoards.collaborativeBoards
+    } else {
+      boards.value = null
+      collaborativeBoards.value = null
     }
-    isLoading.value.board = false    
   }
 
-  async function loadBoard(boardId = route.params.boardId) {
-    isLoading.value.board = true
-    const res = await getBoardById(boardId)
-    if (res.ok) {
-      currentBoard.value = { ...res.data, isPublic: res.data.visibility === Pl1VisibilityType.PUBLIC }
+  async function loadCurrentBoard(boardId = route.params.boardId) {
+    const board = await loadData(getBoardById, 'board', boardId)
+    if (board) {
+      currentBoard.value = { ...board, isPublic: board.visibility === Pl1VisibilityType.PUBLIC }
       await Promise.all([loadTasks(boardId), loadStatuses(boardId), loadCollaborators(boardId)])
+    } else {
+      clearCurrentBoardData()
     }
-    isLoading.value.board = false
   }
 
   async function updateBoard(boardId, boardData) {
-    isLoading.value.board = true
+    isLoading.board = true
+    isError.board = false
     const res = await patchBoard(boardId, boardData)
     if (res.ok) {
       currentBoard.value = { ...currentBoard.value, ...res.data }
@@ -90,6 +101,7 @@ export const useBoardStore = defineStore('board', () => {
       throw new Error(res.message)
     }
     isLoading.value.board = false
+    isError.value.board = !res.ok
     return res.data
   }
 
@@ -112,6 +124,7 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   async function toggleBoardVisibility() {
+    isLoading.action = true
     const res = await patchBoard(currentBoard.value.id, {
       visibility: currentBoard.value.isPublic ? Pl1VisibilityType.PRIVATE : Pl1VisibilityType.PUBLIC
     }, {
@@ -126,12 +139,14 @@ export const useBoardStore = defineStore('board', () => {
         status: 'error'
       })
     }
+    isLoading.action = false
   }
 
-  function clearBoardData() {
+  function clearCurrentBoardData() {
     currentBoard.value = null
-    tasks.value.splice(0, tasks.value.length)
-    statuses.value.splice(0, statuses.value.length)
+    tasks.value = []
+    statuses.value = []
+    collaborators.value = []
     options.value.sortBy = null
     options.value.sortDirection = null
     clearTaskFilterStatus()
@@ -143,6 +158,7 @@ export const useBoardStore = defineStore('board', () => {
 
   return {
     isLoading,
+    isError,
     boards,
     tasks,
     statuses,
@@ -151,13 +167,13 @@ export const useBoardStore = defineStore('board', () => {
     loadTasks,
     loadStatuses,
     loadAllBoards,
-    loadBoard,
+    loadCurrentBoard,
     sortTasks,
     addTaskFilterStatus,
     removeTaskFilterStatus,
     clearTaskFilterStatus,
     toggleBoardVisibility,
-    clearBoardData,
+    clearCurrentBoardData,
     updateBoard,
     collaborativeBoards,
     loadCollaborators,

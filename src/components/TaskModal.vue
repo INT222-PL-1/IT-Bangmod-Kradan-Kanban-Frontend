@@ -127,7 +127,7 @@ const disabledSaveButton = computed(() => {
         attachedFiles.value.length === 0 &&
         taskModalData.value.attachments.length === previousTaskData.attachments.length
       )
-    ) || boardStore.isLoading.microAction
+    ) || boardStore.isLoading.action
 })
 
 async function loadSelectedTaskData() {
@@ -242,10 +242,10 @@ const handleClickClose = () => {
 }
 
 const handleClickConfirm = async () => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
 
   try {
-    boardStore.isLoading.microAction = true
+    boardStore.isLoading.action = true
     if (taskModalMode.value === 'add') {
       await doCreateTask()
       await boardStore.loadTasks()
@@ -259,14 +259,14 @@ const handleClickConfirm = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 
 </script>
 
 <template>
-  <BigModal :show="taskModalData !== null" @clickBG="handleClickClose" className="itbkk-modal-task">
+  <BigModal :show="taskModalData !== null" @clickBG="handleClickClose" class="itbkk-modal-task">
     <template #title>
       <span v-if="taskModalMode === 'view'" class="itbkk-title">{{ taskModalData?.title }}</span>
         <span v-else-if="taskModalMode === 'add'">New Task</span>
@@ -393,7 +393,7 @@ const handleClickConfirm = async () => {
           multiple
           @change="handleFileChange"
           class="hidden"
-          :disabled="allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.microAction"
+          :disabled="allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.action"
         />
         <div class="flex flex-col sm:flex-row sm:justify-between gap-2 relative">
           <div class="text-lg font-semibold">
@@ -406,7 +406,7 @@ const handleClickConfirm = async () => {
             </span>
           </div>
           <div v-if="taskModalMode === 'edit'" class="flex gap-2">
-            <label :for="fileInputId" class="btn btn-sm btn-neutral" :class="{ 'btn-disabled': allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.microAction }">
+            <label :for="fileInputId" class="btn btn-sm btn-neutral" :class="{ 'btn-disabled': allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.action }">
               <IconSVG iconName="paperclip" scale="1" size="1rem" />
               <span>Add attachment</span>
             </label>
@@ -434,7 +434,7 @@ const handleClickConfirm = async () => {
           v-model:existing-files="taskModalData.attachments"
           :fileInputId="fileInputId"
           @dropFiles="handleFileChange"
-          :disabled="allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.microAction"
+          :disabled="allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.action"
           :eachFileUploadProgress="eachFileUploadProgress"
         />
         <AttachmentShowArea v-else-if="taskModalMode === 'view'" :existingFiles="taskModalData.attachments" />

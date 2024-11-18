@@ -27,7 +27,7 @@ const handleAddBoardClick = () => {
 }
 
 const handleBoardClick = async (boardId) => {
-  // await boardStore.loadBoard(boardId)
+  // await boardStore.loadCurrentBoard(boardId)
   router.push({ name: 'all-task', params: { boardId } })
 }
 
@@ -37,10 +37,10 @@ const handleLeaveBoardClick = (board) => {
 }
 
 const handleLeaveConfirm = async () => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
 
   try {
-    boardStore.isLoading.microAction = true
+    boardStore.isLoading.action = true
     const res = await removeCollaborator(selectedBoard.value.id, userStore.user.oid)
     if (res.ok) {
       toastStore.createToast({
@@ -65,7 +65,7 @@ const handleLeaveConfirm = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 
@@ -96,7 +96,7 @@ const handleAcceptDeclineClick = (board) => {
       <span>Do you want to leave <span class="italic font-semibold">{{ selectedBoard?.name }}</span> board?</span>
     </template>
     <template #actions>
-      <button @click="handleLeaveConfirm" class="btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.microAction">
+      <button @click="handleLeaveConfirm" class="btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.action">
         Confirm
       </button>
       <button @click="handleLeaveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">

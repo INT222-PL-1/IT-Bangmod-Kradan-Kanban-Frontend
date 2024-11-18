@@ -8,7 +8,7 @@ defineProps({
     type: Boolean,
     default: false,
   },
-  className: {
+  class: {
     type: String,
     default: '',
   },
@@ -18,7 +18,7 @@ defineProps({
 
 <template>
   <slot v-if="disabled"></slot>
-  <div v-else class="tooltip tooltip-secondary tooltip-top" :class="className" :data-tip="text">
+  <div v-else class="tooltip tooltip-secondary tooltip-top" :class="$props.class" :data-tip="text">
     <slot></slot>
   </div>
 </template>

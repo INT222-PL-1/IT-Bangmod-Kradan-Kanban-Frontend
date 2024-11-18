@@ -65,7 +65,7 @@ const handleSetTheme = (theme) => {
     <template #menu>
       <li>
         <ButtonWithIcon @click="handleSetTheme('system')" iconName="display"
-          className="btn btn-ghost btn-sm justify-start">
+          class="btn btn-ghost btn-sm justify-start">
           <div class="flex justify-between w-full">
             <div>System</div>
             <div v-show="themeSetting === 'system'">
@@ -77,7 +77,7 @@ const handleSetTheme = (theme) => {
       </li>
       <li>
         <ButtonWithIcon @click="handleSetTheme('light')" iconName="sun-fill"
-          className="btn btn-ghost btn-sm justify-start">
+          class="btn btn-ghost btn-sm justify-start">
           <div class="flex justify-between w-full">
             <div>Light</div>
             <div v-show="themeSetting === 'light'">
@@ -89,7 +89,7 @@ const handleSetTheme = (theme) => {
       </li>
       <li>
         <ButtonWithIcon @click="handleSetTheme('dark')" iconName="moon-fill"
-          className="btn btn-ghost btn-sm justify-start">
+          class="btn btn-ghost btn-sm justify-start">
           <div class="flex justify-between w-full">
             <div>Dark</div>
             <div v-show="themeSetting === 'dark'">

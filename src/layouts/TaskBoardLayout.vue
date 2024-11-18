@@ -101,22 +101,22 @@ const handleSignButtonClick = () => {
         <div class="divider divider-horizontal m-0"></div>
         <RouterLink :to="{ name: 'all-task' }" exact-active-class="bg-neutral opacity-100 nav-selected"
           class="btn btn-ghost btn-sm">
-          <IconSVG iconName="kanban" :scale="1.25" className="nav-icon" />
-          <IconSVG iconName="kanban-fill" :scale="1.25" className="nav-icon-selected" />
+          <IconSVG iconName="kanban" :scale="1.25" class="nav-icon" />
+          <IconSVG iconName="kanban-fill" :scale="1.25" class="nav-icon-selected" />
           Task Table
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
         <RouterLink :to="{ name: 'status-manage' }" exact-active-class="bg-neutral opacity-100 nav-selected"
           class="itbkk-manage-status btn btn-ghost btn-sm">
-          <IconSVG iconName="tags" :scale="1.25" className="nav-icon" />
-          <IconSVG iconName="tags-fill" :scale="1.25" className="nav-icon-selected" />
+          <IconSVG iconName="tags" :scale="1.25" class="nav-icon" />
+          <IconSVG iconName="tags-fill" :scale="1.25" class="nav-icon-selected" />
           Manage Status
         </RouterLink>
         <div class="divider divider-horizontal m-0"></div>
         <RouterLink :to="{ name: 'collab-manage' }" exact-active-class="bg-neutral opacity-100 nav-selected"
           class="itbkk-manage-collaborator btn btn-ghost btn-sm">
-          <IconSVG iconName="people" :scale="1.25" className="nav-icon" />
-          <IconSVG iconName="people-fill" :scale="1.25" className="nav-icon-selected" />
+          <IconSVG iconName="people" :scale="1.25" class="nav-icon" />
+          <IconSVG iconName="people-fill" :scale="1.25" class="nav-icon-selected" />
           Manage Collaborators
         </RouterLink>
       </div>

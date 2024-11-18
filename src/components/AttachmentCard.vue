@@ -138,8 +138,8 @@ onUnmounted(() => {
 <template>
   <div class="flex-shrink-0 relative flex flex-col w-40 h-full bg-base-300 rounded-md" :title="file.name">
     <IconSVG v-if="mode === 'edit'" iconName="x" class="absolute cursor-pointer top-1 right-1 z-10" scale="1.5" @click="handleRemoveClick" />
-    <IconSVG v-if="!isOnClient" iconName="check-circle-fill" className="absolute text-success top-1 left-1 z-10" />
-    <IconSVG v-else iconName="upload" className="absolute top-1 left-1 z-10" />
+    <IconSVG v-if="!isOnClient" iconName="check-circle-fill" class="absolute text-success top-1 left-1 z-10" />
+    <IconSVG v-else iconName="upload" class="absolute top-1 left-1 z-10" />
     <div class="h-[50%] bg-secondary rounded-t-md relative">
       <Transition name="fade">
         <div v-if="uploadProgress" class="absolute bg-[#0005] inset-0 grid place-items-center rounded-t-md z-20 opacity-80">

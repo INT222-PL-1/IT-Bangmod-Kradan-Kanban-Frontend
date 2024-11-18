@@ -50,15 +50,17 @@ if (props.colsCount !== props.colHeadersClass.length || props.colsCount !== prop
     <div v-if="isLoading" class="flex justify-center items-center h-40">
       <slot name="loading">Loading...</slot>
     </div>
-    <div v-else-if="isError" class="flex justify-center items-center h-40">
-      <slot name="error">Error...</slot>
-    </div>
     <div v-else-if="items.length === 0" class="flex justify-center items-center h-40">
       <slot name="empty">No data...</slot>
     </div>
-    <div v-else v-for="(item, index) in items" :key="itemsKey ? items[itemsKey] : index" :class="{ 'bg-base-200': index % 2 !== 0 }" class="flex">
-      <div v-for="j in colsCount" :key="j" :class="colsClass[j - 1]" class="px-4 py-3 flex items-center">
-        <slot :name="`col-${j}`" :item="item" :index="index">{{ 'col-' + j }}</slot>
+    <div v-else-if="isError" class="flex justify-center items-center h-40">
+      <slot name="error">Error...</slot>
+    </div>
+    <div v-else class="min-h-40">
+      <div v-for="(item, index) in items" :key="itemsKey ? items[itemsKey] : index" :class="{ 'bg-base-200': index % 2 !== 0 }" class="flex">
+        <div v-for="j in colsCount" :key="j" :class="colsClass[j - 1]" class="px-4 py-3 flex items-center">
+          <slot :name="`col-${j}`" :item="item" :index="index">{{ 'col-' + j }}</slot>
+        </div>
       </div>
     </div>
   </div>

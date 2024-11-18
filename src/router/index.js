@@ -26,7 +26,7 @@ const router = createRouter({
           meta: { title: 'Boards' },
           beforeEnter: async (to, from) => {
             const boardStore = useBoardStore()
-            boardStore.clearBoardData()
+            boardStore.clearCurrentBoardData()
             await boardStore.loadAllBoards()
             if (boardStore.boards.length > 0 && to.name === 'board-add') {
               return { name: 'all-board' }
@@ -200,7 +200,7 @@ router.beforeEach(async (to) => {
     // ? Clear all data and redirect to login
     localStorage.removeItem('itbkk_access_token')
     localStorage.removeItem('itbkk_refresh_token')
-    boardStore.clearBoardData()
+    boardStore.clearCurrentBoardData()
     userStore.clearUserData()
 
     toastStore.createToast({

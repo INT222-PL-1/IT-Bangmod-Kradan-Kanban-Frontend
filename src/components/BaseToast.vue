@@ -37,9 +37,7 @@ onMounted(() => {
 <template>
   <div :class="toastColor[toastData.status]"
     class="w-full sm:min-w-[24rem] max-w-[30rem] animate-pop-in rounded-lg overflow-hidden relative text-white">
-    <div @click="handleCloseToast" class="top-4 right-4 absolute cursor-pointer">
-      <IconSVG iconName="x" />
-    </div>
+    <IconSVG iconName="x" @click="handleCloseToast" class="top-4 right-4 absolute cursor-pointer" />
     <div class="p-4">
       <div class="font-bold">{{ toastData.title }}</div>
       <div class="itbkk-message break-words">

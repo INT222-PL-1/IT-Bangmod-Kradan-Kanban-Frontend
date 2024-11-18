@@ -15,7 +15,7 @@ const props = defineProps({
     type: [Number, String],
     default: '1rem'
   },
-  className: {
+  class: {
     type: String,
     default: ''
   }
@@ -38,7 +38,7 @@ onMounted(async () => {
 <template>
   <div
     :style="{ width: size, height: size }"
-    :class="[className]"
+    :class="[$props.class]"
     class="inline-grid place-items-center icon-svg"
     ref="thisIcon"
   >

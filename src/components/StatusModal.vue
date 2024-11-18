@@ -31,7 +31,7 @@ const disabledSaveButton = computed(() => {
         statusModalData.value.description === previousStatusData.description &&
         statusModalData.value.color === previousStatusData.color
       )
-    ) || boardStore.isLoading.microAction
+    ) || boardStore.isLoading.action
 })
 
 async function loadSelectedStatusData() {
@@ -73,11 +73,11 @@ const handleClickClose = () => {
 }
 
 const handleClickConfirm = async () => {
-  if (boardStore.isLoading.microAction) return
+  if (boardStore.isLoading.action) return
   const { boardId } = route.params
 
   try {
-    boardStore.isLoading.microAction = true
+    boardStore.isLoading.action = true
     if (statusModalMode.value === 'add') {
       const res = await createStatus(statusModalData.value, boardId)
       if (res.ok) {
@@ -118,14 +118,14 @@ const handleClickConfirm = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    boardStore.isLoading.microAction = false
+    boardStore.isLoading.action = false
   }
 }
 
 </script>
 
 <template>
-  <BigModal :show="statusModalData !== null" @clickBG="handleClickClose" className="itbkk-modal-status">
+  <BigModal :show="statusModalData !== null" @clickBG="handleClickClose" class="itbkk-modal-status">
     <template #title>
       <span v-if="statusModalMode === 'add'">Add Status</span>
       <span v-else-if="statusModalMode === 'edit'">Edit Status</span>
