@@ -34,6 +34,8 @@ watch(() => route.name, () => {
     <GhostHaunting />
   </div>
   <BackToTopButton />
+
+  <!-- ? Mobile UI -->
   <aside class="sm:hidden fixed z-50 w-screen" :class="{ 'pointer-events-none': sidebarOpenState === false }">
     <div @click="sidebarOpenState = false"
       class="absolute w-screen h-screen bg-[#0005] backdrop-blur-sm transition"
@@ -81,6 +83,8 @@ watch(() => route.name, () => {
       <button class="btn btn-square btn-ghost btn-sm">
         <IconSVG iconName="list" scale="2" size="2rem" @click="sidebarOpenState = true" />
       </button>
+      <IconSVG iconName="itbkk-logo" />
+      <div class="truncate text-lg">{{ boardStore.currentBoard?.owner.name }}</div>
       <div class="truncate text-lg">{{ boardStore.currentBoard?.name }}</div>
     </div>
   </header>

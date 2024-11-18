@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import IconSVG from './IconSVG.vue'
 import StatusBadge from './StatusBadge.vue'
 import { useBoardStore } from '@/stores/board'
@@ -15,10 +15,6 @@ defineProps({
 const boardStore = useBoardStore()
 const searchBoxElement = ref(null)
 const searchTerm = ref('')
-
-onMounted(async () => {
-  await boardStore.loadStatuses()
-})
 
 const statusList = computed(() => {
   if (boardStore.statuses === null) return []
