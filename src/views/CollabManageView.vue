@@ -316,17 +316,17 @@ const handleAccessRightCancel = () => {
           <ButtonWithIcon
             @click="handleAddButtonClick"
             class="itbkk-collaborator-add btn btn-sm btn-primary text-neutral"
-            iconName="person-plus"  :disabled="userStore.isOwnerOfCurrentBoard === false">
+            iconName="person-plus" :disabled="userStore.isOwnerOfCurrentBoard === false">
             Add Collaborator
           </ButtonWithIcon>
         </BaseTooltip>
 
-        <button @click="handleRefreshBtnClick" type="button"
-          class="btn btn-sm btn-secondary justify-start flex flex-nowrap ">
-          <div :class="{ 'animate-spin': boardStore.isLoading.status }">
-            <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-          </div>
-        </button>
+        <BaseTooltip text="Refresh collaborators">
+          <button @click="handleRefreshBtnClick" type="button"
+            class="btn btn-sm btn-secondary btn-square">
+            <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.collaborator }" />
+          </button>
+        </BaseTooltip>
 
       </template>
       <template #table>

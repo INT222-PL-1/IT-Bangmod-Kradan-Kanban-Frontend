@@ -219,10 +219,8 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
         </BaseTooltip>
         <BaseTooltip text="Refresh Statuses">
           <button @click="handleRefreshBtnClick" type="button"
-            class="btn btn-secondary btn-sm btn-square hidden md:flex">
-            <div :class="{ 'animate-spin': boardStore.isLoading.status }">
-              <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-            </div>
+            class="btn btn-secondary btn-sm btn-square hidden md:inline-flex">
+            <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.status }" />
           </button>
         </BaseTooltip>
       </template>
