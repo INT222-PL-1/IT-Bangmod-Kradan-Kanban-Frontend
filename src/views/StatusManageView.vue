@@ -7,7 +7,6 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import { deleteStatus, deleteStatusAndTransferTasks } from '@/libs/statusManagement'
 import { useToastStore } from '@/stores/toast'
 import StatusSelector from '@/components/StatusSelector.vue'
-import BaseMenu from '@/components/BaseMenu.vue'
 import { useBoardStore } from '@/stores/board'
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import { useUserStore } from '@/stores/user'
@@ -194,32 +193,15 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     <!-- ? Desktop View -->
     <BaseTablePlate>
       <template #right-menu>
-        <BaseMenu side="left" class="md:hidden">
-          <template #icon>
-            <IconSVG iconName="three-dots" scale="1.25" />
-          </template>
-          <template #menu>
-            <button @click="handleRefreshBtnClick" type="button"
-              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-              <div :class="{ 'animate-spin': boardStore.isLoading.status }">
-                <IconSVG iconName="arrow-clockwise" :scale="1.25" />
-              </div>Refresh Statuses
-            </button>
-            <button v-if="userStore.hasWriteAccessOnCurrentBoard" @click="handleAddBtnClick" type="button"
-              class="btn btn-sm btn-ghost justify-start flex flex-nowrap w-full">
-              <IconSVG iconName="plus" :scale="1.25" />Add Status
-            </button>
-          </template>
-        </BaseMenu>
         <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
           <button @click="handleAddBtnClick" type="button"
-            class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
             <IconSVG iconName="plus" :scale="1.25" />Add Status
           </button>
         </BaseTooltip>
         <BaseTooltip text="Refresh Statuses">
           <button @click="handleRefreshBtnClick" type="button"
-            class="btn btn-secondary btn-sm btn-square hidden md:inline-flex">
+            class="btn btn-secondary btn-sm btn-square">
             <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.status }" />
           </button>
         </BaseTooltip>

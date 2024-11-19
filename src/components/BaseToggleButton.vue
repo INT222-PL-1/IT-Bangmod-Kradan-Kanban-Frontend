@@ -100,7 +100,7 @@ const classMap = {
 </script>
 
 <template>
-  <button class="btn btn-sm" :class="classMap[currentValue ? colorTypeOn : colorTypeOff].btn + ' ' + $props.class" :disabled="disabled">
+  <button class="btn btn-sm border-2 border-base-300 hover:border-base-300 sm:border-0" :class="classMap[currentValue ? colorTypeOn : colorTypeOff].btn + ' ' + $props.class" :disabled="disabled">
     <div class="w-6 h-3 border-2 rounded-full flex items-center" :class="disabled ? 'border-base-content border-opacity-20' : classMap[currentValue ? colorTypeOn : colorTypeOff].borderContent">
       <div class="w-[0.45rem] h-[0.45rem] rounded-full transition" :class="[currentValue ? 'translate-x-[calc(1.25rem-0.45rem)]' : 'translate-x-[0.05rem]', disabled ? 'bg-base-content bg-opacity-20' : classMap[currentValue ? colorTypeOn : colorTypeOff].bgContent]"></div>
     </div>

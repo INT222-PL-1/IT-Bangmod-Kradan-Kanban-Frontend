@@ -17,6 +17,10 @@ defineProps({
   menuHeight: {
     type: String,
     default: 'auto'
+  },
+  outline: {
+    type: Boolean,
+    default: false
   }
 })
 </script>
@@ -24,7 +28,10 @@ defineProps({
 <template>
   <div class="dropdown itbkk-button-action" :class="{ 'dropdown-end': side === 'left' }">
     <div tabindex="0" @click="handleClick" role="button"
-      :class="{ 'btn btn-sm btn-ghost btn-square': mode === 'icon' }">
+      :class="[
+        { 'btn btn-sm btn-square': mode === 'icon', },
+        outline ? 'border-2 border-base-300 hover:border-base-300' : 'btn-ghost',
+      ]">
       <slot :name="mode === 'button' ? mode : 'icon'"></slot>
     </div>
     <div tabindex="0" class="dropdown-content menu p-2 shadow-md bg-base-300 border border-base-200 rounded-box w-52 gap-1 flex flex-col"

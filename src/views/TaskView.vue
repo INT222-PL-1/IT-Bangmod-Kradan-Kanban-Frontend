@@ -191,7 +191,8 @@ const handleToggleBoardVisibility = async () => {
       <div class="px-4 mb-4 flex justify-between">
         <StatusFilterBar compact />
         <div class="flex gap-2">
-          <BaseMenu side="left">
+          <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" :disabled="userStore.isOwnerOfCurrentBoard === false" />
+          <BaseMenu side="left" outline>
             <template #icon>
               <IconSVG iconName="three-dots" scale="1.25" />
             </template>
@@ -209,7 +210,6 @@ const handleToggleBoardVisibility = async () => {
               </button>
             </template>
           </BaseMenu>
-          <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" :disabled="userStore.isOwnerOfCurrentBoard === false" />
         </div>
       </div>
       <div v-if="boardStore.isLoading.task && boardStore.tasks.length === 0">
@@ -244,6 +244,10 @@ const handleToggleBoardVisibility = async () => {
         <StatusFilterBar />
       </template>
       <template #right-menu>
+        <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
+          <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" 
+          class="itbkk-board-visibility" :disabled="userStore.isOwnerOfCurrentBoard === false" />
+        </BaseTooltip>
         <BaseMenu side="left" class="md:hidden">
           <template #icon>
             <IconSVG iconName="three-dots" scale="1.25" />
@@ -264,10 +268,6 @@ const handleToggleBoardVisibility = async () => {
             </button>
           </template>
         </BaseMenu>
-        <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
-          <BoardVisibilityToggleButton @click="handleToggleVisibilityButtonClick" 
-          class="itbkk-board-visibility" :disabled="userStore.isOwnerOfCurrentBoard === false" />
-        </BaseTooltip>
         <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
           <button @click="handleAddBtnClick" type="button"
             class="itbkk-button-add btn btn-primary btn-sm text-neutral hidden md:flex" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
