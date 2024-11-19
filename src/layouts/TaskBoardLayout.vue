@@ -32,10 +32,8 @@ const handleSignButtonClick = () => {
 
 function intersectCallback(entry) {
   if (!entry.isIntersecting) {
-    entry.target.classList.add('invisible')
     intersectElements.value.push(entry.target)
   } else {
-    entry.target.classList.remove('invisible')
     intersectElements.value = intersectElements.value.filter(el => el !== entry.target)
   }
 }
@@ -126,19 +124,21 @@ watch(() => route.name, () => {
           <RouterLink :to="{ name: 'all-board' }" class="btn btn-ghost btn-sm pl-0 pr-2 h-full rounded-none opacity-75">
             <IconSVG iconName="arrow-left-short" :scale="1.25" />Board
           </RouterLink>
-          <RouterLink :to="{ name: 'all-task' }" exact-active-class="border-b-2 border-b-primary nav-selected"
+          <RouterLink :to="{ name: 'all-task' }" exact-active-class="border-b-2 border-b-primary hover:border-b-primary nav-selected"
             class="btn btn-ghost btn-sm px-1 h-full rounded-none">
             <IconSVG iconName="kanban" :scale="1.25" class="nav-icon" />
             <IconSVG iconName="kanban-fill" :scale="1.25" class="nav-icon-selected" />
             Task Table
           </RouterLink>
-          <RouterLink :to="{ name: 'status-manage' }" ref="statusBtn" exact-active-class="border-b-2 border-b-primary nav-selected"
+          <RouterLink :to="{ name: 'status-manage' }" ref="statusBtn" exact-active-class="border-b-2 border-b-primary hover:border-b-primary nav-selected"
+            :class="{ 'invisible': intersectElements.includes(statusBtn?.$el) }"
             class="itbkk-manage-status btn btn-ghost btn-sm px-1 h-full rounded-none">
             <IconSVG iconName="tags" :scale="1.25" class="nav-icon" />
             <IconSVG iconName="tags-fill" :scale="1.25" class="nav-icon-selected" />
             Manage Status
           </RouterLink>
-          <RouterLink :to="{ name: 'collab-manage' }" ref="collabBtn" exact-active-class="border-b-2 border-b-primary nav-selected"
+          <RouterLink :to="{ name: 'collab-manage' }" ref="collabBtn" exact-active-class="border-b-2 border-b-primary hover:border-b-primary nav-selected"
+            :class="{ 'invisible': intersectElements.includes(collabBtn?.$el) }"
             class="itbkk-manage-collaborator btn btn-ghost btn-sm px-1 h-full rounded-none">
             <IconSVG iconName="people" :scale="1.25" class="nav-icon" />
             <IconSVG iconName="people-fill" :scale="1.25" class="nav-icon-selected" />
@@ -230,11 +230,11 @@ watch(() => route.name, () => {
   display: none;
 }
 
-.nav-selected .nav-icon {
+.nav-selected > .nav-icon {
   display: none;
 }
 
-.nav-selected .nav-icon-selected {
-  display: block;
+.nav-selected > .nav-icon-selected {
+  display: inline-grid;
 }
 </style>
