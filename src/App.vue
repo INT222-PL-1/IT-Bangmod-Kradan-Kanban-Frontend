@@ -15,11 +15,13 @@ zyos.defineConfig({
   logging: 'none',
   globalResponseHandler: globalResponseHandler
 })
+
+const DEBUG_MODE = import.meta.env.VITE_DEBUG === 'true'
 </script>
 
 
 <template>
-  <DebugUI />
+  <DebugUI v-if="DEBUG_MODE" />
   <ToastContainer />
   <RouterView />
 </template>
