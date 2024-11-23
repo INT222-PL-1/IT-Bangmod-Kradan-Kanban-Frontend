@@ -14,6 +14,7 @@ import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import MiniModal from '@/components/MiniModal.vue'
 import { HttpStatusCode } from 'zyos'
 import DynamicTable from '@/components/DynamicTable.vue'
+import StatusListItem from '@/components/StatusListItem.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -189,6 +190,54 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
   </RouterView>
 
   <section class="max-w-full pt-10 pb-20">
+
+    <!-- ? Mobile View -->
+    <div class="block sm:hidden">
+      <div class="px-4 mb-4 flex justify-end">
+        <div class="flex gap-2">
+          <!-- <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
+            <button @click="handleAddBtnClick" type="button"
+              class="itbkk-button-add btn btn-primary btn-sm text-neutral" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+              <IconSVG iconName="plus" :scale="1.25" />Add Status
+            </button>
+          </BaseTooltip>
+          <BaseTooltip text="Refresh Statuses">
+            <button @click="handleRefreshBtnClick" type="button"
+            class="btn btn-secondary btn-sm btn-square">
+            <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.status }" />
+            </button>
+          </BaseTooltip> -->
+          <button @click="handleAddBtnClick" type="button"
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+            <IconSVG iconName="plus" :scale="1.25" />Add Status
+          </button>
+          <button @click="handleRefreshBtnClick" type="button"
+            class="btn btn-secondary btn-sm btn-square">
+            <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.status }" />
+          </button>
+        </div>
+      </div>
+      <div v-if="boardStore.isLoading.status && boardStore.statuses.length === 0">
+        <div colspan="4" class="flex justify-center items-center h-32">Loading tasks...</div>
+      </div>
+      <div v-else-if="boardStore.isError.status">
+        <div colspan="4" class="flex justify-center items-center h-32">Error while loading statuses from server. Please try again later.</div>
+      </div>
+      <div v-else-if="boardStore.statuses.length === 0">
+        <div colspan="4" class="flex justify-center items-center h-32">No status</div>
+      </div>
+      <div v-else class="w-full flex flex-col items-center gap-4 px-4">
+        <StatusListItem
+          v-for="(status, index) in boardStore.statuses"
+          :key="status.id"
+          @editClick="handleEditBtnClick(status.id)"
+          @deleteClick="handleOpenDeleteModal(status)"
+          :status="status"
+          :index="index"
+          :hasWritePermission="userStore.hasWriteAccessOnCurrentBoard"
+        />
+      </div>
+    </div>
 
     <!-- ? Desktop View -->
     <BaseTablePlate>
