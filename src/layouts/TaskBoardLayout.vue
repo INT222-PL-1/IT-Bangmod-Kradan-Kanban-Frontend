@@ -105,12 +105,12 @@ watch(() => route.name, () => {
     </div>
   </aside>
   <header class="block sm:hidden sticky top-0 z-30">
-    <div class="flex gap-3 items-center bg-base-300 px-4 h-[4rem]">
+    <div class="flex gap-3 items-center bg-base-300 px-4 h-[4rem] relative">
       <button @click="sidebarOpenState = true" class="btn btn-square btn-outline btn-sm">
         <IconSVG iconName="list" scale="1.5" size="1.5rem" />
       </button>
       <IconSVG iconName="itbkk-logo" scale="2.25" size="2.25rem" />
-      <div>
+      <div class="w-9/12">
         <div class="opacity-60">
           <span class="truncate text-sm">{{ boardStore.currentBoard?.owner.name }}</span>
           <span> /</span>
