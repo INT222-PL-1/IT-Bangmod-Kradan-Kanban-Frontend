@@ -28,13 +28,7 @@ const statusBtn = ref(null)
 
 const sidebarOpenState = ref(false)
 const handleSignButtonClick = () => {
-  // const test = new PublicClientApplication()
-  // test.logoutRedirect({
-    //   postLogoutRedirectUri: 'http://localhost:8080/login'
-    // })
-  console.log('Test: ', userStore.isMSAuthenticated)
   if (userStore.isMSAuthenticated) {
-    console.log('Logging out from MS')
     authStore.logoutMS()
     return
   }
@@ -51,7 +45,6 @@ function intersectCallback(entry) {
 }
 
 onMounted(() => {
-  console.log(collabBtn.value.$el)
   nextTick(() => {
     useIntersectionObserver.observeElement(collabBtn.value.$el, intersectCallback, {
       root: mobileNavContainer.value,

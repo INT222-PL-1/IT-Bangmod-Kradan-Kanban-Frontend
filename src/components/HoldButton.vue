@@ -79,7 +79,6 @@ const handleMouseDown = (e) => {
 const handleCancel = () => {
   if (!mouseOrTouchEvent) return
   emits('release')
-  console.log('release')
   bgWidth.value = '0%'
   reset()
 }

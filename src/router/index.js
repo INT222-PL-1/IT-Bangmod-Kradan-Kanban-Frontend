@@ -154,8 +154,6 @@ router.beforeEach(async (to) => {
   const boardStore = useBoardStore()
   const toastStore = useToastStore()
 
-  console.log('Navigating to:', to.name)
-
   await authStore.initializeMsal(msalConfig)
   const activeAccounts = await authStore.msalInstance.getAllAccounts()
   if (activeAccounts.length > 0) {
@@ -194,7 +192,6 @@ router.beforeEach(async (to) => {
     }
 
     if (userStore.isMSAuthenticated) {
-      console.log('Attempting to acquire new token...');
       await authStore.acquireToken()
     } else if (refreshToken) {
       // ? If refresh token exists, try to refresh access token.

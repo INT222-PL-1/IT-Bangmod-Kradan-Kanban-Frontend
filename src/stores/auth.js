@@ -22,7 +22,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
     try {
       msalInstance.value = new PublicClientApplication(config)
-      console.log('MSAL instance initialized', msalInstance.value)
       await msalInstance.value.initialize()
       await handleRedirect()
       setActiveAccount()
@@ -36,18 +35,13 @@ export const useAuthStore = defineStore('auth', () => {
    */
   async function handleRedirect() {
     isLoading.value = true
-    console.log('handleRedirect called')
     try {
       const response = await msalInstance.value.handleRedirectPromise()
-      console.log('Response from handleRedirect', response)
       if (response) {
-        console.log('Redirect response', response)
         activeAccount.value = response.account
         isAuthenticated.value = true
         userStore.loadUserData(response.account.idToken)
-        console.log('User data loaded after redirect', userStore.user)
       }
-      console.log('handleRedirect completed successfully')
     } catch (error) {
       console.error('Error handling redirect', error)
     } finally {
@@ -89,7 +83,6 @@ export const useAuthStore = defineStore('auth', () => {
    */
   function logoutMS(postLogoutRedirectUri = window.location.origin + '/pl1/login') {
     const account = msalInstance.value.getActiveAccount()
-    console.log('Logging out account', account)
     if (!account) {
       console.warn('No active account found for logout')
       return
@@ -117,7 +110,6 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const response = await msalInstance.value.acquireTokenSilent(request)
-      console.log('Token acquired', response)
       return response.accessToken
     } catch (error) {
       console.error('Silent token acquisition failed', error)

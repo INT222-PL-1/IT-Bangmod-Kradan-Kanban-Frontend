@@ -62,16 +62,7 @@ const handleLoginMS = async () => {
     await authStore.loginMS()
 }
 
-const handleLogoutMS = () => {
-    authStore.logoutMS()
-}
-
 onMounted(async () => {
-    // console.log('LoginView mounted', window.location)
-    // await msalClient.initialize()
-    // await msAuth.handleRedirect()
-    
-    console.log(userStore.user)
     if (userStore.user) {
         router.push({ name: 'all-board' })
     }
@@ -115,13 +106,12 @@ onMounted(async () => {
                 <button type="submit" :disabled="username.length === 0 || password.length === 0"
                     :class="{ 'disabled': username.length === 0 || password.length === 0 }"
                     class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
-                </form>
-                <div class="divider">Or</div>
-                <button @click="handleLoginMS" class="btn btn-neutral gap-3">
-                    <IconSVG iconName="microsoft-logo" size="1.5rem" :scale="1.5" />
-                    Login with Microsoft
-                </button>
-                <button @click="handleLogoutMS">logout</button>
+            </form>
+            <div class="divider">Or</div>
+            <button @click="handleLoginMS" class="btn btn-neutral gap-3">
+                <IconSVG iconName="microsoft-logo" size="1.5rem" :scale="1.5" />
+                Login with Microsoft
+            </button>
         </div>
     </main> 
 </template>
