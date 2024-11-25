@@ -6,6 +6,8 @@ import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast'
 import { refreshAccessToken, validateAccessToken } from '@/libs/userManagement'
 import BoardSelectLayout from '@/layouts/BoardSelectLayout.vue'
+import { useAuthStore } from '@/stores/auth'
+import { msalConfig } from '@/configs/authConfig'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -148,14 +150,25 @@ const router = createRouter({
 router.beforeEach(async (to) => {
 
   const userStore = useUserStore()
+  const authStore = useAuthStore()
   const boardStore = useBoardStore()
   const toastStore = useToastStore()
-  
-  // ? User can enter login, not-found and  forbidden page even user is not logged in.
-  if ([ 'login', 'not-found', 'forbidden' ].includes(to.name)) return
+
+  console.log('Navigating to:', to.name)
+
+  await authStore.initializeMsal(msalConfig)
+  const activeAccounts = await authStore.msalInstance.getAllAccounts()
+  if (activeAccounts.length > 0) {
+    authStore.msalInstance.setActiveAccount(activeAccounts[0])
+    userStore.loadUserData(authStore.msalInstance.getActiveAccount().idToken)
+  }
   
   async function handleUserValidation() {
-    const accessToken = localStorage.getItem('itbkk_access_token')
+
+    await authStore.handleRedirect()
+
+
+    let accessToken = userStore.user?.idToken || localStorage.getItem('itbkk_access_token')
     const refreshToken = localStorage.getItem('itbkk_refresh_token')
 
     // ? If access token exists.
@@ -166,18 +179,25 @@ router.beforeEach(async (to) => {
         // ? If access token is valid, load user data. Otherwise, try to refresh access token.
         const isAccessTokenValid = await validateAccessToken(accessToken)
         if (isAccessTokenValid) {
-          userStore.loadUserData()
+          if (userStore.isMSAuthenticated) {
+            userStore.loadUserData(accessToken)
+          } else {
+            userStore.loadUserData()
+          }
           return
         } else {
           throw new Error('Access token is invalid')
         }
       } catch (error) {
-        console.error(error)
+        console.error('Error validating access token:', error)
       }
     }
 
-    // ? If refresh token exists, try to refresh access token.
-    if (refreshToken) {
+    if (userStore.isMSAuthenticated) {
+      console.log('Attempting to acquire new token...');
+      await authStore.acquireToken()
+    } else if (refreshToken) {
+      // ? If refresh token exists, try to refresh access token.
       try {
         // ? If refresh token is valid, refresh access token and run user validation again.
         const res = await refreshAccessToken(refreshToken)
@@ -190,7 +210,7 @@ router.beforeEach(async (to) => {
         }
 
       } catch (error) {
-        console.error(error)
+        console.error('Error refreshing token:', error)
       }
     }
 
@@ -211,6 +231,9 @@ router.beforeEach(async (to) => {
 
     return { name: 'login' } 
   }
+
+  // ? User can enter login, not-found and  forbidden page even user is not logged in.
+  if ([ 'login', 'not-found', 'forbidden' ].includes(to.name)) return
 
   const nextRoute = await handleUserValidation()
   return nextRoute

@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:debug": "vite --mode debug",
-    "host": "vite --host",
+    "dev": "vite --base=/pl1/",
+    "dev:debug": "vite --mode debug --base=/pl1/",
+    "host": "vite --host --base=/pl1/",
     "build": "vite build --base=/pl1/",
     "preview": "vite preview",
     "serve": "vite build && vite preview",
@@ -20,6 +20,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@azure/msal-browser": "^3.27.0",
     "pinia": "^2.1.7",
     "vue": "^3.5.12",
     "vue-router": "^4.3.0",

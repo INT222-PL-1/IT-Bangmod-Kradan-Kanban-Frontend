@@ -2,8 +2,22 @@
 import ResponsiveLogo from '@/components/ResponsiveLogo.vue'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import UserMenuButton from '@/components/UserMenuButton.vue'
-import { RouterView } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth'
 
+const router = useRouter()
+const authStore = useAuthStore()
+const userStore = useUserStore()
+
+const handleSignButtonClick = () => {
+  if (userStore.isMSAuthenticated) {
+    authStore.logoutMS()
+    return
+  }
+  if (userStore.user) userStore.clearUserData()
+  router.push({ name: 'login' })
+}
 
 </script>
 
@@ -12,7 +26,7 @@ import { RouterView } from 'vue-router'
     <ResponsiveLogo type="compact" />
     <div class="flex">
       <ThemeSwitch />
-      <UserMenuButton />
+      <UserMenuButton @clickSignButton="handleSignButtonClick" />
     </div>
   </header>
   <section class="flex flex-col sm:items-center max-w-full min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-5rem)] h-auto">

@@ -1,14 +1,19 @@
 <script setup>
 import IconSVG from '@/components/IconSVG.vue'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
+// import { msalClient } from '@/configs/msalConfig'
 import { login } from '@/libs/userManagement'
+import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
-import { ref, watch } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const { query: { redirect } } = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
+const userStore = useUserStore()
+const authStore = useAuthStore()
 
 const username = ref('')
 const password = ref('')
@@ -53,6 +58,25 @@ const handleLoginSubmit = async () => {
     isLoggingIn.value = false
 }
 
+const handleLoginMS = async () => {
+    await authStore.loginMS()
+}
+
+const handleLogoutMS = () => {
+    authStore.logoutMS()
+}
+
+onMounted(async () => {
+    // console.log('LoginView mounted', window.location)
+    // await msalClient.initialize()
+    // await msAuth.handleRedirect()
+    
+    console.log(userStore.user)
+    if (userStore.user) {
+        router.push({ name: 'all-board' })
+    }
+})
+
 </script>
 
 <template>
@@ -91,12 +115,13 @@ const handleLoginSubmit = async () => {
                 <button type="submit" :disabled="username.length === 0 || password.length === 0"
                     :class="{ 'disabled': username.length === 0 || password.length === 0 }"
                     class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
+                </form>
                 <div class="divider">Or</div>
-                <button class="btn btn-neutral gap-3" disabled>
+                <button @click="handleLoginMS" class="btn btn-neutral gap-3">
                     <IconSVG iconName="microsoft-logo" size="1.5rem" :scale="1.5" />
                     Login with Microsoft
                 </button>
-            </form>
+                <button @click="handleLogoutMS">logout</button>
         </div>
     </main> 
 </template>

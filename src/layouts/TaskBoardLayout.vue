@@ -12,11 +12,13 @@ import { useThemeStore } from '@/stores/theme'
 import GhostHaunting from '@/components/festival/halloween/GhostHaunting.vue'
 import useIntersectionObserver from '@/composables/useIntersectionObserver'
 import BaseMenu from '@/components/BaseMenu.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
+const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
 const mobileNavContainer = ref(null)
@@ -26,6 +28,16 @@ const statusBtn = ref(null)
 
 const sidebarOpenState = ref(false)
 const handleSignButtonClick = () => {
+  // const test = new PublicClientApplication()
+  // test.logoutRedirect({
+    //   postLogoutRedirectUri: 'http://localhost:8080/login'
+    // })
+  console.log('Test: ', userStore.isMSAuthenticated)
+  if (userStore.isMSAuthenticated) {
+    console.log('Logging out from MS')
+    authStore.logoutMS()
+    return
+  }
   if (userStore.user) userStore.clearUserData()
   router.push({ name: 'login' })
 }
@@ -179,7 +191,7 @@ watch(() => route.name, () => {
       </div>
       <div class="flex gap-2">
         <ThemeSwitch />
-        <UserMenuButton />
+        <UserMenuButton @clickSignButton="handleSignButtonClick" />
       </div>
     </div>
   </header>

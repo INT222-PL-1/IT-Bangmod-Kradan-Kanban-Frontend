@@ -1,18 +1,17 @@
 <script setup>
-import { useRouter } from 'vue-router';
 import BaseMenu from './BaseMenu.vue';
 import IconSVG from './IconSVG.vue';
 import { useUserStore } from '@/stores/user';
 import FestivalThemeSwitch from './festival/FestivalThemeSwitch.vue';
 import { useThemeStore } from '@/stores/theme';
 
-const router = useRouter()
+const emits = defineEmits(['clickSignButton'])
+
 const userStore = useUserStore()
 const themeStore = useThemeStore()
 
 const handleSignButtonClick = () => {
-  if (userStore.user) userStore.clearUserData()
-  router.push({ name: 'login'})
+  emits('clickSignButton')
 }
 </script>
 
