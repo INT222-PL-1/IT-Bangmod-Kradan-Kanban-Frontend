@@ -180,7 +180,7 @@ const handleAcceptDeclineClick = (board) => {
 
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.3s;
+  transition: opacity 150ms;
 }
 
 .v-enter-from,

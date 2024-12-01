@@ -4,6 +4,7 @@ import IconSVG from './IconSVG.vue'
 import StatusBadge from './StatusBadge.vue'
 import { useBoardStore } from '@/stores/board'
 import NotificationIndicator from './NotificationIndicator.vue'
+import { useRoute } from 'vue-router'
 
 defineProps({
   compact: {
@@ -12,6 +13,7 @@ defineProps({
   }
 })
 
+const route = useRoute()
 const boardStore = useBoardStore()
 const searchBoxElement = ref(null)
 const searchTerm = ref('')
@@ -27,7 +29,7 @@ const filteredStatusList = computed(() => {
 })
 
 const handleFilterClick = async () => {
-  await boardStore.loadStatuses()
+  await boardStore.loadStatuses(route.params.boardId)
   searchBoxElement.value.focus()
 }
 

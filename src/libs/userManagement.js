@@ -45,7 +45,7 @@ export async function refreshAccessToken(refreshToken) {
  */
 export async function validateAccessToken(accessToken) {
     try {
-        const res = await zyos.fetch(`${SERVER_URL}/token/validate`, { retry: 5, timeout: 1000, noGlobalResponseHandling: true, token: `Bearer ${accessToken}` })
+        const res = await zyos.fetch(`${SERVER_URL}/token/validate`, { retry: 2, timeout: 10000, noGlobalResponseHandling: true, token: `Bearer ${accessToken}` })
 
         if (res.ok) {
             return true

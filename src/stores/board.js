@@ -3,14 +3,12 @@ import { defineStore } from 'pinia'
 import { getBoardById, getBoards, patchBoard } from '@/libs/boardManagement'
 import { getStatuses } from '@/libs/statusManagement'
 import { getTasks } from '@/libs/taskManagement'
-import { useRoute } from 'vue-router'
 import { useToastStore } from './toast'
 import { getCollaborators } from '@/libs/collaboratorManagement'
 import Pl1VisibilityType from '@/libs/enum/Pl1VisibilityType'
 import { HttpStatusCode } from 'zyos'
 
 export const useBoardStore = defineStore('board', () => {
-  const route = useRoute()
   const toastStore = useToastStore()
   const isLoading = ref({
     action: false,
@@ -58,15 +56,15 @@ export const useBoardStore = defineStore('board', () => {
   }
   
   
-  async function loadTasks(boardId = route.params.boardId) {
+  async function loadTasks(boardId) {
     tasks.value = await loadData(getTasks, 'task', boardId, options.value)
   }
 
-  async function loadStatuses(boardId = route.params.boardId) {
+  async function loadStatuses(boardId) {
     statuses.value = await loadData(getStatuses, 'status', boardId)
   }
 
-  async function loadCollaborators(boardId = route.params.boardId) {
+  async function loadCollaborators(boardId) {
     collaborators.value = await loadData(getCollaborators, 'collaborator', boardId)
   }
 
@@ -81,7 +79,7 @@ export const useBoardStore = defineStore('board', () => {
     }
   }
 
-  async function loadCurrentBoard(boardId = route.params.boardId) {
+  async function loadCurrentBoard(boardId) {
     const board = await loadData(getBoardById, 'board', boardId)
     if (board) {
       currentBoard.value = { ...board, isPublic: board.visibility === Pl1VisibilityType.PUBLIC }
@@ -153,7 +151,7 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   watch(options, async () => {
-    await loadTasks()
+    await loadTasks(currentBoard.value.id)
   }, { deep: true })
 
   return {

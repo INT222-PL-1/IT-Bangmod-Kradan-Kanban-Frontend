@@ -1,23 +1,23 @@
 <script setup>
 import IconSVG from '@/components/IconSVG.vue'
+import MsLoginWaitingForeground from '@/components/MsLoginWaitingForeground.vue'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import { login } from '@/libs/userManagement'
 import { useMsalStore } from '@/stores/msal'
 import { useToastStore } from '@/stores/toast'
-import { useUserStore } from '@/stores/user'
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const { query: { redirect } } = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
-const userStore = useUserStore()
 const msalStore = useMsalStore()
 
 const username = ref('')
 const password = ref('')
 const isPasswordShow = ref(false)
 const isLoggingIn = ref(false)
+const isLoggingInMs = ref(false)
 const isLoginFailed = ref(false)
 
 watch(username, (newValue) => {
@@ -58,14 +58,24 @@ const handleLoginSubmit = async () => {
 }
 
 const handleLoginMS = async () => {
-    await msalStore.loginMS()
+    isLoggingInMs.value = true
+    try {
+        await msalStore.loginMS()
+    } catch (error) {
+        toastStore.createToast({
+            status: 'error',
+            title: 'Login Failed',
+            description: 'An error occurred while logging in with Microsoft account.'
+        })
+        isLoggingInMs.value = false
+    }
 }
 
-onMounted(async () => {
-    if (userStore.user) {
-        router.push({ name: 'all-board' })
-    }
-})
+// onMounted(async () => {
+//     if (userStore.user) {
+//         router.push({ name: 'all-board' })
+//     }
+// })
 
 </script>
 
@@ -73,6 +83,9 @@ onMounted(async () => {
     <div class="fixed top-4 right-4 z-40">
         <ThemeSwitch />
     </div>
+    <Transition>
+        <MsLoginWaitingForeground :show="isLoggingInMs" />
+    </Transition>
     <main class="w-screen h-screen grid place-items-center">
         <div
             class="flex flex-col w-screen h-screen md:w-auto md:h-auto bg-base-200 rounded-xl px-14 py-14 animate-slide-in">
@@ -117,4 +130,13 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.v-enter-active,
+.v-leave-active {
+    transition: opacity 150ms;
+}
+
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
+}
 </style>

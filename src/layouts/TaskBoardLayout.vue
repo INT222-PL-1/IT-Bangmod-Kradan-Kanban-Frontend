@@ -27,9 +27,9 @@ const collabBtn = ref(null)
 const statusBtn = ref(null)
 
 const sidebarOpenState = ref(false)
-const handleSignButtonClick = () => {
+const handleSignButtonClick = async () => {
   if (userStore.isMSAuthenticated) {
-    msalStore.logoutMS()
+    await msalStore.logoutMS()
     return
   }
   if (userStore.user) userStore.clearUserData()

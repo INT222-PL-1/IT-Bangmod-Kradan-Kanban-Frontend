@@ -7,7 +7,7 @@ import { useToastStore } from '@/stores/toast'
 import { refreshAccessToken, validateAccessToken } from '@/libs/userManagement'
 import BoardSelectLayout from '@/layouts/BoardSelectLayout.vue'
 import { useMsalStore } from '@/stores/msal'
-import { graphScopes, msalConfig } from '@/configs/authConfig'
+import { msalConfig } from '@/configs/authConfig'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -166,12 +166,9 @@ router.beforeEach(async (to) => {
   // }
   
   async function handleUserValidation() {
-    console.log(msalStore.activeAccount)
 
     let accessToken = msalStore.activeAccount?.idToken || localStorage.getItem('itbkk_access_token')
     const refreshToken = localStorage.getItem('itbkk_refresh_token')
-
-    console.log(accessToken)
 
     // ? If access token exists.
     if (accessToken) {

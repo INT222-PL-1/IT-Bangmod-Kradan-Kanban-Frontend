@@ -10,9 +10,9 @@ const router = useRouter()
 const msalStore = useMsalStore()
 const userStore = useUserStore()
 
-const handleSignButtonClick = () => {
+const handleSignButtonClick = async () => {
   if (userStore.isMSAuthenticated) {
-    msalStore.logoutMS()
+    await msalStore.logoutMS()
     return
   }
   if (userStore.user) userStore.clearUserData()

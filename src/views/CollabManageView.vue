@@ -31,12 +31,12 @@ const removeModalOpenState = ref(false)
 const changeAccessRightModalOpenState = ref(false)
 
 async function refreshCollaborators() {
-  await boardStore.loadCollaborators()
+  await boardStore.loadCollaborators(route.params.boardId)
 }
 
 onMounted(async () => {
   if (boardStore.currentBoard === null) {
-    await boardStore.loadCurrentBoard()
+    await boardStore.loadCurrentBoard(route.params.boardId)
   } else {
     await refreshCollaborators()
   }

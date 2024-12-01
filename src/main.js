@@ -33,12 +33,11 @@ zyos.defineConfig({
   globalResponseHandler: globalResponseHandler
 })
 
-msalStore.initializeMsal(msalConfig)
-  .then(() => {
-    msalStore.ssoSilent()
-  })
+const initialApp = async () => {
+  await msalStore.initializeMsal(msalConfig)
+  await msalStore.ssoSilent()
+  app.use(router)
+  app.mount('#app')
+}
 
-app.use(router)
-
-app.mount('#app')
-
+initialApp()

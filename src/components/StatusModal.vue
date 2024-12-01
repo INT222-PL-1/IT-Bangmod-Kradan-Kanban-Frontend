@@ -95,7 +95,7 @@ const handleClickConfirm = async () => {
           status: 'error'
         })
       }
-      boardStore.loadStatuses()
+      boardStore.loadStatuses(route.params.boardId)
     } else if (statusModalMode.value === 'edit') {
       const res = await updateStatus(statusModalData.value, boardId)
       if (res.ok) {
@@ -113,7 +113,7 @@ const handleClickConfirm = async () => {
           status: 'error'
         })
       }
-      boardStore.loadStatuses()
+      boardStore.loadStatuses(route.params.boardId)
     }
   } catch (error) {
     console.error(error)

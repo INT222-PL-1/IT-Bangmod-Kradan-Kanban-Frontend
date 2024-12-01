@@ -33,7 +33,7 @@ const boardSettingsModalOpenState = ref(false)
 const boardVisibilityModalOpenState = ref(false)
 
 async function refreshBoardTasks() {
-  await boardStore.loadCurrentBoard()
+  await boardStore.loadCurrentBoard(route.params.boardId)
 }
 
 onBeforeMount(async () => {
@@ -395,7 +395,7 @@ const handleToggleBoardVisibility = async () => {
 <style scoped>
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.3s;
+  transition: opacity 150ms;
 }
 
 .v-enter-from,

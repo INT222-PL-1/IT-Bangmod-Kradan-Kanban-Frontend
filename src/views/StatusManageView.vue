@@ -28,7 +28,7 @@ const statusTransferModalOpenState = ref(false)
 const statusIdToTransfer = ref(1)
 
 async function refreshBoardStatuses() {
-  await boardStore.loadCurrentBoard()
+  await boardStore.loadCurrentBoard(route.params.boardId)
 }
 
 onMounted(async () => {
@@ -78,7 +78,7 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
         description: 'The tasks have been transferred and the status has been deleted.',
         status: 'success'
       })
-      await boardStore.loadStatuses()
+      await boardStore.loadStatuses(route.params.boardId)
     } else {
       toastStore.createToast({
         title: 'Error',
@@ -108,14 +108,14 @@ const handleDeleteStatus = async (statusId) => {
         description: 'The status has been deleted',
         status: 'success'
       })
-      await boardStore.loadStatuses()
+      await boardStore.loadStatuses(route.params.boardId)
     } else {
       toastStore.createToast({
         title: 'Error',
         description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
         status: 'error'
       })
-      await boardStore.loadStatuses()
+      await boardStore.loadStatuses(route.params.boardId)
     }
   } catch (error) {
     console.error(error)
@@ -333,7 +333,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
 <style scoped>
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.3s;
+  transition: opacity 150ms;
 }
 
 .v-enter-from,

@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { graphScopes } from '@/configs/authConfig'
 import { useUserStore } from './user'
+import router from '@/router'
 
 export const useMsalStore = defineStore('msal', () => {
   const msalInstance = ref(null)
@@ -23,61 +24,39 @@ export const useMsalStore = defineStore('msal', () => {
     try {
       msalInstance.value = new PublicClientApplication(config)
       await msalInstance.value.initialize()
-      await handleRedirect()
-      // setActiveAccount()
       console.log('MSAL initialized')
     } catch (error) {
       console.error('MSAL initialization failed', error)
     }
   }
 
-  /**
-   * Handle redirect response after login or token refresh
-   */
-  async function handleRedirect() {
-    isLoading.value = true
-    try {
-      const response = await msalInstance.value.handleRedirectPromise()
-      if (response) {
-        activeAccount.value = response.account
-        msalInstance.value.setActiveAccount(response.account)
-        isAuthenticated.value = true
-        console.log('Handle redirect response', response)
-        // console.log(msalInstance.value.getActiveAccount())
-        // localStorage.setItem('itbkk_access_token', response.account.idToken)
-        userStore.loadUserData(response.account.idToken)
-      }
-    } catch (error) {
-      console.error('Error handling redirect', error)
-    } finally {
-      isLoading.value = false
-    }
+  function setActiveAccount(account) {
+    activeAccount.value = account
+    msalInstance.value.setActiveAccount(account)
+    isAuthenticated.value = true
+    userStore.loadUserData(account.idToken)
   }
-
-  /**
-   * Set the active account in the store
-   */
-  function setActiveAccount() {
-    activeAccount.value = msalInstance.value.getActiveAccount()
-    isAuthenticated.value = !!activeAccount.value
-  }
-
 
   // const test = new PublicClientApplication()
   // test.handleRedirectPromise()
   /**
    * Login using redirect flow
    */
-  async function loginMS(redirectUri = window.location.origin + '/pl1/board') {
+  async function loginMS() {
     try {
       isLoading.value = true
-      console.log('loginMS', redirectUri)
-      await msalInstance.value.loginPopup({
+      const response = await msalInstance.value.loginPopup({
         scopes: graphScopes.scopes,
-        redirectUri
       })
+      if (response) {
+        activeAccount.value = response.account
+        setActiveAccount(response.account)
+        userStore.loadUserData(response.account.idToken)
+        router.push({ name: 'all-board' })
+      }
     } catch (error) {
       console.error('Login failed', error)
+      throw error
     } finally {
       isLoading.value = false
     }
@@ -87,16 +66,16 @@ export const useMsalStore = defineStore('msal', () => {
    * Logout the current user using redirect flow
    * @param {string} postLogoutRedirectUri - Where to redirect the user after logout
    */
-  function logoutMS(postLogoutRedirectUri = window.location.origin + '/pl1/login') {
+  async function logoutMS() {
     const account = msalInstance.value.getActiveAccount()
     if (!account) {
       console.warn('No active account found for logout')
       return
     }
-    msalInstance.value.logoutRedirect({
-      account,
-      postLogoutRedirectUri,
-    })
+    const res = await msalInstance.value.logoutPopup()
+
+    console.log('Logout response', res)
+    router.push({ name: 'login' })
   }
 
   /**
@@ -116,14 +95,18 @@ export const useMsalStore = defineStore('msal', () => {
 
     try {
       const response = await msalInstance.value.acquireTokenSilent(request)
-      return response.accessToken
+      
+      if (response) {
+        setActiveAccount(response.account)
+      }
+      console.log('Silent token acquisition response', response)
     } catch (error) {
       console.error('Silent token acquisition failed', error)
 
       if (error instanceof InteractionRequiredAuthError) {
         // Fallback to an interactive token acquisition
         try {
-          await msalInstance.value.acquireTokenRedirect(request)
+          await msalInstance.value.acquireTokenPopup(request)
         } catch (interactiveError) {
           console.error('Interactive token acquisition failed', interactiveError)
         }
@@ -137,9 +120,7 @@ export const useMsalStore = defineStore('msal', () => {
         scopes: graphScopes.scopes
       })
       if (response) {
-        msalInstance.value.setActiveAccount(response.account)
-        isAuthenticated.value = true
-        userStore.loadUserData(response.account.idToken)
+        setActiveAccount(response.account)
       }
       console.log('Silent SSO response', response)
     } catch (error) {
@@ -155,7 +136,6 @@ export const useMsalStore = defineStore('msal', () => {
     initializeMsal,
     loginMS,
     logoutMS,
-    handleRedirect,
     acquireToken,
     ssoSilent,
   }

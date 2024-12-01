@@ -248,13 +248,13 @@ const handleClickConfirm = async () => {
     boardStore.isLoading.action = true
     if (taskModalMode.value === 'add') {
       await doCreateTask()
-      await boardStore.loadTasks()
+      await boardStore.loadTasks(route.params.boardId)
     } else if (taskModalMode.value === 'edit') {
       if (attachedFiles.value.length > 0) {
         await doUploadAttachments()
       }
       await doUpdateTask()
-      await boardStore.loadTasks()
+      await boardStore.loadTasks(route.params.boardId)
     }
   } catch (error) {
     console.error(error)
