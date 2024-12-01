@@ -4,13 +4,13 @@ import Pl1ErrorTypes from "./enum/Pl1ErrorTypes"
 import { refreshAccessToken } from "./userManagement"
 import { useUserStore } from "@/stores/user"
 import { HttpStatusCode } from "zyos"
-import { useAuthStore } from "@/stores/auth"
+import { useMsalStore } from "@/stores/msal"
 
 
 const globalResponseHandler = async (response) => {
   const toastStore = useToastStore()
   const userStore = useUserStore()
-  const authStore = useAuthStore()
+  const msalStore = useMsalStore()
 
   if (response.statusCode === HttpStatusCode.UNAUTHORIZED) {
     if (router.currentRoute.value.name === 'login') return
@@ -23,7 +23,7 @@ const globalResponseHandler = async (response) => {
     ].includes(response.data.type)) {
 
       if (userStore.isMSAuthenticated) {
-        await authStore.acquireToken()
+        await msalStore.acquireToken()
       } else {
         try {
           const refreshToken = localStorage.getItem('itbkk_refresh_token')

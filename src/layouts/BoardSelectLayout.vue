@@ -4,15 +4,15 @@ import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import UserMenuButton from '@/components/UserMenuButton.vue'
 import { RouterView, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { useAuthStore } from '@/stores/auth'
+import { useMsalStore } from '@/stores/msal'
 
 const router = useRouter()
-const authStore = useAuthStore()
+const msalStore = useMsalStore()
 const userStore = useUserStore()
 
 const handleSignButtonClick = () => {
   if (userStore.isMSAuthenticated) {
-    authStore.logoutMS()
+    msalStore.logoutMS()
     return
   }
   if (userStore.user) userStore.clearUserData()

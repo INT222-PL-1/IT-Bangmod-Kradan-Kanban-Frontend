@@ -12,13 +12,13 @@ import { useThemeStore } from '@/stores/theme'
 import GhostHaunting from '@/components/festival/halloween/GhostHaunting.vue'
 import useIntersectionObserver from '@/composables/useIntersectionObserver'
 import BaseMenu from '@/components/BaseMenu.vue'
-import { useAuthStore } from '@/stores/auth'
+import { useMsalStore } from '@/stores/msal'
 
 const route = useRoute()
 const router = useRouter()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
-const authStore = useAuthStore()
+const msalStore = useMsalStore()
 const themeStore = useThemeStore()
 
 const mobileNavContainer = ref(null)
@@ -29,7 +29,7 @@ const statusBtn = ref(null)
 const sidebarOpenState = ref(false)
 const handleSignButtonClick = () => {
   if (userStore.isMSAuthenticated) {
-    authStore.logoutMS()
+    msalStore.logoutMS()
     return
   }
   if (userStore.user) userStore.clearUserData()

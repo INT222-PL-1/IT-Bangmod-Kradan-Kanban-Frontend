@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import { graphScopes } from '@/configs/authConfig'
 import { useUserStore } from './user'
 
-export const useAuthStore = defineStore('auth', () => {
+export const useMsalStore = defineStore('msal', () => {
   const msalInstance = ref(null)
   const activeAccount = ref(null)
   const userStore = useUserStore()
@@ -24,7 +24,8 @@ export const useAuthStore = defineStore('auth', () => {
       msalInstance.value = new PublicClientApplication(config)
       await msalInstance.value.initialize()
       await handleRedirect()
-      setActiveAccount()
+      // setActiveAccount()
+      console.log('MSAL initialized')
     } catch (error) {
       console.error('MSAL initialization failed', error)
     }
@@ -39,7 +40,11 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await msalInstance.value.handleRedirectPromise()
       if (response) {
         activeAccount.value = response.account
+        msalInstance.value.setActiveAccount(response.account)
         isAuthenticated.value = true
+        console.log('Handle redirect response', response)
+        // console.log(msalInstance.value.getActiveAccount())
+        // localStorage.setItem('itbkk_access_token', response.account.idToken)
         userStore.loadUserData(response.account.idToken)
       }
     } catch (error) {
@@ -63,10 +68,11 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Login using redirect flow
    */
-  async function loginMS(redirectUri = window.location.origin + '/pl1/login') {
+  async function loginMS(redirectUri = window.location.origin + '/pl1/board') {
     try {
       isLoading.value = true
-      await msalInstance.value.loginRedirect({
+      console.log('loginMS', redirectUri)
+      await msalInstance.value.loginPopup({
         scopes: graphScopes.scopes,
         redirectUri
       })
@@ -125,6 +131,22 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function ssoSilent() {
+    try {
+      const response = await msalInstance.value.ssoSilent({
+        scopes: graphScopes.scopes
+      })
+      if (response) {
+        msalInstance.value.setActiveAccount(response.account)
+        isAuthenticated.value = true
+        userStore.loadUserData(response.account.idToken)
+      }
+      console.log('Silent SSO response', response)
+    } catch (error) {
+      console.error('Silent SSO failed', error)
+    }
+  }
+
   return {
     msalInstance,
     activeAccount,
@@ -135,5 +157,6 @@ export const useAuthStore = defineStore('auth', () => {
     logoutMS,
     handleRedirect,
     acquireToken,
+    ssoSilent,
   }
 })

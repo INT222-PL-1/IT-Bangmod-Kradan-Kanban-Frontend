@@ -1,9 +1,8 @@
 <script setup>
 import IconSVG from '@/components/IconSVG.vue'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
-// import { msalClient } from '@/configs/msalConfig'
 import { login } from '@/libs/userManagement'
-import { useAuthStore } from '@/stores/auth'
+import { useMsalStore } from '@/stores/msal'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
 import { onMounted, ref, watch } from 'vue'
@@ -13,7 +12,7 @@ const { query: { redirect } } = useRoute()
 const router = useRouter()
 const toastStore = useToastStore()
 const userStore = useUserStore()
-const authStore = useAuthStore()
+const msalStore = useMsalStore()
 
 const username = ref('')
 const password = ref('')
@@ -59,7 +58,7 @@ const handleLoginSubmit = async () => {
 }
 
 const handleLoginMS = async () => {
-    await authStore.loginMS()
+    await msalStore.loginMS()
 }
 
 onMounted(async () => {
@@ -112,6 +111,7 @@ onMounted(async () => {
                 <IconSVG iconName="microsoft-logo" size="1.5rem" :scale="1.5" />
                 Login with Microsoft
             </button>
+            <button @click="msalStore.logoutMS()">Logout</button>
         </div>
     </main> 
 </template>

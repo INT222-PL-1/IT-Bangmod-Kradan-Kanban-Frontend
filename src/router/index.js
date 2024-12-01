@@ -6,8 +6,8 @@ import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast'
 import { refreshAccessToken, validateAccessToken } from '@/libs/userManagement'
 import BoardSelectLayout from '@/layouts/BoardSelectLayout.vue'
-import { useAuthStore } from '@/stores/auth'
-import { msalConfig } from '@/configs/authConfig'
+import { useMsalStore } from '@/stores/msal'
+import { graphScopes, msalConfig } from '@/configs/authConfig'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -150,24 +150,28 @@ const router = createRouter({
 router.beforeEach(async (to) => {
 
   const userStore = useUserStore()
-  const authStore = useAuthStore()
+  const msalStore = useMsalStore()
   const boardStore = useBoardStore()
   const toastStore = useToastStore()
 
-  await authStore.initializeMsal(msalConfig)
-  const activeAccounts = await authStore.msalInstance.getAllAccounts()
-  if (activeAccounts.length > 0) {
-    authStore.msalInstance.setActiveAccount(activeAccounts[0])
-    userStore.loadUserData(authStore.msalInstance.getActiveAccount().idToken)
-  }
+  await msalStore.initializeMsal(msalConfig)
+
+  // if (window.location.hash) await msalStore.handleRedirect()
+  // console.log(window.location.toString())
+
+  // const activeAccounts = await msalStore.msalInstance.getAllAccounts()
+  // if (activeAccounts.length > 0) {
+  //   msalStore.msalInstance.setActiveAccount(activeAccounts[0])
+  //   userStore.loadUserData(msalStore.msalInstance.getActiveAccount().idToken)
+  // }
   
   async function handleUserValidation() {
+    console.log(msalStore.activeAccount)
 
-    await authStore.handleRedirect()
-
-
-    let accessToken = userStore.user?.idToken || localStorage.getItem('itbkk_access_token')
+    let accessToken = msalStore.activeAccount?.idToken || localStorage.getItem('itbkk_access_token')
     const refreshToken = localStorage.getItem('itbkk_refresh_token')
+
+    console.log(accessToken)
 
     // ? If access token exists.
     if (accessToken) {
@@ -192,7 +196,7 @@ router.beforeEach(async (to) => {
     }
 
     if (userStore.isMSAuthenticated) {
-      await authStore.acquireToken()
+      await msalStore.acquireToken()
     } else if (refreshToken) {
       // ? If refresh token exists, try to refresh access token.
       try {
