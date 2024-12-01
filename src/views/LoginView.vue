@@ -5,11 +5,13 @@ import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import { login } from '@/libs/userManagement'
 import { useMsalStore } from '@/stores/msal'
 import { useToastStore } from '@/stores/toast'
-import { ref, watch } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const { query: { redirect } } = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 const toastStore = useToastStore()
 const msalStore = useMsalStore()
 
@@ -71,11 +73,11 @@ const handleLoginMS = async () => {
     }
 }
 
-// onMounted(async () => {
-//     if (userStore.user) {
-//         router.push({ name: 'all-board' })
-//     }
-// })
+onMounted(async () => {
+    if (userStore.user) {
+        router.push({ name: 'all-board' })
+    }
+})
 
 </script>
 
@@ -84,7 +86,7 @@ const handleLoginMS = async () => {
         <ThemeSwitch />
     </div>
     <Transition>
-        <MsLoginWaitingForeground :show="isLoggingInMs" />
+        <MsLoginWaitingForeground @clickPopup="handleLoginMS" :show="isLoggingInMs" />
     </Transition>
     <main class="w-screen h-screen grid place-items-center">
         <div
@@ -124,7 +126,7 @@ const handleLoginMS = async () => {
                 <IconSVG iconName="microsoft-logo" size="1.5rem" :scale="1.5" />
                 Login with Microsoft
             </button>
-            <button @click="msalStore.logoutMS()">Logout</button>
+            <!-- <button @click="msalStore.logoutMS()">Logout</button> -->
         </div>
     </main> 
 </template>

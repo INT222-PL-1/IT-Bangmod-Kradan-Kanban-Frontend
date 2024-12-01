@@ -14,7 +14,7 @@ defineProps({
     <div class="text-2xl font-semibold mb-3">Logging in with Microsoft</div>
     <div class="loading text-primary loading-lg loading-dots"></div>
     <div>Pop-up window will appear soon.</div>
-    <div>if not, please click <span @click="$emit('clickPopup')" class="text-primary underline">here</span> to open it manually.</div>
+    <div>if not, please click <span @click="$emit('clickPopup')" class="text-primary underline cursor-pointer">here</span> to open it manually.</div>
   </div>
 </template>
 

@@ -75,6 +75,7 @@ export const useMsalStore = defineStore('msal', () => {
     const res = await msalInstance.value.logoutPopup()
 
     console.log('Logout response', res)
+    userStore.clearUserData()
     router.push({ name: 'login' })
   }
 
