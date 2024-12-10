@@ -18,7 +18,7 @@ const handleSignButtonClick = () => {
 <template>
   <BaseMenu side="left" mode="button">
     <template #button>
-      <button class="inline-flex gap-3">
+      <button class="inline-flex gap-3 items-center">
         <IconSVG iconName="person-circle" scale="1.5" size="1.5" />
         <div class="itbkk-fullname max-w-24 xl:max-w-none truncate text-left text-xm xl:text-base">{{ userStore.user ? userStore.user.name.replace('-', '&#8209;') : 'Guest' }}</div>
       </button>
