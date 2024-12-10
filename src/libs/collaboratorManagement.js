@@ -23,7 +23,8 @@ export async function addCollaborator(boardId, { email, accessRight }, zyosOptio
     const res = await zyos.fetch(url, {
       method: 'POST',
       body: { email, accessRight },
-      ...zyosOptions
+      ...zyosOptions,
+      timeout: 10000
     })
     return res
   } catch (error) {

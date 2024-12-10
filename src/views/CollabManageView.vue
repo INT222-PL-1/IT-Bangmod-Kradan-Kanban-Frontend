@@ -23,8 +23,13 @@ const defaultCollaboratorModalData = {
   accessRight: 'READ'
 }
 const collaboratorModalData = ref(defaultCollaboratorModalData)
+const collabEmailInputRef = ref(null)
 const addModalOpenState = ref(false)
-const disabledAddButton = computed(() => !collaboratorModalData.value.email || collaboratorModalData.value.email.length > 50 || boardStore.isLoading.action)
+const isEnterSelfEmail = computed(() => collaboratorModalData.value.email === userStore.user.email)
+const disabledAddButton = computed(() => !collaboratorModalData.value.email ||
+                                          collaboratorModalData.value.email.length > 50 ||
+                                          isEnterSelfEmail.value ||
+                                          boardStore.isLoading.action)
 
 const selectedCollaborator = ref(null)
 const removeModalOpenState = ref(false)
@@ -51,6 +56,9 @@ const handleAddButtonClick = () => {
 
   collaboratorModalData.value = { ...defaultCollaboratorModalData }
   addModalOpenState.value = true
+  setTimeout(() => {
+    collabEmailInputRef.value.focus()
+  }, 150)
 }
 
 const handleAddConfirm = async () => {
@@ -103,6 +111,7 @@ const handleAddConfirm = async () => {
 }
 
 const handleAddCancel = () => {
+  if (boardStore.isLoading.action) return
   addModalOpenState.value = false
 }
 
@@ -238,10 +247,17 @@ const handleAccessRightCancel = () => {
           <div v-show="collaboratorModalData.email.length > 50"
             class="text-error text-xs">Email can not be more than 50
             characters</div>
+          <div v-show="isEnterSelfEmail"
+            class="text-error text-xs">You can not enter your own email</div>
           <div :class="{ 'border border-error animate-shake-x-in': collaboratorModalData.email.length > 50 }"
             class="bg-base-200 px-4 py-2 mt-2 rounded-lg">
-            <input v-model.trim="collaboratorModalData.email" placeholder="Enter Collaborator E-mail (Required)"
-              class="itbkk-collaborator-email break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none" />
+            <input
+              ref="collabEmailInputRef"
+              v-model.trim="collaboratorModalData.email"
+              placeholder="Enter Collaborator E-mail (Required)"
+              class="itbkk-collaborator-email break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none disabled:opacity-40 disabled:cursor-not-allowed"
+              :disabled="boardStore.isLoading.action"
+            />
           </div>
         </div>
       </div>
@@ -254,8 +270,11 @@ const handleAccessRightCancel = () => {
         </div>
         <div :class="{ 'border border-error animate-shake-x-in': false }"
           class="bg-base-200 mt-2 rounded-lg">
-          <select v-model="collaboratorModalData.accessRight"
-            class="itbkk-access-right select select-ghost select-sm w-full my-1">
+          <select
+            v-model="collaboratorModalData.accessRight"
+            class="itbkk-access-right select select-ghost select-sm w-full my-1"
+            :disabled="boardStore.isLoading.action"
+          >
             <option value="READ">Read</option>
             <option value="WRITE">Write</option>
           </select>
@@ -263,10 +282,11 @@ const handleAccessRightCancel = () => {
       </div>
     </template>
     <template #actions>
+      <div v-show="boardStore.isLoading.action" class="loading loading-spinner"></div>
       <button @click="handleAddConfirm" :class="{ disabled: disabledAddButton }" class="itbkk-button-confirm btn btn-sm btn-success" :disabled="disabledAddButton">
-        Add
+        {{ boardStore.isLoading.action ? 'Adding...' : 'Add' }}
       </button>
-      <button @click="handleAddCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+      <button @click="handleAddCancel" class="itbkk-button-cancel btn btn-sm btn-neutral" :disabled="boardStore.isLoading.action">
         Cancel
       </button>
     </template>
@@ -283,10 +303,15 @@ const handleAccessRightCancel = () => {
       <span v-else>Do you want to remove <span class="italic">{{ selectedCollaborator?.name }}</span> from the board?</span>
     </template>
     <template #actions>
+      <div v-show="boardStore.isLoading.action" class="loading loading-spinner"></div>
       <button @click="handleRemoveConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.action">
-        Confirm
+        {{
+          boardStore.isLoading.action ?
+          (selectedCollaborator?.inviteStatus === 'PENDING' ? 'Cancelling...' : 'Removing...') :
+          'Confirm'
+        }}
       </button>
-      <button @click="handleRemoveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+      <button @click="handleRemoveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral" :disabled="boardStore.isLoading.action">
         Cancel
       </button>
     </template>
@@ -316,7 +341,7 @@ const handleAccessRightCancel = () => {
           <ButtonWithIcon
             @click="handleAddButtonClick"
             class="itbkk-collaborator-add btn btn-sm btn-primary text-neutral"
-            iconName="person-plus" :disabled="userStore.isOwnerOfCurrentBoard === false">
+            iconName="person-plus" :disabled="userStore.isOwnerOfCurrentBoard === false || boardStore.isLoading.action">
             Add Collaborator
           </ButtonWithIcon>
         </BaseTooltip>

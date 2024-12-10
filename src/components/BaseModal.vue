@@ -27,7 +27,7 @@ const handleClickBG = (e) => {
 <template>
   <div v-if="show" :class="{ 'grid place-items-center': mobileCenter }"
     class="fixed inset-0 bg-[#0005] backdrop-blur-sm z-50 transition-opacity sm:flex sm:flex-col sm:items-center sm:pt-28 overflow-y-auto"
-    @click="handleClickBG">
+    @mousedown="handleClickBG">
     <slot></slot>
     <div class="min-h-20" />
   </div>
