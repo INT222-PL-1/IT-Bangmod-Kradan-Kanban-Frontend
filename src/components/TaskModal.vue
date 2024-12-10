@@ -266,7 +266,12 @@ const handleClickConfirm = async () => {
 </script>
 
 <template>
-  <BigModal :show="taskModalData !== null" @clickBG="handleClickClose" class="itbkk-modal-task">
+  <BigModal
+    :show="taskModalData !== null"
+    @clickBG="handleClickClose"
+    class="itbkk-modal-task"
+    :isLoading="boardStore.isLoading.action"
+  >
     <template #title>
       <span v-if="taskModalMode === 'view'" class="itbkk-title">{{ taskModalData?.title }}</span>
         <span v-else-if="taskModalMode === 'add'">New Task</span>
@@ -288,8 +293,15 @@ const handleClickConfirm = async () => {
         </div>
         <div :class="{ 'border border-error animate-shake-x-in': taskModalData.title.length > 100 }"
           class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-[1]">
-          <textarea v-model.trim="taskModalData.title" placeholder="Enter Task Title (Required)"
-            class="itbkk-title break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
+          <textarea
+            v-model.trim="taskModalData.title"
+            placeholder="Enter Task Title (Required)"
+            class="itbkk-title break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"
+            :class="{
+              'opacity-50 pointer-events-none cursor-not-allowed': boardStore.isLoading.action
+            }"
+            :disabled="boardStore.isLoading.action"
+          ></textarea>
         </div>
       </div>
       <div class="mt-4 grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2 gap-8 flex-auto">
@@ -314,9 +326,17 @@ const handleClickConfirm = async () => {
               <div v-if="taskModalMode === 'view'" class="itbkk-description break-words">
                 {{ taskModalData?.description || 'No Description Provided' }}
               </div>
-              <textarea v-else-if="['add', 'edit'].includes(taskModalMode)" v-model.trim="taskModalData.description"
+              <textarea
+                v-else-if="['add', 'edit'].includes(taskModalMode)"
+                v-model.trim="taskModalData.description"
                 placeholder="Enter Task Description"
-                class="itbkk-description break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
+                class="itbkk-description break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"
+                :class="{
+                  'opacity-50 pointer-events-none cursor-not-allowed': boardStore.isLoading.action
+                }"
+                :disabled="boardStore.isLoading.action"
+              >
+              </textarea>
             </div>
           </div>
         </div>
@@ -341,8 +361,13 @@ const handleClickConfirm = async () => {
             </div>
             <input v-else-if="['add', 'edit'].includes(taskModalMode)" v-model.trim="taskModalData.assignees"
               placeholder="Enter Assignees"
-              :class="{ 'border border-error animate-shake-x-in': taskModalData.assignees.length > 30 }"
-              class="itbkk-assignees w-[20rem] outline-none focus:placeholder:opacity-50 bg-base-200 px-4 py-2 rounded-lg mt-2" />
+              :class="{
+                'border border-error animate-shake-x-in': taskModalData.assignees.length > 30,
+                'opacity-50 pointer-events-none cursor-not-allowed': boardStore.isLoading.action
+              }"
+              class="itbkk-assignees w-[20rem] outline-none focus:placeholder:opacity-50 bg-base-200 px-4 py-2 rounded-lg mt-2"
+              :disabled="boardStore.isLoading.action"
+            />
           </div>
           <div>
             <div>
@@ -359,7 +384,7 @@ const handleClickConfirm = async () => {
                 class="itbkk-status" />
             </div>
             <div v-else-if="['add', 'edit'].includes(taskModalMode)" class="w-full max-w-[16rem] mt-2">
-              <StatusSelector v-model="taskModalData.status.id" />
+              <StatusSelector v-model="taskModalData.status.id" :disabled="boardStore.isLoading.action" />
             </div>
           </div>
           <div v-if="['view', 'edit'].includes(taskModalMode)">
@@ -415,7 +440,7 @@ const handleClickConfirm = async () => {
               <span>Clear attachment</span>
             </button> -->
             <BaseTooltip text="Click/press and hold to clear all attachments" :disabled="allFilesCount === 0">
-              <HoldButton @holdFinish="handleClearAttachment" :duration="2000" color="error" :disabled="allFilesCount === 0">
+              <HoldButton @holdFinish="handleClearAttachment" :duration="2000" color="error" :disabled="allFilesCount === 0 || boardStore.isLoading.action">
                 <IconSVG iconName="trash-fill" scale="1" size="1rem" />
                 <span>Clear attachment</span>
               </HoldButton>
@@ -441,14 +466,19 @@ const handleClickConfirm = async () => {
       </div>
     </template>
     <template #actions>
+      <div v-show="boardStore.isLoading.action" class="loading loading-spinner"></div>
       <button
         v-if="['add', 'edit'].includes(taskModalMode)"
         @click="handleClickConfirm"
         :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
         class="itbkk-button-confirm btn btn-success" :disabled="disabledSaveButton">
-        {{ attachedFiles.length > 0 ? 'Upload & Save' : 'Save' }}
+        <!-- {{ attachedFiles.length > 0 ? 'Upload & Save' : 'Save' }} -->
+        {{ boardStore.isLoading.action ?
+          'Saving...' : 
+          attachedFiles.length > 0 ? 'Upload & Save' : 'Save'
+        }}
       </button>
-      <button v-once @click="handleClickClose" class="itbkk-button itbkk-button-cancel btn btn-neutral">
+      <button v-once @click="handleClickClose" class="itbkk-button itbkk-button-cancel btn btn-neutral" :disabled="boardStore.isLoading.action">
         {{ taskModalMode === 'view' ? 'Close' : 'Cancel' }}
       </button>
     </template>

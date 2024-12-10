@@ -16,6 +16,10 @@ defineProps({
   hasWritePermission: {
     type: Boolean,
     required: true
+  },
+  isLoading: {
+    type: Boolean,
+    required: false
   }
 })
 
@@ -41,17 +45,18 @@ const handleDeleteClick = () => {
 
         <div class="relative">
           <div class="absolute text-sm bg-neutral rounded-full px-2 translate-x-1">Description</div>
-          <div class="rounded-lg bg-base-100 mt-3 py-2 px-3">
-            {{ status.description }}
+          <div class="rounded-lg bg-base-100 mt-3 pt-3 pb-2 px-3">
+            <span v-if="status.description">{{ status.description }}</span>
+            <span v-else class="opacity-60 italic">No description</span>
           </div>
         </div>
 
         <div v-if="!status.isPredefined && hasWritePermission" class="flex gap-2">
-          <button @click="handleEditClick" class="btn btn-outline btn-xs active:scale-95 transition">
+          <button @click="handleEditClick" class="btn btn-outline btn-xs active:scale-95 transition" :disabled="isLoading">
             <IconSVG iconName="pencil-square" scale="0.75" />
             Edit
           </button>
-          <button @click="handleDeleteClick" class="btn btn-outline btn-xs btn-error cursor-pointer active:scale-95 transition">
+          <button @click="handleDeleteClick" class="btn btn-outline btn-xs btn-error cursor-pointer active:scale-95 transition" :disabled="isLoading">
             <IconSVG iconName="trash-fill" scale="0.75" />
             Delete
           </button>

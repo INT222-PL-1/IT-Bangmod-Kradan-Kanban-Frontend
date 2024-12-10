@@ -125,7 +125,12 @@ const handleClickConfirm = async () => {
 </script>
 
 <template>
-  <BigModal :show="statusModalData !== null" @clickBG="handleClickClose" class="itbkk-modal-status">
+  <BigModal
+    :show="statusModalData !== null"
+    @clickBG="handleClickClose"
+    class="itbkk-modal-status"
+    :isLoading="boardStore.isLoading.action"
+  >
     <template #title>
       <span v-if="statusModalMode === 'add'">Add Status</span>
       <span v-else-if="statusModalMode === 'edit'">Edit Status</span>
@@ -142,15 +147,21 @@ const handleClickConfirm = async () => {
                   ({{ statusModalData.name.length + '/50' }})
                 </span>
               </span>
-              <span v-show="statusModalData.name.length > 50" class="text-error text-xs">Status name can not be more
-                than
-                50
-                characters</span>
+              <span v-show="statusModalData.name.length > 50" class="text-error text-xs">
+                Status name can not be more than 50 character
+              </span>
             </div>
             <div :class="{ 'border border-error animate-shake-x-in': statusModalData.name.length > 50 }"
               class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-[1]">
-              <textarea v-model.trim="statusModalData.name" placeholder="Enter Status Name (Required)"
-                class="itbkk-status-name break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
+              <textarea
+                v-model.trim="statusModalData.name"
+                placeholder="Enter Status Name (Required)"
+                class="itbkk-status-name break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"
+                :class="{
+                  'opacity-50 pointer-events-none cursor-not-allowed': boardStore.isLoading.action
+                }"
+                :disabled="boardStore.isLoading.action"
+              ></textarea>
             </div>
           </div>
           <div class="flex flex-col flex-auto">
@@ -169,8 +180,15 @@ const handleClickConfirm = async () => {
               'border border-error animate-shake-x-in': statusModalData.description?.length > 200,
               'italic text-[grey] grid place-items-center': !statusModalData?.description,
             }" class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-auto">
-              <textarea v-model.trim="statusModalData.description" placeholder="Enter Task Description"
-                class="itbkk-status-description break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
+              <textarea
+                v-model.trim="statusModalData.description"
+                placeholder="Enter Task Description"
+                class="itbkk-status-description break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"
+                :class="{
+                  'opacity-50 pointer-events-none cursor-not-allowed': boardStore.isLoading.action
+                }"
+                :disabled="boardStore.isLoading.action"
+              ></textarea>
             </div>
           </div>
           <div class="flex-none">
@@ -183,7 +201,7 @@ const handleClickConfirm = async () => {
               <ColorPalette v-model="statusModalData.color" :colorList="[
                 '#DC143C', '#ff5500', '#FFA500', '#80ff00', '#3CB371', '#40E0D0',
                 '#20B2AA', '#1E90FF', '#9370DB', '#BA55D3', '#FF1493', '#A9A9A9'
-              ]" />
+              ]" :disabled="boardStore.isLoading.action" />
             </div>
           </div>
         </div>
@@ -213,12 +231,14 @@ const handleClickConfirm = async () => {
       </div>
     </template>
     <template #actions>
+      <div v-show="boardStore.isLoading.action" class="loading loading-spinner" />
       <button @click="handleClickConfirm"
         :class="{ 'btn-disabled disabled cursor-not-allowed': disabledSaveButton }"
-        class="itbkk-button-confirm btn btn-success" :disabled="disabledSaveButton">
-        Save
+        class="itbkk-button-confirm btn btn-success" :disabled="disabledSaveButton"
+      >
+        {{ boardStore.isLoading.action ? 'Saving...' : 'Save' }}
       </button>
-      <button @click="handleClickClose" class="itbkk-button-cancel btn btn-neutral">
+      <button @click="handleClickClose" class="itbkk-button-cancel btn btn-neutral" :disabled="boardStore.isLoading.action">
         Cancel
       </button>
     </template>

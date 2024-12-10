@@ -132,7 +132,12 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
 </script>
 
 <template>
-  <MiniModal @clickBG="statusDeleteModalOpenState = false" :show="statusDeleteModalOpenState" :mobileCenter="true">
+  <MiniModal
+    @clickBG="statusDeleteModalOpenState = false"
+    :show="statusDeleteModalOpenState"
+    :mobileCenter="true"
+    :isLoading="boardStore.isLoading.action"
+  >
     <template #title>Delete a Status</template>
     <template #content>
       <div class="itbkk-message break-words">
@@ -140,20 +145,30 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
       </div>
     </template>
     <template #actions>
-      <button @click="statusDeleteModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+      <div v-show="boardStore.isLoading.action" class="loading loading-spinner"></div>
+      <button
+        @click="statusDeleteModalOpenState = false"
+        class="itbkk-button-cancel btn btn-sm btn-neutral"
+        :disabled="boardStore.isLoading.action"
+      >
         Cancel
       </button>
-      <button @click="handleDeleteStatus(statusModalData.id)"
+      <button
+        @click="handleDeleteStatus(statusModalData.id)"
         class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
         :disabled="boardStore.isLoading.action"
       >
-        Confirm
+        {{ boardStore.isLoading.action ? 'Deleting...' : 'Confirm' }}
       </button>
     </template>
   </MiniModal>
 
-  <MiniModal @clickBG="statusTransferModalOpenState = false" :show="statusTransferModalOpenState"
-    :mobileCenter="true">
+  <MiniModal
+    @clickBG="statusTransferModalOpenState = false"
+    :show="statusTransferModalOpenState"
+    :mobileCenter="true"
+    :isLoading="boardStore.isLoading.action"
+  >
     <template #title>Transfer a Status</template>
     <template #content>
       <div class="itbkk-message break-words">
@@ -165,20 +180,30 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
           task{{ statusModalData.count > 1 ? 's' : '' }} in this status to existing status.
           <div class="flex items-center gap-2 mt-4">
             Transfer tasks to
-            <StatusSelector v-model="statusIdToTransfer" :excludeStatusId="statusModalData.id" />
+            <StatusSelector
+              v-model="statusIdToTransfer"
+              :excludeStatusId="statusModalData.id"
+              :disabled="boardStore.isLoading.action"
+            />
           </div>
         </div>
       </div>
     </template>
     <template #actions>
-      <button @click="statusTransferModalOpenState = false" class="itbkk-button-cancel btn btn-sm btn-neutral">
+      <div v-show="boardStore.isLoading.action" class="loading loading-spinner"></div>
+      <button
+        @click="statusTransferModalOpenState = false"
+        class="itbkk-button-cancel btn btn-sm btn-neutral"
+        :disabled="boardStore.isLoading.action"
+      >
         Cancel
       </button>
-      <button @click="handleTransferAndDeleteStatus(statusModalData.id, statusIdToTransfer)"
+      <button
+        @click="handleTransferAndDeleteStatus(statusModalData.id, statusIdToTransfer)"
         class="itbkk-button-confirm btn btn-sm btn-error btn-outline"
         :disabled="boardStore.isLoading.action"
       >
-        Transfer and Delete
+        {{ boardStore.isLoading.action ? 'Transferring...' : 'Transfer and Delete' }}
       </button>
     </template>
   </MiniModal>
@@ -207,12 +232,18 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
             <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.status }" />
             </button>
           </BaseTooltip> -->
-          <button @click="handleAddBtnClick" type="button"
-            class="itbkk-button-add btn btn-primary btn-sm text-neutral" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+          <button
+            @click="handleAddBtnClick" type="button"
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral"
+            :disabled="userStore.hasWriteAccessOnCurrentBoard === false || boardStore.isLoading.action"
+          >
             <IconSVG iconName="plus" :scale="1.25" />Add Status
           </button>
-          <button @click="handleRefreshBtnClick" type="button"
-            class="btn btn-secondary btn-sm btn-square">
+          <button
+            @click="handleRefreshBtnClick"
+            type="button"
+            class="btn btn-secondary btn-sm btn-square"
+          >
             <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.status }" />
           </button>
         </div>
@@ -235,6 +266,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
           :status="status"
           :index="index"
           :hasWritePermission="userStore.hasWriteAccessOnCurrentBoard"
+          :isLoading="boardStore.isLoading.action"
         />
       </div>
     </div>
@@ -243,14 +275,21 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     <BaseTablePlate>
       <template #right-menu>
         <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
-          <button @click="handleAddBtnClick" type="button"
-            class="itbkk-button-add btn btn-primary btn-sm text-neutral" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+          <button
+            @click="handleAddBtnClick"
+            type="button"
+            class="itbkk-button-add btn btn-primary btn-sm text-neutral"
+            :disabled="userStore.hasWriteAccessOnCurrentBoard === false || boardStore.isLoading.action"
+          >
             <IconSVG iconName="plus" :scale="1.25" />Add Status
           </button>
         </BaseTooltip>
         <BaseTooltip text="Refresh Statuses">
-          <button @click="handleRefreshBtnClick" type="button"
-            class="btn btn-secondary btn-sm btn-square">
+          <button
+            @click="handleRefreshBtnClick"
+            type="button"
+            class="btn btn-secondary btn-sm btn-square"
+          >
             <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.status }" />
           </button>
         </BaseTooltip>
@@ -307,14 +346,14 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
               <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
                 <ButtonWithIcon @click="handleEditBtnClick(item.id)"
                   class="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap"
-                  iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                  iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false || boardStore.isLoading.action">
                   Edit
                 </ButtonWithIcon>
               </BaseTooltip>
               <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
                 <ButtonWithIcon @click="handleOpenDeleteModal(item)"
                   class="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
-                  iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
+                  iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false || boardStore.isLoading.action">
                   Delete
                 </ButtonWithIcon>
               </BaseTooltip>

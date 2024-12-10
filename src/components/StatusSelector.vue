@@ -10,6 +10,10 @@ const props = defineProps({
     type: Number,
     default: -1,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const route = useRoute()
@@ -36,8 +40,8 @@ const filteredStatusList = computed(() => {
 
 <template>
   <div>
-    <div class="dropdown itbkk-button-action">
-      <div tabindex="0" @click="handleClick" role="button">
+    <div class="dropdown itbkk-button-action" :class="{ 'opacity-50 pointer-events-none': disabled }">
+      <div tabindex="0" role="button">
         <div class="active:scale-90 transition flex bg-base-200 rounded-xl p-2 hover:contrast-75">
           <StatusBadge class="cursor-pointer" :statusData="statusList.find(status => status.id === model)"
             textWrapMode="wrap" width="15rem" />

@@ -5,6 +5,7 @@ import IconSVG from './IconSVG.vue';
 import BaseTooltip from './BaseTooltip.vue';
 import zyos from 'zyos';
 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL
 const emits = defineEmits(['removeClick'])
 const image = ref(null)
 
@@ -67,10 +68,10 @@ function downloadLocalFile() {
 }
 
 async function downloadServerFile() {
-  const blobUrl = await getBlobUrl(props.file.url)
+  const blobUrl = await getBlobUrl(SERVER_URL + props.file.path)
   const a = document.createElement('a')
   a.href = blobUrl
-  a.download = props.file.url.split('/').at(-1)
+  a.download = props.file.path.split('/').at(-1)
   a.click()
   a.remove()
   URL.revokeObjectURL(blobUrl)
@@ -82,7 +83,7 @@ function previewLocalFile() {
 }
 
 async function previewServerFile() {
-  const blobUrl = await getBlobUrl(props.file.url)
+  const blobUrl = await getBlobUrl(SERVER_URL + props.file.path)
   window.open(blobUrl, '_blank')
 }
 
@@ -113,7 +114,7 @@ onMounted(async () => {
       }
       reader.readAsDataURL(props.file)
     } else {
-      image.value = await getBlobUrl(props.file.url)
+      image.value = await getBlobUrl(SERVER_URL + props.file.path)
     }
   }
 
@@ -121,7 +122,7 @@ onMounted(async () => {
     if (isOnClient.value) {
       image.value = await captureVideoThumbnail(props.file)
     } else {
-      const res = await zyos.fetch(props.file.url)
+      const res = await zyos.fetch(SERVER_URL + props.file.path)
       image.value = await captureVideoThumbnail(res.data)
     }
   }

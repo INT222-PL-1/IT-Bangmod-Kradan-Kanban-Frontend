@@ -20,6 +20,10 @@ defineProps({
     type: String,
     default: 'column',
     validator: (value) => ['column', 'row'].includes(value)
+  },
+  isLoading: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -29,7 +33,7 @@ const themeStore = useThemeStore()
 
 <template>
   <Transition>
-    <BaseModal :show="show" @clickBG="clickBG" :mobileCenter="true">
+    <BaseModal :show="show" @clickBG="clickBG" :mobileCenter="true" :isLoading="isLoading">
       <div class="absolute bg-base-300 max-w-[90vw] rounded-xl h-auto flex flex-col" :style="{ width }">
         <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none flex justify-between">
           <slot name="title">Title</slot>

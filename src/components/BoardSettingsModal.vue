@@ -77,7 +77,7 @@ watch(() => boardStore.currentBoard, (newBoard) => {
 </script>
 
 <template>
-  <MiniModal @clickBG="$emit('clickClose')" :show="show">
+  <MiniModal @clickBG="$emit('clickClose')" :show="show" :isLoading="boardStore.isLoading.board">
     <template #title>
       Board Settings
     </template>
@@ -91,21 +91,22 @@ watch(() => boardStore.currentBoard, (newBoard) => {
       </div>
       <div class="flex items-center justify-between">
         <div>Limit the number of tasks in this status</div>
-        <input v-model="newSettings.isTaskLimitEnabled" class="itbkk-limit-task toggle" type="checkbox">
+        <input v-model="newSettings.isTaskLimitEnabled" class="itbkk-limit-task toggle" type="checkbox" :disabled="boardStore.isLoading.board" />
       </div>
       <div :class="{ 'opacity-50 cursor-not-allowed': newSettings.isTaskLimitEnabled === false }"
         class="flex items-center justify-between">
         <div>Set number of tasks limit</div>
         <input v-model="newSettings.taskLimitPerStatus" class="input input-bordered input-sm w-16" type="number" min="0"
-          max="9999" :disabled="newSettings.isTaskLimitEnabled === false" />
+          max="9999" :disabled="newSettings.isTaskLimitEnabled === false || boardStore.isLoading.board" />
       </div>
     </template>
     <template #actions>
+      <div v-show="boardStore.isLoading.board" class="loading loading-spinner" />
       <button @click="handleApplySetting" class="itbkk-button-confirm btn btn-sm btn-success"
         :disabled="disabledApplySettingsBtn">
-        Apply
+        {{ boardStore.isLoading.board ? 'Applying...' : 'Apply' }}
       </button>
-      <button @click="handleCloseSetting" class="itbkk-button-cancel btn btn-sm btn-neutral">
+      <button @click="handleCloseSetting" class="itbkk-button-cancel btn btn-sm btn-neutral" :disabled="boardStore.isLoading.board">
         Go back
       </button>
     </template>

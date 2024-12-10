@@ -17,6 +17,10 @@ defineProps({
   hasWritePermission: {
     type: Boolean,
     required: true
+  },
+  isLoading: {
+    type: Boolean,
+    required: false
   }
 })
 
@@ -60,11 +64,11 @@ const handleDeleteClick = (e) => {
       </div>
       <div class="text-xs font-semibold ml-1">Updated {{ humanReadDate(task.updatedOn) }}</div>
       <div v-if="hasWritePermission" class="mt-2 flex gap-2">
-        <button @click="handleEditClick" class="btn btn-outline btn-sm active:scale-95 transition">
+        <button @click="handleEditClick" class="btn btn-outline btn-sm active:scale-95 transition" :disabled="isLoading">
           <IconSVG iconName="pencil-square" scale="1" />
           Edit
         </button>
-        <button @click="handleDeleteClick" class="btn btn-outline btn-sm btn-error cursor-pointer active:scale-95 transition">
+        <button @click="handleDeleteClick" class="btn btn-outline btn-sm btn-error cursor-pointer active:scale-95 transition" :disabled="isLoading">
           <IconSVG iconName="trash-fill" scale="1" />
           Delete
         </button>

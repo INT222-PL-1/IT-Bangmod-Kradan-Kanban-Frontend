@@ -24,6 +24,10 @@ defineProps({
     type: String,
     default: 'column',
     validator: (value) => ['column', 'row'].includes(value)
+  },
+  isLoading: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -32,7 +36,7 @@ const themeStore = useThemeStore()
 </script>
 
 <template>
-  <BaseModal :show="show" @clickBG="clickBG" :mobileCenter="false">
+  <BaseModal :show="show" @clickBG="clickBG" :mobileCenter="false" :isLoading="isLoading">
     <div :class="$props.class" class="bg-base-300 max-w-[100vw] sm:max-w-[90vw] sm:rounded-xl h-auto flex flex-col" :style="{ width }">
       <div class="text-2xl font-bold p-4 border-b-2 border-base-100 break-words flex-none flex justify-between">
         <div class="w-full">

@@ -232,7 +232,12 @@ const handleAccessRightCancel = () => {
 
   <!-- ? Add Collaborator Modal -->
   <MiniModal
-    :show="addModalOpenState" @clickBG="handleAddCancel" contentFlow="row" :mobileCenter="true">
+    :show="addModalOpenState"
+    @clickBG="handleAddCancel"
+    contentFlow="row"
+    :mobileCenter="true"
+    :isLoading="boardStore.isLoading.action"
+  >
     <template #title>Add Collaborator</template>
     <template #content>
       <div class="flex flex-col gap-2 flex-[2]">
@@ -294,7 +299,11 @@ const handleAccessRightCancel = () => {
 
   <!-- ? Remove Collaborator or Cancel Invitation Modal -->
   <MiniModal
-    :show="removeModalOpenState" @clickBG="handleRemoveCancel" :mobileCenter="true">
+    :show="removeModalOpenState"
+    @clickBG="handleRemoveCancel"
+    :mobileCenter="true"
+    :isLoading="boardStore.isLoading.action"
+  >
     <template #title>
       {{ selectedCollaborator?.inviteStatus === 'PENDING' ? 'Cancel Invitation' : 'Remove Collaborator' }}
     </template>
@@ -319,7 +328,11 @@ const handleAccessRightCancel = () => {
 
   <!-- ? Change access right modal -->
   <MiniModal
-    :show="changeAccessRightModalOpenState" @clickBG="handleAccessRightCancel" :mobileCenter="true">
+    :show="changeAccessRightModalOpenState"
+    @clickBG="handleAccessRightCancel"
+    :mobileCenter="true"
+    :isLoading="boardStore.isLoading.action"
+  >
     <template #title>Change Access Right</template>
     <template #content>
       <span>Do you want to change access right of <span class="italic">{{ selectedCollaborator?.name }}</span> to <span class="font-semibold">{{ selectedCollaborator?.accessRight }}</span>?</span>
