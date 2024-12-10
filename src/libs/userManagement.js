@@ -12,7 +12,8 @@ export async function login(username, password) {
                 userName: username,
                 password
             },
-            useToken: false
+            useToken: false,
+            timeout: 10000,
         })
         return res
     } catch (error) {

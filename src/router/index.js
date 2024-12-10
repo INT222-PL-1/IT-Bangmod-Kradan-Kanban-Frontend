@@ -1,13 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import TaskBoardLayout from '@/layouts/TaskBoardLayout.vue'
 import { useUserStore } from '@/stores/user'
 import BoardView from '@/views/BoardView.vue'
 import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast'
 import { refreshAccessToken, validateAccessToken } from '@/libs/userManagement'
-import BoardSelectLayout from '@/layouts/BoardSelectLayout.vue'
 import { useMsalStore } from '@/stores/msal'
 import { msalConfig } from '@/configs/authConfig'
+import MainLayout from '@/layouts/MainLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,7 +18,8 @@ const router = createRouter({
     },
     {
       path: '/board',
-      component: BoardSelectLayout,
+      component: MainLayout,
+      meta: { layout: 'Home' },
       children: [
         {
           path: '',
@@ -51,8 +51,8 @@ const router = createRouter({
     {
       path: '/board/:boardId',
       redirect: { name: 'all-task' },
-      component: TaskBoardLayout,
-      meta: { title: 'Tasks' },
+      component: MainLayout,
+      meta: { title: 'Tasks', layout: 'Board' },
       children: [
         {
           path: 'task',
@@ -155,15 +155,6 @@ router.beforeEach(async (to) => {
   const toastStore = useToastStore()
 
   await msalStore.initializeMsal(msalConfig)
-
-  // if (window.location.hash) await msalStore.handleRedirect()
-  // console.log(window.location.toString())
-
-  // const activeAccounts = await msalStore.msalInstance.getAllAccounts()
-  // if (activeAccounts.length > 0) {
-  //   msalStore.msalInstance.setActiveAccount(activeAccounts[0])
-  //   userStore.loadUserData(msalStore.msalInstance.getActiveAccount().idToken)
-  // }
   
   async function handleUserValidation() {
 

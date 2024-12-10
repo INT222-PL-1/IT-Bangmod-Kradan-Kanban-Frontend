@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { User } from '@/libs/classes/User'
 import { useBoardStore } from './board'
 import Pl1AccessRight from '@/libs/enum/Pl1AccessRight'
+import router from '@/router'
 
 export const useUserStore = defineStore('user', () => {
   const user = ref(null)
@@ -29,5 +30,10 @@ export const useUserStore = defineStore('user', () => {
     user.value = null
   }
 
-  return { user, isUserLoaded, loadUserData, clearUserData, isOwnerOfCurrentBoard, hasWriteAccessOnCurrentBoard,  isMSAuthenticated }
+  function signOut() {
+    clearUserData()
+    router.push({ name: 'login' })
+  }
+
+  return { user, isUserLoaded, loadUserData, clearUserData, isOwnerOfCurrentBoard, hasWriteAccessOnCurrentBoard,  isMSAuthenticated, signOut }
 })

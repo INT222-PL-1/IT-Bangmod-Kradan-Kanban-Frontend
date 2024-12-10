@@ -126,7 +126,7 @@ onMounted(async () => {
                 <IconSVG iconName="microsoft-logo" size="1.5rem" :scale="1.5" />
                 Login with Microsoft
             </button>
-            <!-- <button @click="msalStore.logoutMS()">Logout</button> -->
+            <!-- <button @click="msalStore.signOutMS()">Logout</button> -->
         </div>
     </main> 
 </template>

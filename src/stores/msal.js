@@ -66,7 +66,7 @@ export const useMsalStore = defineStore('msal', () => {
    * Logout the current user using redirect flow
    * @param {string} postLogoutRedirectUri - Where to redirect the user after logout
    */
-  async function logoutMS() {
+  async function signOutMS() {
     const account = msalInstance.value.getActiveAccount()
     if (!account) {
       console.warn('No active account found for logout')
@@ -136,7 +136,7 @@ export const useMsalStore = defineStore('msal', () => {
     isLoading,
     initializeMsal,
     loginMS,
-    logoutMS,
+    signOutMS,
     acquireToken,
     ssoSilent,
   }

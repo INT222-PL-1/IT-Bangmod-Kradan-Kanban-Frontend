@@ -1,5 +1,5 @@
 <script setup>
-import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import BackToTopButton from '@/components/BackToTopButton.vue'
 import IconSVG from '@/components/IconSVG.vue'
@@ -12,13 +12,12 @@ import { useThemeStore } from '@/stores/theme'
 import GhostHaunting from '@/components/festival/halloween/GhostHaunting.vue'
 import useIntersectionObserver from '@/composables/useIntersectionObserver'
 import BaseMenu from '@/components/BaseMenu.vue'
-import { useMsalStore } from '@/stores/msal'
+
+const emits = defineEmits(['clickSignOut', 'clickLogin'])
 
 const route = useRoute()
-const router = useRouter()
 const boardStore = useBoardStore()
 const userStore = useUserStore()
-const msalStore = useMsalStore()
 const themeStore = useThemeStore()
 
 const mobileNavContainer = ref(null)
@@ -28,12 +27,11 @@ const statusBtn = ref(null)
 
 const sidebarOpenState = ref(false)
 const handleSignButtonClick = async () => {
-  if (userStore.isMSAuthenticated) {
-    await msalStore.logoutMS()
-    return
+  if (userStore.user) {
+    emits('clickSignOut')
+  } else {
+    emits('clickLogin')
   }
-  if (userStore.user) userStore.clearUserData()
-  router.push({ name: 'login' })
 }
 
 function intersectCallback(entry) {
@@ -221,7 +219,7 @@ watch(() => route.name, () => {
     <div id="navbar-item-right"></div>
   </nav>
   <section class="flex flex-col sm:items-center max-w-full min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-8rem)] h-auto">
-    <RouterView />
+    <slot></slot>
   </section>
   <footer class="footer footer-center p-4 bg-base-300 text-base-content">
     <aside>

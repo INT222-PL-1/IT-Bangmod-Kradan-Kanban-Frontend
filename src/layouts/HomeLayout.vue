@@ -2,21 +2,18 @@
 import ResponsiveLogo from '@/components/ResponsiveLogo.vue'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import UserMenuButton from '@/components/UserMenuButton.vue'
-import { RouterView, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { useMsalStore } from '@/stores/msal'
 
-const router = useRouter()
-const msalStore = useMsalStore()
+const emits = defineEmits(['clickSignOut', 'clickLogin'])
+
 const userStore = useUserStore()
 
 const handleSignButtonClick = async () => {
-  if (userStore.isMSAuthenticated) {
-    await msalStore.logoutMS()
-    return
+  if (userStore.user) {
+    emits('clickSignOut')
+  } else {
+    emits('clickLogin')
   }
-  if (userStore.user) userStore.clearUserData()
-  router.push({ name: 'login' })
 }
 
 </script>
@@ -30,7 +27,7 @@ const handleSignButtonClick = async () => {
     </div>
   </header>
   <section class="flex flex-col sm:items-center max-w-full min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-5rem)] h-auto">
-    <RouterView />
+    <slot></slot>
   </section>
   <footer class="footer footer-center p-4 bg-base-300 text-base-content">
     <aside>
