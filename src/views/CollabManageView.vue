@@ -181,9 +181,9 @@ const handleAccessRightConfirm = async () => {
   if (boardStore.isLoading.action) return
   if (userStore.isOwnerOfCurrentBoard === false) return
 
-  const res = await patchCollaborator(route.params.boardId, selectedCollaborator.value.oid, { accessRight: selectedCollaborator.value.accessRight })
   try {
     boardStore.isLoading.action = true
+    const res = await patchCollaborator(route.params.boardId, selectedCollaborator.value.oid, { accessRight: selectedCollaborator.value.accessRight })
     if (res.ok) {
       toastStore.createToast({
         title: 'Success',
@@ -325,10 +325,15 @@ const handleAccessRightCancel = () => {
       <span>Do you want to change access right of <span class="italic">{{ selectedCollaborator?.name }}</span> to <span class="font-semibold">{{ selectedCollaborator?.accessRight }}</span>?</span>
     </template>
     <template #actions>
+      <div v-show="boardStore.isLoading.action" class="loading loading-spinner"></div>
       <button @click="handleAccessRightConfirm" class="itbkk-button-confirm btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.action">
-        Confirm
+        {{
+          boardStore.isLoading.action ?
+          'Changing...' :
+          'Confirm'
+        }}
       </button>
-      <button @click="handleAccessRightCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+      <button @click="handleAccessRightCancel" class="itbkk-button-cancel btn btn-sm btn-neutral" :disabled="boardStore.isLoading.action">
         Cancel
       </button>
     </template>
@@ -382,7 +387,7 @@ const handleAccessRightCancel = () => {
           </template>
           <template #col-3="{ item }">
             <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
-              <select @change="handleAccessRightChange(item)" v-model="item.accessRight" class="itbkk-access-right transition flex bg-base-100 select select-ghost select-sm"  :disabled="userStore.isOwnerOfCurrentBoard === false">
+              <select @change="handleAccessRightChange(item)" v-model="item.accessRight" class="itbkk-access-right transition flex bg-base-100 select select-ghost select-sm"  :disabled="userStore.isOwnerOfCurrentBoard === false || boardStore.isLoading.action">
                 <option value="READ">Read</option>
                 <option value="WRITE">Write</option>
               </select>
@@ -390,7 +395,7 @@ const handleAccessRightCancel = () => {
           </template>
           <template #col-4="{ item }">
             <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
-              <button @click="handleRemoveButtonClick(item)" class="itbkk-collab-remove btn btn-sm btn-outline min-w-35 max-w-35" :class="{ 'btn-error': item.inviteStatus === 'JOINED' }"  :disabled="userStore.isOwnerOfCurrentBoard === false">
+              <button @click="handleRemoveButtonClick(item)" class="itbkk-collab-remove btn btn-sm btn-outline min-w-35 max-w-35" :class="{ 'btn-error': item.inviteStatus === 'JOINED' }"  :disabled="userStore.isOwnerOfCurrentBoard === false || boardStore.isLoading.action">
                 {{ item.inviteStatus === 'PENDING' ? 'Cancel' : 'Remove' }}
               </button>
             </BaseTooltip>
