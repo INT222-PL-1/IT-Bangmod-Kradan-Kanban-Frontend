@@ -174,11 +174,21 @@ watch(() => route.name, () => {
     <div class="flex justify-between items-center bg-base-300 px-6 h-[5rem]">
       <div class="flex items-center gap-2">
         <ResponsiveLogo type="compact" />
-        <div class="text-secondary">
-          <IconSVG iconName="chevron-right" :scale="1" />
+        <div v-show="boardStore.currentBoard?.name" class="flex items-center gap-2">
+          <div class="text-secondary">
+            <IconSVG iconName="chevron-right" :scale="1" />
+          </div>
+          <!-- <div class="text-xl truncate max-w-[45vw]" :title="boardStore.currentBoard?.name">
+            {{ boardStore.currentBoard?.name }}
+          </div> -->
+          <div class="max-w-[50vw]">
+            <div class="opacity-60">
+              <span class="truncate text-sm">{{ boardStore.currentBoard?.owner.name }}</span>
+              <span> /</span>
+            </div>
+            <div class="truncate text-lg -mt-1">{{ boardStore.currentBoard?.name }}</div>
+          </div>
         </div>
-        <div class="text-xl truncate max-w-[45vw]" :title="boardStore.currentBoard?.name">{{
-          boardStore.currentBoard?.name }}</div>
       </div>
       <div class="flex gap-2">
         <ThemeSwitch />

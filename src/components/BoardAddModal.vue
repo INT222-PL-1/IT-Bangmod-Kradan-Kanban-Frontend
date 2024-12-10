@@ -50,7 +50,7 @@ const handleClickCancel = () => {
 </script>
 
 <template>
-  <MiniModal :show="true" @clickBG="handleClickCancel">
+  <MiniModal :show="true" @clickBG="handleClickCancel" :isLoading="boardStore.isLoading.action">
     <template #title>
       New Board
     </template>
@@ -63,22 +63,30 @@ const handleClickCancel = () => {
             ({{ boardModalData.name.length + '/120' }})
           </span>
         </span>
-        <span v-show="boardModalData.name.length > 120" class="text-error text-xs">Board name can not be more than
-          120
-          characters</span>
+        <span v-show="boardModalData.name.length > 120" class="text-error text-xs">
+          Board name can not be more than 120 characters
+        </span>
       </div>
       <div :class="{ 'border border-error animate-shake-x-in': boardModalData.name.length > 120 }"
         class="bg-base-200 px-4 py-2 mt-2 rounded-lg flex-[1]">
-        <textarea v-model.trim="boardModalData.name" placeholder="Enter Board Name (Required)"
-          class="itbkk-board-name break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"></textarea>
+        <textarea
+          v-model.trim="boardModalData.name"
+          placeholder="Enter Board Name (Required)"
+          class="itbkk-board-name break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none"
+          :class="{
+            'opacity-50 pointer-events-none cursor-not-allowed': boardStore.isLoading.action
+          }"
+          :disabled="boardStore.isLoading.action"
+        ></textarea>
       </div>
     </template>
     <template #actions>
+      <div v-show="boardStore.isLoading.action" class="loading loading-spinner"></div>
       <button @click="handleClickConfirm" :class="{ disabled: disabledSaveButton }"
         class="itbkk-button-ok btn btn-sm btn-success" :disabled="disabledSaveButton">
-        Create
+        {{ boardStore.isLoading.action ? 'Creating...' : 'Create' }}
       </button>
-      <button @click="handleClickCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+      <button @click="handleClickCancel" class="itbkk-button-cancel btn btn-sm btn-neutral" :disabled="boardStore.isLoading.action">
         Cancel
       </button>
     </template>

@@ -30,7 +30,7 @@ defineProps({
     <div tabindex="0" @click="handleClick" role="button"
       :class="[
         { 'btn btn-sm btn-square': mode === 'icon', },
-        outline ? 'border-2 border-base-300 hover:border-base-300' : 'btn-ghost',
+        outline ? 'border-2 border-base-300 hover:border-base-300' : 'btn btn-sm btn-ghost',
       ]">
       <slot :name="mode === 'button' ? mode : 'icon'"></slot>
     </div>

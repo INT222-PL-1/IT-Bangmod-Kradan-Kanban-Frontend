@@ -88,7 +88,11 @@ const handleAcceptDeclineClick = (board) => {
 
   <!-- ? Leave Board Modal -->
   <MiniModal
-    :show="leaveModalOpenState" @clickBG="leaveModalOpenState = false" :mobileCenter="true">
+    :show="leaveModalOpenState"
+    @clickBG="leaveModalOpenState = false"
+    :mobileCenter="true"
+    :isLoading="boardStore.isLoading.action"
+  >
     <template #title>
       Leave Board
     </template>
@@ -96,10 +100,11 @@ const handleAcceptDeclineClick = (board) => {
       <span>Do you want to leave <span class="italic font-semibold">{{ selectedBoard?.name }}</span> board?</span>
     </template>
     <template #actions>
+      <div v-show="boardStore.isLoading.action" class="loading loading-spinner" />
       <button @click="handleLeaveConfirm" class="btn btn-sm btn-error btn-outline" :disabled="boardStore.isLoading.action">
-        Confirm
+        {{ boardStore.isLoading.action ? 'Leaving...' : 'Confirm' }}
       </button>
-      <button @click="handleLeaveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral">
+      <button @click="handleLeaveCancel" class="itbkk-button-cancel btn btn-sm btn-neutral" :disabled="boardStore.isLoading.action">
         Cancel
       </button>
     </template>
@@ -143,7 +148,13 @@ const handleAcceptDeclineClick = (board) => {
               <div>You have no board yet.</div>
               <div>Join other boards or <span @click="handleAddBoardClick" class="text-primary underline underline-offset-2 cursor-pointer">create a new one.</span></div>
             </div>
-            <BoardListItem v-else v-for="board in boardStore.boards" :key="board" :board="board" @boardClick="handleBoardClick" />
+            <BoardListItem
+              v-else
+              v-for="board in boardStore.boards"
+              :key="board"
+              :board="board"
+              @boardClick="handleBoardClick"
+            />
           </div>
         </div>
 
@@ -165,7 +176,15 @@ const handleAcceptDeclineClick = (board) => {
               <div>You have no collaborative board yet.</div>
               <div>Accept invitations and join other boards.</div>
             </div>
-            <BoardListItem v-else v-for="board in boardStore.collaborativeBoards" :key="board" :board="board" @boardClick="handleBoardClick" @leaveBoardClick="handleLeaveBoardClick($event)" @acceptDeclineInviteClick="handleAcceptDeclineClick($event)" />
+            <BoardListItem
+              v-else
+              v-for="board in boardStore.collaborativeBoards"
+              :key="board"
+              :board="board"
+              @boardClick="handleBoardClick"
+              @leaveBoardClick="handleLeaveBoardClick($event)"
+              @acceptDeclineInviteClick="handleAcceptDeclineClick($event)"
+            />
             <!-- <BoardListItem v-else v-for="board in boardStore.boards" :key="board" :board="board" @boardClick="handleBoardClick" /> -->
           </div>
         </div>
