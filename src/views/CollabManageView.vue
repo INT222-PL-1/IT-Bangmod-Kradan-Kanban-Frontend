@@ -2,6 +2,7 @@
 import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import ButtonWithIcon from '@/components/ButtonWithIcon.vue'
+import CollaboratorListItem from '@/components/CollaboratorListItem.vue'
 import DynamicTable from '@/components/DynamicTable.vue'
 import IconSVG from '@/components/IconSVG.vue'
 import MiniModal from '@/components/MiniModal.vue'
@@ -56,9 +57,9 @@ const handleAddButtonClick = () => {
 
   collaboratorModalData.value = { ...defaultCollaboratorModalData }
   addModalOpenState.value = true
-  setTimeout(() => {
-    collabEmailInputRef.value.focus()
-  }, 150)
+  // setTimeout(() => {
+  //   collabEmailInputRef.value.focus()
+  // }, 150)
 }
 
 const handleAddConfirm = async () => {
@@ -353,6 +354,61 @@ const handleAccessRightCancel = () => {
   </MiniModal>
 
   <section class="max-w-full pt-10 pb-20">
+    <!-- ? Mobile View -->
+    <div class="block sm:hidden">
+      <div class="px-4 mb-4 flex justify-end">
+        <div class="flex gap-2">
+          <ButtonWithIcon
+            @click="handleAddButtonClick"
+            class="itbkk-collaborator-add btn btn-sm btn-primary text-neutral"
+            iconName="person-plus"
+            :disabled="userStore.isOwnerOfCurrentBoard === false || boardStore.isLoading.action"
+            >
+            Add Collaborator
+          </ButtonWithIcon>
+          <button
+            @click="handleRefreshBtnClick"
+            type="button"
+            class="btn btn-secondary btn-sm btn-square"
+          >
+            <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.collaborator }" />
+          </button>
+        </div>
+      </div>
+      <div v-if="boardStore.isLoading.collaborator && boardStore.collaborators.length === 0">
+        <div colspan="4" class="flex justify-center items-center h-32">Loading collaborators...</div>
+      </div>
+      <div v-else-if="boardStore.isError.collaborator">
+        <div colspan="4" class="flex justify-center items-center h-32">Error while loading collaborators from server. Please try again later.</div>
+      </div>
+      <div v-else-if="boardStore.collaborators.length === 0">
+        <div colspan="4" class="flex justify-center items-center h-32">No collaborator</div>
+      </div>
+      <div v-else class="w-full flex flex-col items-center gap-4 px-4">
+        <!-- <StatusListItem
+          v-for="(status, index) in boardStore.statuses"
+          :key="status.id"
+          @editClick="handleEditBtnClick(status.id)"
+          @deleteClick="handleOpenDeleteModal(status)"
+          :status="status"
+          :index="index"
+          :hasWritePermission="userStore.hasWriteAccessOnCurrentBoard"
+          :isLoading="boardStore.isLoading.action"
+        /> -->
+        <CollaboratorListItem
+          v-for="(collab, index) in boardStore.collaborators"
+          :key="collab.oid"
+          v-model:accessRight="collab.accessRight"
+          @changeAccessRight="handleAccessRightChange($event)"
+          :collaborator="collab"
+          :index="index"
+          :isLoading="boardStore.isLoading.action"
+          :disabled="userStore.isOwnerOfCurrentBoard === false"
+        />
+      </div>
+    </div>
+
+    <!-- ? Desktop View -->
     <BaseTablePlate>
       <template #right-menu>
         <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
