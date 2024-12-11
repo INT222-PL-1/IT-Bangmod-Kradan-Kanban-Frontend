@@ -5,7 +5,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import ColorPalette from './ColorPalette.vue'
 import StatusBadge from './StatusBadge.vue';
-import { colorValidator, errorArrayToString } from '@/libs/utils';
+import { bodyScrollLock, bodyScrollUnlock, colorValidator, errorArrayToString } from '@/libs/utils';
 import IconSVG from './IconSVG.vue';
 import { useBoardStore } from '@/stores/board';
 import { HttpStatusCode } from 'zyos';
@@ -53,6 +53,7 @@ async function loadSelectedStatusData() {
 }
 
 onMounted(async () => {
+  bodyScrollLock()
   statusModalMode.value = route.name.split('-').pop()
   if (statusModalMode.value === 'add') {
     statusModalData.value = {
@@ -69,6 +70,7 @@ onMounted(async () => {
 })
 
 const handleClickClose = () => {
+  bodyScrollUnlock()
   router.replace({ name: 'status-manage' })
 }
 
@@ -87,8 +89,9 @@ const handleClickConfirm = async () => {
           description: `The status "${createdStatus.name}" is added successfully`,
           status: 'success'
         })
+        bodyScrollUnlock()
         router.push({ name: 'status-manage' })
-      } else {
+      } else if (res.setStatusCode === HttpStatusCode.UNAUTHORIZED) {
         toastStore.createToast({
           title: `Error while creating status`,
           description: `An error has occurred.\n${res.data?.errors ? 'Status ' + errorArrayToString(res.data.errors) : res.message}`,

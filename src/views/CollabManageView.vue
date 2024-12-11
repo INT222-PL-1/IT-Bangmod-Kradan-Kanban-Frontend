@@ -7,6 +7,8 @@ import DynamicTable from '@/components/DynamicTable.vue'
 import IconSVG from '@/components/IconSVG.vue'
 import MiniModal from '@/components/MiniModal.vue'
 import { addCollaborator, patchCollaborator, removeCollaborator } from '@/libs/collaboratorManagement'
+import globalResponseHandler from '@/libs/globalResponseHandler'
+import { bodyScrollLock, bodyScrollUnlock } from '@/libs/utils'
 import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
@@ -60,6 +62,7 @@ const handleAddButtonClick = () => {
   // setTimeout(() => {
   //   collabEmailInputRef.value.focus()
   // }, 150)
+  bodyScrollLock()
 }
 
 const handleAddConfirm = async () => {
@@ -77,6 +80,7 @@ const handleAddConfirm = async () => {
       })
       addModalOpenState.value = false
       await refreshCollaborators()
+      bodyScrollUnlock()
     } else {
       if (res.statusCode === HttpStatusCode.FORBIDDEN) {
         toastStore.createToast({
@@ -97,11 +101,7 @@ const handleAddConfirm = async () => {
           status: 'error'
         })
       } else {
-        toastStore.createToast({
-          title: 'Error',
-          description: 'There is a problem. Please try again later.',
-          status: 'error'
-        })
+        await globalResponseHandler(res)
       }
     }
   } catch (error) {
@@ -114,6 +114,7 @@ const handleAddConfirm = async () => {
 const handleAddCancel = () => {
   if (boardStore.isLoading.action) return
   addModalOpenState.value = false
+  bodyScrollUnlock()
 }
 
 const handleRemoveButtonClick = (collaborator) => {
@@ -121,6 +122,7 @@ const handleRemoveButtonClick = (collaborator) => {
 
   selectedCollaborator.value = collaborator
   removeModalOpenState.value = true
+  bodyScrollLock()
 }
 
 const handleRemoveConfirm = async () => {
@@ -138,6 +140,7 @@ const handleRemoveConfirm = async () => {
       })
       removeModalOpenState.value = false
       await refreshCollaborators()
+      bodyScrollUnlock()
     } else {
       if (res.statusCode === HttpStatusCode.FORBIDDEN) {
         toastStore.createToast({
@@ -152,12 +155,7 @@ const handleRemoveConfirm = async () => {
           status: 'error'
         })
         removeModalOpenState.value = false
-      } else {
-        toastStore.createToast({
-          title: 'Error',
-          description: 'There is a problem. Please try again later.',
-          status: 'error'
-        })
+        bodyScrollUnlock()
       }
     }
   } catch (error) {
@@ -169,6 +167,7 @@ const handleRemoveConfirm = async () => {
 
 const handleRemoveCancel = () => {
   removeModalOpenState.value = false
+  bodyScrollUnlock()
 }
 
 const handleAccessRightChange = (collaborator) => {
@@ -176,6 +175,7 @@ const handleAccessRightChange = (collaborator) => {
 
   selectedCollaborator.value = collaborator
   changeAccessRightModalOpenState.value = true
+  bodyScrollLock()
 }
 
 const handleAccessRightConfirm = async () => {
@@ -193,6 +193,7 @@ const handleAccessRightConfirm = async () => {
       })
       changeAccessRightModalOpenState.value = false
       await refreshCollaborators()
+      bodyScrollUnlock()
     } else {
       if (res.statusCode === HttpStatusCode.FORBIDDEN) {
         toastStore.createToast({
@@ -207,12 +208,7 @@ const handleAccessRightConfirm = async () => {
           status: 'error'
         })
         changeAccessRightModalOpenState.value = false
-      } else {
-        toastStore.createToast({
-          title: 'Error',
-          description: 'There is a problem. Please try again later.',
-          status: 'error'
-        })
+        bodyScrollUnlock()
       }
     }
   } catch (error) {
@@ -225,6 +221,7 @@ const handleAccessRightConfirm = async () => {
 const handleAccessRightCancel = () => {
   selectedCollaborator.value.accessRight = selectedCollaborator.value.accessRight === 'READ' ? 'WRITE' : 'READ'
   changeAccessRightModalOpenState.value = false
+  bodyScrollUnlock()
 }
 
 </script>
@@ -262,7 +259,6 @@ const handleAccessRightCancel = () => {
               v-model.trim="collaboratorModalData.email"
               placeholder="Enter Collaborator E-mail (Required)"
               class="itbkk-collaborator-email break-words w-full h-full outline-none focus:placeholder:opacity-50 bg-transparent resize-none disabled:opacity-40 disabled:cursor-not-allowed"
-              :disabled="boardStore.isLoading.action"
             />
           </div>
         </div>
@@ -385,16 +381,6 @@ const handleAccessRightCancel = () => {
         <div colspan="4" class="flex justify-center items-center h-32">No collaborator</div>
       </div>
       <div v-else class="w-full flex flex-col items-center gap-4 px-4">
-        <!-- <StatusListItem
-          v-for="(status, index) in boardStore.statuses"
-          :key="status.id"
-          @editClick="handleEditBtnClick(status.id)"
-          @deleteClick="handleOpenDeleteModal(status)"
-          :status="status"
-          :index="index"
-          :hasWritePermission="userStore.hasWriteAccessOnCurrentBoard"
-          :isLoading="boardStore.isLoading.action"
-        /> -->
         <CollaboratorListItem
           v-for="(collab, index) in boardStore.collaborators"
           :key="collab.oid"
@@ -470,56 +456,6 @@ const handleAccessRightCancel = () => {
             </BaseTooltip>
           </template>
         </DynamicTable>
-        <!-- <table class="table table-zebra">
-
-          <thead>
-            <tr class="select-none">
-              <th class="min-w-16 max-w-16"></th>
-              <th class="min-w-52 max-w-52 sm:min-w-[20vw] sm:max-w-[20vw]">Members</th>
-              <th class="min-w-96 max-w-96 sm:min-w-[20vw] sm:max-w-[30vw]">Access Right</th>
-              <th class="min-w-60 max-w-60">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr v-if="boardStore.isLoading.collaborator && boardStore.isLoading.collaborator === 0">
-              <td colspan="4" class="text-center h-32">Loading collaborators...</td>
-            </tr>
-            <tr v-else-if="boardStore.collaborators === null">
-              <td colspan="4" class="text-center h-32">Error while loading collaborators from server. Please try again later.</td>
-            </tr>
-            <tr v-else-if="boardStore.collaborators.length === 0">
-              <td colspan="4" class="text-center h-32">No collaborator</td>
-            </tr>
-            <tr v-else v-for="(collaborator, index) in boardStore.collaborators" :key="collaborator.oid" class="itbkk-item">
-              <td class="min-w-16 max-w-16 itbkk-item">
-                <div class="grid place-items-center">
-                  <div>{{ index + 1 }}</div>
-                </div>
-              </td>
-
-              <td class="min-w-16 max-w-16 justify-center">
-                <div class="itbkk-name text-md font-bold">{{ collaborator.name }}</div>
-                <div class="itbkk-email text-sm text-gray-500 itbkk-email">{{ collaborator.email }}</div>
-              </td>
-
-              <td class="min-w-18 max-w-18">
-                <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
-                  <select @change="handleAccessRightChange(collaborator)" v-model="collaborator.accessRight" class="itbkk-access-right transition flex bg-base-100 select select-ghost select-sm"  :disabled="userStore.isOwnerOfCurrentBoard === false">
-                    <option value="READ">Read</option>
-                    <option value="WRITE">Write</option>
-                  </select>
-                </BaseTooltip>
-              </td>
-
-              <td>
-                <BaseTooltip text="You need to be board owner to perform this action." :disabled="userStore.isOwnerOfCurrentBoard">
-                  <button @click="handleRemoveButtonClick(collaborator)" class="itbkk-collab-remove btn btn-sm btn-error btn-outline min-w-35 max-w-35"  :disabled="userStore.isOwnerOfCurrentBoard === false">Remove</button>
-                </BaseTooltip>
-              </td>
-            </tr>
-          </tbody>
-        </table> -->
       </template>
     </BaseTablePlate>
   </section>

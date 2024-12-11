@@ -4,14 +4,6 @@ import daisyui from 'daisyui'
 export default {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
-    extend: {
-      colors: {
-        'or2-base-100': '#f4f4f4',
-        'or2-base-200': '#ececec',
-        'or2-base-300': '#fafafa',
-        'or2-base-content': '#374151',
-      }
-    }
   },
   daisyui: {
     themes: [
@@ -21,8 +13,8 @@ export default {
           secondary: '#e2e2e2',
           accent: '#00cdb7',
           neutral: '#fafafa',
-          "base-100": "#ececec",
-          "base-200": "#f0f0f0",
+          "base-100": "#efefef",
+          "base-200": "#f8f8f8",
           'base-300': '#ffffff',
           'base-content': '#374151',
           info: '#00b5ff',

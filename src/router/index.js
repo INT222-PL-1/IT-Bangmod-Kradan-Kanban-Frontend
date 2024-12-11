@@ -152,7 +152,7 @@ router.beforeEach(async (to) => {
   const userStore = useUserStore()
   const msalStore = useMsalStore()
   const boardStore = useBoardStore()
-  const toastStore = useToastStore()
+  // const toastStore = useToastStore()
 
   await msalStore.initializeMsal(msalConfig)
   
@@ -212,11 +212,11 @@ router.beforeEach(async (to) => {
     boardStore.clearCurrentBoardData()
     userStore.clearUserData()
 
-    toastStore.createToast({
-      title: 'Error',
-      description: 'Cannot enter the page. Please login and try again later.',
-      status: 'error',
-    })
+    // toastStore.createToast({
+    //   title: 'Error',
+    //   description: 'Cannot enter the page. Please login and try again later.',
+    //   status: 'error',
+    // })
 
     return { name: 'login' } 
   }

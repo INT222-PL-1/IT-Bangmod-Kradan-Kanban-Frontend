@@ -1,5 +1,6 @@
 <script setup>
 import MiniModal from '@/components/MiniModal.vue';
+import { bodyScrollLock, bodyScrollUnlock } from '@/libs/utils';
 import { useMsalStore } from '@/stores/msal';
 import { useUserStore } from '@/stores/user';
 import { defineAsyncComponent, ref } from 'vue';
@@ -20,14 +21,17 @@ const handleSignOutConfirm = async () => {
     userStore.signOut()
   }
   signOutModalOpenState.value = false
+  bodyScrollUnlock()
 }
 
 const handleSignOutCancel = () => {
   signOutModalOpenState.value = false
+  bodyScrollUnlock()
 }
 
 const handleSignOutClick = async () => {
   signOutModalOpenState.value = true
+  bodyScrollLock()
 }
 
 const handleLoginClick = () => {
@@ -48,8 +52,8 @@ const handleLoginClick = () => {
     </template>
     <template #actions>
       <button
-      class="btn btn-neutral btn-sm"
-      @click="handleSignOutCancel"
+        class="btn btn-neutral btn-sm"
+        @click="handleSignOutCancel"
       >
         Cancel
       </button>

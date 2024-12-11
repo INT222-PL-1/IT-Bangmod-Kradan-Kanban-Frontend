@@ -19,6 +19,7 @@ import BaseTablePlate from '@/components/BaseTablePlate.vue'
 import MiniModal from '@/components/MiniModal.vue'
 import { HttpStatusCode } from 'zyos'
 import DynamicTable from '@/components/DynamicTable.vue'
+import { bodyScrollLock, bodyScrollUnlock } from '@/libs/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -100,11 +101,18 @@ const handleSort = (e) => {
 
 const handleSettingsButtonClick = () => {
   if (userStore.isOwnerOfCurrentBoard === false) return
+  bodyScrollLock()
   boardSettingsModalOpenState.value = true
+}
+
+const handleSettingsClose = () => {
+  bodyScrollUnlock()
+  boardSettingsModalOpenState.value = false
 }
 
 const handleToggleVisibilityButtonClick = () => {
   if (userStore.isOwnerOfCurrentBoard === false) return
+  bodyScrollLock()
   boardVisibilityModalOpenState.value = true
 }
 
@@ -123,17 +131,23 @@ const handleToggleBoardVisibility = async () => {
   } catch (error) {
     console.error(error)
   } finally {
+    bodyScrollUnlock()
     boardStore.isLoading.action = false
   }
+}
+
+const handleToggleBoardVisibilityCancel = () => {
+  bodyScrollUnlock()
+  boardVisibilityModalOpenState.value = false
 }
 </script>
 
 <template>
 
-  <BoardSettingsModal :show="boardSettingsModalOpenState" @clickClose="boardSettingsModalOpenState = false" />
+  <BoardSettingsModal :show="boardSettingsModalOpenState" @clickClose="handleSettingsClose" />
 
   <MiniModal
-    @clickBG="boardVisibilityModalOpenState = false"
+    @clickBG="handleToggleBoardVisibilityCancel"
     :show="boardVisibilityModalOpenState"
     :mobileCenter="true"
     :isLoading="boardStore.isLoading.action"
@@ -154,7 +168,7 @@ const handleToggleBoardVisibility = async () => {
     <template #actions>
       <div v-show="boardStore.isLoading.action" class="loading loading-spinner" />
       <button
-        @click="boardVisibilityModalOpenState = false"
+        @click="handleToggleBoardVisibilityCancel"
         class="itbkk-button-cancel btn btn-sm btn-neutral"
         :disabled="boardStore.isLoading.action"
       >

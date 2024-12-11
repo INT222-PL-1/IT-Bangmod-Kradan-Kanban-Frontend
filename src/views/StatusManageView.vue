@@ -15,6 +15,7 @@ import MiniModal from '@/components/MiniModal.vue'
 import { HttpStatusCode } from 'zyos'
 import DynamicTable from '@/components/DynamicTable.vue'
 import StatusListItem from '@/components/StatusListItem.vue'
+import { bodyScrollLock, bodyScrollUnlock } from '@/libs/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -52,6 +53,12 @@ const handleEditBtnClick = (statusId) => {
 const handleOpenTransferModal = (statusData) => {
   statusModalData.value = statusData
   statusTransferModalOpenState.value = true
+  bodyScrollLock()
+}
+
+const handleCloseTransferModal = () => {
+  statusTransferModalOpenState.value = false
+  bodyScrollUnlock()
 }
 
 const handleOpenDeleteModal = (statusData) => {
@@ -61,7 +68,13 @@ const handleOpenDeleteModal = (statusData) => {
   } else {
     statusModalData.value = statusData
     statusDeleteModalOpenState.value = true
+    bodyScrollLock()
   }
+}
+
+const handleCloseDeleteModal = () => {
+  statusDeleteModalOpenState.value = false
+  bodyScrollUnlock()
 }
 
 const handleTransferStatus = async (fromStatusId, toStatusId) => {
@@ -91,6 +104,7 @@ const handleTransferStatus = async (fromStatusId, toStatusId) => {
   } finally {
     statusTransferModalOpenState.value = false
     boardStore.isLoading.action = false
+    bodyScrollUnlock()
   }
 }
 
@@ -108,6 +122,7 @@ const handleDeleteStatus = async (statusId) => {
         description: 'The status has been deleted',
         status: 'success'
       })
+
       await boardStore.loadStatuses(route.params.boardId)
     } else {
       toastStore.createToast({
@@ -122,6 +137,7 @@ const handleDeleteStatus = async (statusId) => {
   } finally {
     statusDeleteModalOpenState.value = false
     boardStore.isLoading.action = false
+    bodyScrollUnlock()
   }
 }
 
@@ -133,7 +149,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
 
 <template>
   <MiniModal
-    @clickBG="statusDeleteModalOpenState = false"
+    @clickBG="handleCloseDeleteModal"
     :show="statusDeleteModalOpenState"
     :mobileCenter="true"
     :isLoading="boardStore.isLoading.action"
@@ -147,7 +163,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     <template #actions>
       <div v-show="boardStore.isLoading.action" class="loading loading-spinner"></div>
       <button
-        @click="statusDeleteModalOpenState = false"
+        @click="handleCloseDeleteModal"
         class="itbkk-button-cancel btn btn-sm btn-neutral"
         :disabled="boardStore.isLoading.action"
       >
@@ -164,7 +180,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
   </MiniModal>
 
   <MiniModal
-    @clickBG="statusTransferModalOpenState = false"
+    @clickBG="handleCloseTransferModal"
     :show="statusTransferModalOpenState"
     :mobileCenter="true"
     :isLoading="boardStore.isLoading.action"
@@ -192,7 +208,7 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     <template #actions>
       <div v-show="boardStore.isLoading.action" class="loading loading-spinner"></div>
       <button
-        @click="statusTransferModalOpenState = false"
+        @click="handleCloseTransferModal"
         class="itbkk-button-cancel btn btn-sm btn-neutral"
         :disabled="boardStore.isLoading.action"
       >
@@ -220,18 +236,6 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
     <div class="block sm:hidden">
       <div class="px-4 mb-4 flex justify-end">
         <div class="flex gap-2">
-          <!-- <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
-            <button @click="handleAddBtnClick" type="button"
-              class="itbkk-button-add btn btn-primary btn-sm text-neutral" :disabled="userStore.hasWriteAccessOnCurrentBoard === false">
-              <IconSVG iconName="plus" :scale="1.25" />Add Status
-            </button>
-          </BaseTooltip>
-          <BaseTooltip text="Refresh Statuses">
-            <button @click="handleRefreshBtnClick" type="button"
-            class="btn btn-secondary btn-sm btn-square">
-            <IconSVG iconName="arrow-clockwise" :scale="1.25" :class="{ 'animate-spin': boardStore.isLoading.status }" />
-            </button>
-          </BaseTooltip> -->
           <button
             @click="handleAddBtnClick" type="button"
             class="itbkk-button-add btn btn-primary btn-sm text-neutral"
@@ -345,17 +349,29 @@ const handleTransferAndDeleteStatus = async (fromStatusId, toStatusId) => {
             <div v-if="item.isPredefined === false" class="flex justify-start items-center gap-2 w-full">
               <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
                 <ButtonWithIcon @click="handleEditBtnClick(item.id)"
-                  class="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start flex flex-nowrap"
+                  class="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 justify-start hidden md:flex flex-nowrap"
                   iconName="pencil-square" :disabled="userStore.hasWriteAccessOnCurrentBoard === false || boardStore.isLoading.action">
                   Edit
                 </ButtonWithIcon>
+                <button
+                  @click="handleEditBtnClick(item.id)" type="button" class="itbkk-button-edit btn btn-sm bg-base-300 hover:bg-base-100 inline-flex md:hidden"
+                  :disabled="userStore.hasWriteAccessOnCurrentBoard === false || boardStore.isLoading.action"
+                >
+                  <IconSVG iconName="pencil-square" />
+                </button>
               </BaseTooltip>
               <BaseTooltip text="You need to be board owner or has write access to perform this action." :disabled="userStore.hasWriteAccessOnCurrentBoard">
                 <ButtonWithIcon @click="handleOpenDeleteModal(item)"
-                  class="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error flex flex-nowrap"
+                  class="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 justify-start text-error hidden md:flex flex-nowrap"
                   iconName="trash-fill" :disabled="userStore.hasWriteAccessOnCurrentBoard === false || boardStore.isLoading.action">
                   Delete
                 </ButtonWithIcon>
+                <button
+                  @click="handleOpenDeleteModal(item)" type="button" class="itbkk-button-delete btn btn-sm bg-base-300 hover:bg-base-100 text-error inline-flex md:hidden"
+                  :disabled="userStore.hasWriteAccessOnCurrentBoard === false || boardStore.isLoading.action"
+                >
+                  <IconSVG iconName="trash-fill" />
+                </button>
               </BaseTooltip>
             </div>
             <div v-else></div>

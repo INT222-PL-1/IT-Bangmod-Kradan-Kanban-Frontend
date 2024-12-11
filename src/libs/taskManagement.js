@@ -1,3 +1,4 @@
+import { useUserStore } from '@/stores/user'
 import zyos, { ZyosResponse } from 'zyos'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
@@ -112,7 +113,10 @@ export async function deleteTask(taskId, boardId) {
  * @param {function} onUploadProgress - callback function for upload progress
  */
 export async function uploadTaskAttachments(taskId, boardId, files, onFileProgress) {
+  const userStore = useUserStore()
   const url = `${BASE_URL}/${boardId}/tasks/${taskId}/files`
+
+  const accessToken = userStore.isMSAuthenticated ? userStore.user.idToken : localStorage.getItem('itbkk_access_token')
 
   const uploadSuccessFile = []
 
@@ -124,7 +128,7 @@ export async function uploadTaskAttachments(taskId, boardId, files, onFileProgre
       zyos.xhr(url, {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('itbkk_access_token')
+          'Authorization': 'Bearer ' + accessToken
         },
         body: formData,
         onUploadProgress: (progressEvent) => {
@@ -147,16 +151,19 @@ export async function uploadTaskAttachments(taskId, boardId, files, onFileProgre
 }
 
 export async function uploadTaskAttachment(taskId, boardId, file, onProgress) {
+  const userStore = useUserStore()
   const url = `${BASE_URL}/${boardId}/tasks/${taskId}/files`
 
   const formData = new FormData()
   formData.append('files', file)
 
+  const accessToken = userStore.isMSAuthenticated ? userStore.user.idToken : localStorage.getItem('itbkk_access_token')
+
   try {
     const res = await zyos.xhr(url, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('itbkk_access_token')
+        'Authorization': 'Bearer ' + accessToken
       },
       body: formData,
       onUploadProgress: (progressEvent) => {

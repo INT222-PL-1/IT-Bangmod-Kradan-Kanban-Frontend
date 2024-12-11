@@ -1,5 +1,5 @@
 <script setup>
-import { captureVideoThumbnail, formatFileSize, getBootStrapIconFromMIME } from '@/libs/utils';
+import { formatFileSize, getBootStrapIconFromMIME } from '@/libs/utils';
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import IconSVG from './IconSVG.vue';
 import BaseTooltip from './BaseTooltip.vue';
@@ -113,17 +113,9 @@ onMounted(async () => {
         image.value = e.target.result
       }
       reader.readAsDataURL(props.file)
-    } else {
-      image.value = await getBlobUrl(SERVER_URL + props.file.path)
-    }
-  }
-
-  if (props.file.type.includes('video')) {
-    if (isOnClient.value) {
-      image.value = await captureVideoThumbnail(props.file)
-    } else {
-      const res = await zyos.fetch(SERVER_URL + props.file.path)
-      image.value = await captureVideoThumbnail(res.data)
+    } else if (props.file.thumbnailPath) {
+      console.log('props.file', props.file)
+      image.value = await getBlobUrl(SERVER_URL + props.file.path + '/thumbnailPath')
     }
   }
 })

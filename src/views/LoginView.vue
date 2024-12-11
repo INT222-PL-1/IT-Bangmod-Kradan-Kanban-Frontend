@@ -37,6 +37,8 @@ const handleTogglePasswordShow = () => {
 const handleLoginSubmit = async () => {
     isLoggingIn.value = true
     isLoginFailed.value = false
+    
+    isPasswordShow.value = false
 
     const res = await login(username.value, password.value)
 
@@ -88,9 +90,9 @@ onMounted(async () => {
     <Transition>
         <MsLoginWaitingForeground @clickPopup="handleLoginMS" :show="isLoggingInMs" />
     </Transition>
-    <main class="w-screen h-screen grid place-items-center">
+    <main class="w-screen h-screen grid place-items-center bg-base-200 md:bg-transparent">
         <div
-            class="flex flex-col w-screen h-screen md:w-auto md:h-auto bg-base-200 rounded-xl px-14 py-14 animate-slide-in">
+            class="flex flex-col w-screen max-w-[28rem] h-screen md:w-auto md:h-auto bg-transparent md:bg-base-200 rounded-xl px-14 py-14 animate-slide-in">
             <IconSVG iconName="itbkk-logo" :scale="4" size="4rem" />
             <span class="text-[2rem] mt-[1rem] mb-[0.5rem]">Login</span>
             <span class="opacity-80">Welcome to IT-Bangmod Kradan Kanban.</span>
@@ -117,12 +119,12 @@ onMounted(async () => {
                         </div>
                     </button>
                 </div>
-                <button type="submit" :disabled="username.length === 0 || password.length === 0"
-                    :class="{ 'disabled': username.length === 0 || password.length === 0 }"
+                <button type="submit" :disabled="username.length === 0 || password.length === 0 || isLoggingIn"
+                    :class="{ 'disabled': username.length === 0 || password.length === 0 || isLoggingIn }"
                     class="itbkk-button-signin mt-[2rem] btn btn-secondary py-[0.75rem] text-secondary-content text-base rounded-full disabled:cursor-not-allowed">Login</button>
             </form>
             <div class="divider">Or</div>
-            <button @click="handleLoginMS" class="btn btn-neutral gap-3">
+            <button @click="handleLoginMS" class="btn btn-neutral gap-3" :class="{ 'opacity-50': isLoggingIn }" :disabled="isLoggingIn">
                 <IconSVG iconName="microsoft-logo" size="1.5rem" :scale="1.5" />
                 Login with Microsoft
             </button>

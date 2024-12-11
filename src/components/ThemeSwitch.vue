@@ -4,6 +4,14 @@ import BaseMenu from './BaseMenu.vue';
 import IconSVG from './IconSVG.vue';
 import ButtonWithIcon from './ButtonWithIcon.vue';
 
+defineProps({
+  mode: {
+    type: String,
+    default: 'default',
+    validator: (value) => ['default', 'toggle'].includes(value)
+  }
+})
+
 const LOCAL_STORAGE_PREFIX = 'itbkk-'
 const DARKMODE_THEME = 'itbkk-dark'
 const LIGHTMODE_THEME = 'itbkk-light'
@@ -44,10 +52,20 @@ const handleSetTheme = (theme) => {
   themeSetup()
 }
 
+const handleThemeRotate = () => {
+  if (themeSetting.value === 'light') {
+    handleSetTheme('dark')
+  } else if (themeSetting.value === 'dark') {
+    handleSetTheme('system')
+  } else {
+    handleSetTheme('light')
+  }
+}
+
 </script>
 
 <template>
-  <BaseMenu side="left">
+  <BaseMenu side="left" v-if="mode === 'default'">
     <template #icon>
       <div class="grid place-items-center w-8 h-8">
         <Transition>
@@ -101,6 +119,25 @@ const handleSetTheme = (theme) => {
       </li>
     </template>
   </BaseMenu>
+    <!-- <ButtonWithIcon @click="handleSetTheme(themeSetting === 'dark' ? 'light' : 'dark')" iconName="moon-fill"
+    class="btn btn-ghost btn-sm" /> -->
+    <button v-if="mode === 'toggle'" @click="handleThemeRotate()" class="btn btn-ghost justify-start gap-4">
+      <div class="grid place-items-center w-4">
+        <Transition>
+          <IconSVG v-show="(!isSystemDark && themeSetting === 'system') || themeSetting === 'light'" iconName="sun-fill" :scale="1.25" size="1rem" class="absolute" />
+        </Transition>
+        <Transition>
+          <IconSVG v-show="(isSystemDark && themeSetting === 'system') || themeSetting === 'dark'" iconName="moon-fill" :scale="1.25" size="1rem" class="absolute" />
+        </Transition>
+      </div>
+      <div>Theme: {{
+        themeSetting === 'dark' ?
+        'Dark' :
+        themeSetting === 'light' ?
+        'Light' :
+        'System'
+      }}</div>
+    </button>
 </template>
 
 <style scoped>

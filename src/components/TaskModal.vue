@@ -1,5 +1,5 @@
 <script setup>
-import { getTimezone, formatDateTime, sumFileSizes } from '@/libs/utils'
+import { getTimezone, formatDateTime, sumFileSizes, bodyScrollLock, bodyScrollUnlock } from '@/libs/utils'
 import StatusBadge from './StatusBadge.vue'
 import StatusSelector from './StatusSelector.vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -100,6 +100,7 @@ const handleFileChange = (e) => {
     files = Array.from(e)
   } else {
     files = Array.from(e.target.files)
+    e.target.value = ''
   }
   if (files.length === 0) return
   const validFiles = filterValidFiles(files)
@@ -156,6 +157,7 @@ async function doCreateTask() {
       description: `The task "${createdTask.title}" is added successfully.`,
       status: 'success'
     })
+    bodyScrollUnlock()
     router.push({ name: 'all-task' })
   } else {
     toastStore.createToast({
@@ -175,6 +177,7 @@ async function doUpdateTask() {
       description: `The task "${updatedTask.title}" is updated successfully`,
       status: 'success'
     })
+    bodyScrollUnlock()
     router.push({ name: 'all-task' })
   } else {
     toastStore.createToast({
@@ -218,6 +221,7 @@ async function doUploadAttachments() {
 }
 
 onMounted(async () => {
+  bodyScrollLock()
   taskModalMode.value = route.name.split('-').pop()
   if (taskModalMode.value === 'add') {
     taskModalData.value = {
@@ -238,6 +242,7 @@ onMounted(async () => {
 })
 
 const handleClickClose = () => {
+  bodyScrollUnlock()
   router.replace({ name: 'all-task' })
 }
 
@@ -421,16 +426,17 @@ const handleClickConfirm = async () => {
           :disabled="allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.action"
         />
         <div class="flex flex-col sm:flex-row sm:justify-between gap-2 relative">
-          <div class="text-lg font-semibold">
+          <div class="flex-auto text-lg font-semibold">
             <span>Attachments </span>
             <!-- <span v-if="['add', 'edit'].includes(taskModalMode)" class="text-sm">
               ({{ taskModalData.assignees.length + '/30' }})
             </span> -->
             <span class="text-sm opacity-50">
-              {{ allFilesCount + '/10 files' }} <span>{{ allFilesSize + '/200MB (20MB/file)' }}</span>
+              {{ allFilesCount + '/10 files' }}
+              {{ allFilesSize + '/200MB&nbsp;(20MB/file)' }}
             </span>
           </div>
-          <div v-if="taskModalMode === 'edit'" class="flex gap-2">
+          <div v-if="taskModalMode === 'edit'" class="flex-none flex gap-2">
             <label :for="fileInputId" class="btn btn-sm btn-neutral" :class="{ 'btn-disabled': allFilesCount >= MAX_FILE_COUNT || boardStore.isLoading.action }">
               <IconSVG iconName="paperclip" scale="1" size="1rem" />
               <span>Add attachment</span>

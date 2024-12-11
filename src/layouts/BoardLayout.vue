@@ -100,6 +100,7 @@ watch(() => route.name, () => {
           <IconSVG iconName="people" :scale="1.25" />Collaborator
         </RouterLink>
         <div class="divider"></div>
+        <ThemeSwitch mode="toggle" />
         <button @click="handleSignButtonClick" class="btn btn-ghost justify-start gap-4">
           <IconSVG :iconName="userStore.user ? 'box-arrow-left' : 'box-arrow-in-right'" :scale="1.25" />
           Sign {{ userStore.user ? 'Out' : 'In' }}

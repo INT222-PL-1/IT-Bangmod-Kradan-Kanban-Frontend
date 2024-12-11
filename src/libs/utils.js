@@ -262,3 +262,11 @@ export function captureVideoThumbnail(videoFile) {
       })
   })
 }
+
+export function bodyScrollLock() {
+  document.body.style.overflow = 'hidden'
+}
+
+export function bodyScrollUnlock() {
+  document.body.style.overflow = 'auto'
+}

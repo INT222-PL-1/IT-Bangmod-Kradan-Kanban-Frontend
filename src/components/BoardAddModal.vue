@@ -1,11 +1,12 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
 import { createBoard } from '@/libs/boardManagement';
 import { useToastStore } from '@/stores/toast';
 import MiniModal from './MiniModal.vue';
 import { useBoardStore } from '@/stores/board';
+import { bodyScrollLock, bodyScrollUnlock } from '@/libs/utils';
 
 const boardStore = useBoardStore() 
 const userStore = useUserStore()
@@ -44,8 +45,13 @@ const handleClickConfirm = async () => {
 }
 
 const handleClickCancel = () => {
+  bodyScrollUnlock()
   router.push({ name: 'all-board' })
 }
+
+onMounted(() => {
+  bodyScrollLock()
+})
 
 </script>
 

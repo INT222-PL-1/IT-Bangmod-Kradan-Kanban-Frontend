@@ -3,6 +3,7 @@ import BoardListItem from '@/components/BoardListItem.vue'
 import IconSVG from '@/components/IconSVG.vue'
 import MiniModal from '@/components/MiniModal.vue';
 import { removeCollaborator } from '@/libs/collaboratorManagement';
+import { bodyScrollLock, bodyScrollUnlock } from '@/libs/utils';
 import { useBoardStore } from '@/stores/board'
 import { useToastStore } from '@/stores/toast';
 import { useUserStore } from '@/stores/user';
@@ -34,6 +35,7 @@ const handleBoardClick = async (boardId) => {
 const handleLeaveBoardClick = (board) => {
   selectedBoard.value = board
   leaveModalOpenState.value = true
+  bodyScrollLock()
 }
 
 const handleLeaveConfirm = async () => {
@@ -50,9 +52,11 @@ const handleLeaveConfirm = async () => {
       })
       leaveModalOpenState.value = false
       await boardStore.loadAllBoards()
+      bodyScrollUnlock()
     } else {
       if (res.statusCode === HttpStatusCode.FORBIDDEN || res.statusCode === HttpStatusCode.NOT_FOUND) {
         leaveModalOpenState.value = false
+        bodyScrollUnlock()
         return
       } else {
         toastStore.createToast({

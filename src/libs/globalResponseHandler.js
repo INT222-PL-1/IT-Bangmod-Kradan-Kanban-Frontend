@@ -6,7 +6,6 @@ import { useUserStore } from "@/stores/user"
 import { HttpStatusCode } from "zyos"
 import { useMsalStore } from "@/stores/msal"
 
-
 const globalResponseHandler = async (response) => {
   const toastStore = useToastStore()
   const userStore = useUserStore()
@@ -37,11 +36,30 @@ const globalResponseHandler = async (response) => {
       }
 
     } else if (response.data.type === Pl1ErrorTypes.UNAUTHORIZED_UPDATE) {
-      toastStore.createToast({
-        title: 'Error',
-        description: 'You are not authorized to do this action.',
-        status: 'error',
-      })
+
+      if (userStore.isMSAuthenticated) {
+        await msalStore.acquireToken()
+      } else {
+        try {
+          const refreshToken = localStorage.getItem('itbkk_refresh_token')
+          const res = await refreshAccessToken(refreshToken)
+          if (res.ok) {
+            localStorage.setItem('itbkk_access_token', res.data.access_token)
+          }
+          toastStore.createToast({
+            title: 'Error',
+            description: 'There is a problem. Please try again later.',
+            status: 'error'
+          })
+        } catch (error) {
+          toastStore.createToast({
+            title: 'Error',
+            description: 'You are not authorized to do this action.',
+            status: 'error',
+          })
+        }
+      }
+
     } else if (response.data.type === Pl1ErrorTypes.REFRESH_TOKEN_INVALID) {
       toastStore.createToast({
         title: 'Error',
