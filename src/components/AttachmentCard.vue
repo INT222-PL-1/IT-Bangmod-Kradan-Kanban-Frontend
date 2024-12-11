@@ -64,7 +64,7 @@ function downloadLocalFile() {
   a.download = props.file.name
   a.click()
   a.remove()
-  URL.revokeObjectURL(url)
+  // URL.revokeObjectURL(url)
 }
 
 async function downloadServerFile() {
@@ -74,7 +74,7 @@ async function downloadServerFile() {
   a.download = props.file.path.split('/').at(-1)
   a.click()
   a.remove()
-  URL.revokeObjectURL(blobUrl)
+  // URL.revokeObjectURL(blobUrl)
 }
 
 function previewLocalFile() {
