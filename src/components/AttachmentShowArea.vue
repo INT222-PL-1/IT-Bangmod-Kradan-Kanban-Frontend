@@ -1,28 +1,19 @@
 <script setup>
-import { ref } from 'vue';
 import AttachmentCard from './AttachmentCard.vue';
 import IconSVG from './IconSVG.vue';
 
-const props = defineProps({
+defineProps({
   existingFiles: {
     type: Array,
     required: true
   }
 })
 
-const fileAreaRef = ref(null)
-
-const handleWheel = (e) => {
-  if (props.existingFiles.length === 0) return
-  e.preventDefault()
-  fileAreaRef.value.scrollLeft += e.deltaY + e.deltaX
-}
-
 </script>
 
 <template>
-  <div class="relative" @wheel="handleWheel">
-    <div ref="fileAreaRef" class="h-60 mt-2 bg-base-200 rounded-lg overflow-x-auto">
+  <div class="relative">
+    <div class="h-60 mt-2 bg-base-200 rounded-lg overflow-x-auto">
       <div v-if="existingFiles.length > 0" class="flex gap-4 h-full p-4 w-fit">
         <AttachmentCard
           v-for="file in existingFiles"

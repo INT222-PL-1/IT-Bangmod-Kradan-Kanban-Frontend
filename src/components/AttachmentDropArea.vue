@@ -30,7 +30,6 @@ const existingFiles = defineModel('existing-files', {
   default: []
 })
 
-const fileAreaRef = ref(null)
 const showDropArea = ref(false)
 const fileCount = computed(() => existingFiles.value.length + attachedFiles.value.length)
 
@@ -70,17 +69,11 @@ const handleClick = () => {
 const handleDragOver = (e) => {
   e.preventDefault()
 }
-
-const handleWheel = (e) => {
-  if (attachedFiles.value.length + existingFiles.value.length === 0) return
-  e.preventDefault()
-  fileAreaRef.value.scrollLeft += e.deltaY + e.deltaX
-}
 </script>
 
 <template>
-  <div class="relative" @wheel="handleWheel">
-    <div @dragenter="handleDragEnter" ref="fileAreaRef" class="relative h-60 mt-2 bg-base-200 rounded-lg overflow-x-auto">
+  <div class="relative">
+    <div @dragenter="handleDragEnter" class="relative h-60 mt-2 bg-base-200 rounded-lg overflow-x-auto">
       <div v-show="fileCount > 0" class="flex gap-4 h-full p-4 w-fit">
         <AttachmentCard
           v-for="file in existingFiles"
