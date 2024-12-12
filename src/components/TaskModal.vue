@@ -159,14 +159,13 @@ async function doCreateTask() {
     })
     bodyScrollUnlock()
     router.push({ name: 'all-task' })
+  } else {
+    toastStore.createToast({
+      title: 'Error',
+      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
+      status: 'error'
+    })
   }
-  // else {
-  //   toastStore.createToast({
-  //     title: 'Error',
-  //     description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
-  //     status: 'error'
-  //   })
-  // }
 }
 
 async function doUpdateTask() {
