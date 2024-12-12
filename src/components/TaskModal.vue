@@ -484,7 +484,13 @@ const handleClickConfirm = async () => {
           attachedFiles.length > 0 ? 'Upload & Save' : 'Save'
         }}
       </button>
-      <button v-once @click="handleClickClose" class="itbkk-button itbkk-button-cancel btn btn-neutral" :disabled="boardStore.isLoading.action">
+      <button
+        v-once
+        @click="handleClickClose"
+        class="itbkk-button itbkk-button-cancel btn btn-neutral"
+        :class="{ 'btn-disabled disabled cursor-not-allowed': boardStore.isLoading.action }"
+        :disabled="boardStore.isLoading.action"
+      >
         {{ taskModalMode === 'view' ? 'Close' : 'Cancel' }}
       </button>
     </template>

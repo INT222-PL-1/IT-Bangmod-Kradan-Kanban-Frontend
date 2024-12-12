@@ -114,7 +114,6 @@ onMounted(async () => {
       }
       reader.readAsDataURL(props.file)
     } else if (props.file.thumbnailPath) {
-      console.log('props.file', props.file)
       image.value = await getBlobUrl(SERVER_URL + props.file.thumbnailPath)
     }
   }

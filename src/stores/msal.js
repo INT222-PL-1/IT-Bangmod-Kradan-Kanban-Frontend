@@ -18,13 +18,12 @@ export const useMsalStore = defineStore('msal', () => {
    */
   async function initializeMsal(config) {
     if (msalInstance.value) {
-      console.warn('MSAL instance already initialized')
+      // console.warn('MSAL instance already initialized')
       return
     }
     try {
       msalInstance.value = new PublicClientApplication(config)
       await msalInstance.value.initialize()
-      console.log('MSAL initialized')
     } catch (error) {
       console.error('MSAL initialization failed', error)
     }
@@ -37,8 +36,6 @@ export const useMsalStore = defineStore('msal', () => {
     userStore.loadUserData(account.idToken)
   }
 
-  // const test = new PublicClientApplication()
-  // test.handleRedirectPromise()
   /**
    * Login using redirect flow
    */
@@ -72,9 +69,7 @@ export const useMsalStore = defineStore('msal', () => {
       console.warn('No active account found for logout')
       return
     }
-    const res = await msalInstance.value.logoutPopup()
-
-    console.log('Logout response', res)
+    await msalInstance.value.logoutPopup()
     userStore.clearUserData()
     router.push({ name: 'login' })
   }
@@ -100,7 +95,6 @@ export const useMsalStore = defineStore('msal', () => {
       if (response) {
         setActiveAccount(response.account)
       }
-      console.log('Silent token acquisition response', response)
     } catch (error) {
       console.error('Silent token acquisition failed', error)
 
@@ -123,7 +117,6 @@ export const useMsalStore = defineStore('msal', () => {
       if (response) {
         setActiveAccount(response.account)
       }
-      console.log('Silent SSO response', response)
     } catch (error) {
       console.error('Silent SSO failed', error)
     }
