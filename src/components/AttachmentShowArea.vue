@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import AttachmentCard from './AttachmentCard.vue';
 import IconSVG from './IconSVG.vue';
 
-defineProps({
+const props = defineProps({
   existingFiles: {
     type: Array,
     required: true
@@ -13,6 +13,7 @@ defineProps({
 const fileAreaRef = ref(null)
 
 const handleWheel = (e) => {
+  if (props.existingFiles.length === 0) return
   e.preventDefault()
   fileAreaRef.value.scrollLeft += e.deltaY + e.deltaX
 }

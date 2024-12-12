@@ -72,6 +72,7 @@ const handleDragOver = (e) => {
 }
 
 const handleWheel = (e) => {
+  if (attachedFiles.value.length + existingFiles.value.length === 0) return
   e.preventDefault()
   fileAreaRef.value.scrollLeft += e.deltaY + e.deltaX
 }
