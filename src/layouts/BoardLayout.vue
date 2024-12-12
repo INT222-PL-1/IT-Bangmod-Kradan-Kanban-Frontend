@@ -117,8 +117,7 @@ watch(() => route.name, () => {
       <IconSVG iconName="itbkk-logo" scale="2.25" size="2.25rem" />
       <div class="w-9/12">
         <div class="opacity-60">
-          <span class="truncate text-sm">{{ boardStore.currentBoard?.owner.name }}</span>
-          <span> /</span>
+          <span class="truncate text-sm">{{ boardStore.currentBoard?.owner.name }}&nbsp;/</span>
         </div>
         <div class="truncate text-lg -mt-1">{{ boardStore.currentBoard?.name }}</div>
       </div>
