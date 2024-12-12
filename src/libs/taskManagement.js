@@ -114,6 +114,7 @@ export async function deleteTask(taskId, boardId) {
  */
 export async function uploadTaskAttachments(taskId, boardId, files, onFileProgress) {
   const userStore = useUserStore()
+
   const url = `${BASE_URL}/${boardId}/tasks/${taskId}/files`
 
   const accessToken = userStore.isMSAuthenticated ? userStore.user.idToken : localStorage.getItem('itbkk_access_token')

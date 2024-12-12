@@ -159,13 +159,14 @@ async function doCreateTask() {
     })
     bodyScrollUnlock()
     router.push({ name: 'all-task' })
-  } else {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
-      status: 'error'
-    })
   }
+  // else {
+  //   toastStore.createToast({
+  //     title: 'Error',
+  //     description: `An error has occurred.\n${res.statusCode === HttpStatusCode.UNAUTHORIZED ? 'Please try again later.' : res.message}`,
+  //     status: 'error'
+  //   })
+  // }
 }
 
 async function doUpdateTask() {
@@ -179,13 +180,14 @@ async function doUpdateTask() {
     })
     bodyScrollUnlock()
     router.push({ name: 'all-task' })
-  } else {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error occurred while updating the task.\nPlease try again later.`,
-      status: 'error'
-    })
-  }
+  } 
+  // else {
+  //   toastStore.createToast({
+  //     title: 'Error',
+  //     description: `An error occurred while updating the task.\nPlease try again later.`,
+  //     status: 'error'
+  //   })
+  // }
 }
 
 async function doUploadAttachments() {
@@ -211,13 +213,14 @@ async function doUploadAttachments() {
       attachedFiles.value = []
       taskModalData.value.attachments = attachedFileList
     }
-  } else {
-    toastStore.createToast({
-      title: 'Error',
-      description: `An error occurred while uploading attachments.\nPlease try again later.`,
-      status: 'error'
-    })
   }
+  // else {
+  //   toastStore.createToast({
+  //     title: 'Error',
+  //     description: `An error occurred while uploading attachments.\nPlease try again later.`,
+  //     status: 'error'
+  //   })
+  // }
 }
 
 onMounted(async () => {
