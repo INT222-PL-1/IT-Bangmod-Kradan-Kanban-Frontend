@@ -28,6 +28,7 @@ const statusBtn = ref(null)
 const sidebarOpenState = ref(false)
 const handleSignButtonClick = async () => {
   if (userStore.user) {
+    sidebarOpenState.value = false
     emits('clickSignOut')
   } else {
     emits('clickLogin')
