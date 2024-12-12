@@ -110,11 +110,15 @@ export const useMsalStore = defineStore('msal', () => {
   }
 
   async function ssoSilent() {
-    const response = await msalInstance.value.ssoSilent({
-      scopes: graphScopes.scopes
-    })
-    if (response) {
-      setActiveAccount(response.account)
+    try {
+      const response = await msalInstance.value.ssoSilent({
+        scopes: graphScopes.scopes
+      })
+      if (response) {
+        setActiveAccount(response.account)
+      }
+    } catch (error) {
+      console.warn('Silent SSO failed')
     }
   }
 
